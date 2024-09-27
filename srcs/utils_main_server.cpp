@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:31:44 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/09/27 17:51:53 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/09/27 17:54:36 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ Server ft_main_server(int mode, Server & new_main_server)
 
 Server	ft_get_main_server(void)
 {
-	return (ft_main_server(0, NULL));
+	Server null_server;
+	return (ft_main_server(0, null_server));
 }
 
 void	ft_set_main_server(Server & new_main_server)
