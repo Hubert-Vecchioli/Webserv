@@ -6,12 +6,11 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:23:30 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/09/27 17:42:31 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/09/27 17:52:06 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
-#include "signal.cpp"
+#include "webserv.hpp"
 
 int main(int ac, char **av)
 {
