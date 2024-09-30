@@ -6,13 +6,13 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:31:44 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/09/27 17:54:36 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/09/29 13:14:13 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-Server ft_main_server(int mode, Server & new_main_server)
+Server	ft_main_server(int mode, Server & new_main_server)
 {
 	static Server main_server;
 

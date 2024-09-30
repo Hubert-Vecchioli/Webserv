@@ -5,12 +5,14 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/27 17:48:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/09/27 17:53:14 by hvecchio         ###   ########.fr       */
+/*   Created: 2024/09/29 13:14:32 by hvecchio          #+#    #+#             */
+/*   Updated: 2024/09/29 13:42:46 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-void displayTimestamp(void)
+#include "webserv.hpp"
+
+void	displayTimestamp(void)
 {
 	std::time_t now = time(0);
     std::tm *date = localtime(&now);
@@ -22,5 +24,11 @@ void displayTimestamp(void)
 	std::cout << std::setfill('0') << std::setw(2) << date->tm_hour;
 	std::cout << std::setfill('0') << std::setw(2) << date->tm_min;
 	std::cout << std::setfill('0') << std::setw(2) << date->tm_sec;
-	std::cout << "]";
+	std::cout << "] ";
+}
+
+void	print(std::string message)
+{
+	displayTimestamp();
+	std::cout << message << std::endl;
 }
