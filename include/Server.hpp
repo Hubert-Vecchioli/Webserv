@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/09/29 21:27:26 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/01 08:45:51 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@
 class Server
 {
 	private:
-		bool isServerGreenlighted;
-		int serverFD;
+		bool _isServerGreenlighted;
+		int _serverFD;
 		std::map<int, Socket*>	_sockets;
 		std::map<int, Client*>	_clients;
 
