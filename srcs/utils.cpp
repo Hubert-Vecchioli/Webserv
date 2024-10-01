@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Utils.cpp                                          :+:      :+:    :+:   */
+/*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 13:14:32 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/09/29 13:42:46 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/01 12:17:54 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,11 @@ void	displayTimestamp(void)
 	std::cout << "] ";
 }
 
-void	print(std::string message)
+void	print(int i, std::string message)
 {
 	displayTimestamp();
-	std::cout << message << std::endl;
+	if(i == 1)
+		std::cout << message << std::endl;
+	else
+		std::cerr << message << std::endl;
 }

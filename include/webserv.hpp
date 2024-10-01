@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/09/29 14:55:28 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/01 12:27:47 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@
 # include <string>
 # include <cstdlib>
 # include <limits>
-
-//# include <sys/epoll.h>
+# include <netinet/in.h>
+# include <sys/epoll.h>
 
 #endif
