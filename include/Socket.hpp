@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:53:56 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/01 12:32:57 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/01 13:28:08 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,25 @@
 # define SOCKET_HPP
 
 #include "webserv.hpp"
-	// 
 
+// That can almost be replaced by a struct 
 class Socket
 {
 	private:
+		//Placeholder - check if all are needed - any are mising
+		int							_fd;
+		unsigned int				_port;
+		std::string					_ip;
+		std::vector<BlocServer>*	_servers;
 		struct sockaddr_in	_sockaddr
 
 	public:
 		Socket(void);
+		Socket(int fd, std::string ip, unsigned int port, std::vector<BlocServer>* servers);
 		Socket(Socket const & rhs);
 		Socket &operator=(Socket const & rhs);
 		~Socket(void);
+		//Todo: Add getters or move the attribute to public?
 };
 
 #endif
