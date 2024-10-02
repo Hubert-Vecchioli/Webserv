@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/02 17:09:05 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/02 19:36:22 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,46 +20,90 @@ Server::~Server()
 {
 	if (this->_serverFD != -1)
 		close(_serverFD);
-	
-	//close FD and delete associated containers
+	//close and delete all
 }
 
-void Server::init(void)
+void Server::startServer(ConfigurationFile & configurationFile)
 {
-	print(1, "[Info] - Initiating the webserv");
+	print(1, "[Info] - Starting the webserv");
 	this->_serverFD(epoll_create(MAX_EVENTS));
     if (this->_serverFD == -1)
-		print(2, "[Error] - Failure to initiate the epoll instance");
-        // Should we stop the project ?
-	std::vector<std::vector<BlockServer>> &parsed_config = this->_config.getBlockServers();
+		throw FailureInitiateEpollInstanceException();
+	//row below to do udated - containers to be modified
+	std::vector<std::vector<BlockServer>> &parsed_config = configurationFile.getBlockServers();
 	for (std::vector<BlocServer>::iterator it = parsed_config.begin(); it != parsed_config.end(); ++it)
 	{
 		int blocServersFD = socket(AF_INET, SOCK_STREAM, 0);
 		if (blocServersFD == -1)
-			print(2, "[Error] - Failure to initiate a socket while initialising servers");
-			// Should we stop the project ?
+			throw FailureInitiateSocketException();
 		epoll_event ev;
-		ev.events = EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLERR ;
+		ev.events = EPOLLRDHUP | EPOLLHUP | EPOLLERR | EPOLLIN;
 		ev.data.fd = blocServersFD;
-		int epollFDAddResult = epoll_ctl(this->_serverFD, EPOLL_CTL_ADD, blocServersFD, &ev)
+		int epollFDAddResult = epoll_ctl(this->_serverFD, EPOLL_CTL_ADD, blocServersFD, &ev);
 		if (epollFDAddResult == -1)
-			print(2, "[Error] - Failure to add the FD to the epoll listen list");
-			// Should we stop the project ?
-		this->_sockets[blocServersFD] = new Socket(blocServersFD, &it->second);
+			throw FailureAddFDToEpollException();
+		this->_sockets[blocServersFD] = new Socket(blocServersFD, &it);
+		// rendre la socket non bloquante avec fcntl()
 	}
 	this->_isServerGreenlighted = true;
 }
 
-void Server::run(void)
+void Server::runServer(void)
 {
-	
-	while(this->_isServerGreenlighted == true)
+	epoll_event	epollEvents[MAX_EVENTS];
+	try
 	{
-		//epoll_wait
+		while(this->_isServerGreenlighted == true)
+		{
+			int epollWaitResult = epoll_wait(this->_serverFD, epollEvents, MAX_EVENTS, EPOLL_MAX_WAIT_TIME_MS);
+			if (epollWaitResult == -1)
+				throw FailureEpollWaitException();
+				// Should we stop the project ? I chose to but to be reviewed
+			for (int eventId = 0; eventId < epollWaitResult; eventId++)
+				triageEvents(epollEvents, eventId);
+		}
+	}
+	catch(const std::exception& e)
+	{
+		print(2, e.what());
 	}
 }
 
 void Server::stop( void )
 {
 	this->_isServerGreenlighted(false);
+}
+
+void Server::triageEvents(epoll_event *epollEvents, int eventId)
+{
+	if (event & (EPOLLHUP | EPOLLERR | EPOLLRDHUP))
+		//Disconnect the client and print a message
+	if (event & EPOLLIN)
+		// Check it the client exists: Add a new client or manage the received request
+		// EPOLLOUT?
+}
+
+Server & getInstance(void)
+{
+	// static method to return the only instance generated
+}
+
+const char* Server::FailureInitiateEpollInstanceException::what() const throw()
+{
+	return ("[Error] - Failure to initiate the epoll instance");
+}
+
+const char* Server::FailureInitiateSocketException::what() const throw()
+{
+	return ("[Error] - Failure to initiate a socket while initialising servers");
+}
+
+const char* Server::FailureAddFDToEpollException::what() const throw()
+{
+	return ("[Error] - Failure to add the FD to the epoll listen list");
+}
+
+const char* Server::FailureEpollWaitException::what() const throw()
+{
+	return ("[Error] - Failure to add the FD to the epoll listen list");
 }
