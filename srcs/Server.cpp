@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/01 13:08:31 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/02 16:30:24 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,22 @@ void Server::init(void)
     if (this->_serverFD == -1)
 		print(2, "[Error] - Failure to initiate the epoll instance");
         // Should we stop the project ?
-	// Request a socket FD for each port to listen to - thanks to the function socket()?
-	// Return the FD and place it under watch of epoll thanks to epoll_ctl
+	std::vector<std::vector<BlockServer>> &parsed_config = this->_config.getBlockServers();
+	for (std::vector<BlocServer>::iterator it = parsed_config.begin(); it != parsed_config.end(); ++it)
+	{
+		int blocServersFD = socket(AF_INET, SOCK_STREAM, 0);
+		if (blocServersFD == -1)
+			print(2, "[Error] - Failure to initiate a socket while initialising servers");
+			// Should we stop the project ?
+		epoll_event ev;
+		ev.events = EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLERR ;
+		ev.data.fd = blocServersFD;
+		int epollFDAddResult = epoll_ctl(this->_serverFD, EPOLL_CTL_ADD, blocServersFD, &ev)
+		if (epollFDAddResult == -1)
+			print(2, "[Error] - Failure to add the FD to the epoll listen list");
+			// Should we stop the project ?
+		this->_sockets[blocServersFD] = new Socket(blocServersFD, &it->second);
+	}
 	this->_isServerGreenlighted = true;
 }
 
