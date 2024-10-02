@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:53:54 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/02 16:44:02 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/02 17:06:41 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,5 +23,5 @@ Socket::Socket(int fd, std::string ip, unsigned int port, std::vector<BlocServer
 Socket::~Socket(void)
 {
 	if (this->_fd != -1)
-		close(this->_fd); // should it be protected
+		close(this->_fd); // should it be protected?
 }

@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/02 16:38:56 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/02 17:09:05 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@ Server::Server() : _isServerGreenlighted(false), _serverFD(-1)
 
 Server::~Server()
 {
-	if (this->_epollFD != -1)
-		protectedCall(close(_epollFD), "Faild to close epoll instance", false);
+	if (this->_serverFD != -1)
+		close(_serverFD);
 	
 	//close FD and delete associated containers
 }
