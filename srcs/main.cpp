@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:23:30 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/02 18:49:38 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/03 07:00:08 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ int main(int ac, char **av)
 {
 	Server server;
 
-	// DEPRECATED ft_set_main_server(server);
 	signal(SIGINT, ft_stop_server);
 	try
 	{

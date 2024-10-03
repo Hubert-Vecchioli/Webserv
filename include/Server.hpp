@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/02 19:30:44 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/03 06:59:18 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 class Server
 {
 	private:
+		Server					_uniqueInstance;
 		bool 					_isServerGreenlighted;
 		int						_serverFD;
 		std::map<int, Socket*>	_sockets;
@@ -33,7 +34,7 @@ class Server
 		void runServer(void);
 		void stopServer(void);
 		void triageEvents(epoll_event *epollEvents, int eventId);
-		static Server & getInstance(void);
+		static const Server & getInstance(void) {return _uniqueInstance};
 		
 		class FailureInitiateEpollInstanceException : public std::exception
 		{
