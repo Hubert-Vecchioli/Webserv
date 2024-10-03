@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/02 19:36:22 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/03 07:02:53 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 Server::Server() : _isServerGreenlighted(false), _serverFD(-1)
 {
+	this->_uniqueInstance = *this;
 }
 
 Server::~Server()
