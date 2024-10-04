@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/03 07:00:29 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/04 06:25:15 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 # include <limits>
 # include <netinet/in.h>
 # include <sys/epoll.h>
+# include <fcntl.h>
 
 #define MAX_EVENTS 50 // to be increassed later on
 #define EPOLL_MAX_WAIT_TIME_MS 1000 // to be modified later on

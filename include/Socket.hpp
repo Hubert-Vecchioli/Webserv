@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:53:56 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/03 06:51:36 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/04 06:11:02 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,38 @@
 class Socket
 {
 	private:
-		//Placeholder - check if all are needed - any are mising
+		std::string					_ip;
 		int							_fd;
-		std::vector<BlocServer>*	_serverBlocks;
+		unsigned int				_port;
 		struct sockaddr_in	_sockaddr
 
 	public:
 		Socket(void);
-		Socket(int fd, std::vector<BlocServer>* servers);
+		Socket(int fd, unsigned int port, std::string ip);
 		Socket(Socket const & rhs);
 		Socket &operator=(Socket const & rhs);
 		~Socket(void);
-		//Todo: Add getters or move the attribute to public?
+
+		class FailureSetNonBlockingSocketException : public std::exception
+		{
+			public:
+				virtual const char* what() const throw();
+		};
+		class FailureUpdateSocketException : public std::exception
+		{
+			public:
+				virtual const char* what() const throw();
+		};
+		class FailureBindSocketException : public std::exception
+		{
+			public:
+				virtual const char* what() const throw();
+		};
+		class FailureSocketListenException : public std::exception
+		{
+			public:
+				virtual const char* what() const throw();
+		};
 };
 
 #endif
