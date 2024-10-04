@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:55:36 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/04 17:26:27 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/04 18:38:22 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ class ConfigurationFile
 		int 											_workers;
 		std::string										_error_log;
 		std::vector<ServerBlock> 						_serverBlocks;
-		//std::vector<pair <int, int> > 	_ip_port;
 		//std::vector<BlocServer>							_configurationMapIpPort; // string with the Port and IP? or all within the bloc server?
 	public:
 		ConfigurationFile(void);
@@ -38,6 +37,7 @@ class ConfigurationFile
 		void parseServerBlock(void);
 		
 		// method getBlockServers to get _configurationMapIpPort
+		std::vector<pair<int, int> > getserverIPandPorts(void) const;
 };
 
 #endif
