@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/04 06:22:31 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/04 06:28:07 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void Server::startServer(ConfigurationFile & configurationFile)
 	this->_serverFD(epoll_create(MAX_EVENTS));
     if (this->_serverFD == -1)
 		throw FailureInitiateEpollInstanceException();
-	std::vector<pair <std::string ip, unsigned int port> ip_port>  = configurationFile.getIpPorts();
+	std::vector<pair <std::string ip, unsigned int port> ip_port> &parsed_config = configurationFile.getIpPorts();
 	for (std::vector<BlocServer>::iterator it = parsed_config.begin(); it != parsed_config.end(); ++it)
 	{
 		if (socket(AF_INET, SOCK_STREAM, 0) == -1)
@@ -40,7 +40,7 @@ void Server::startServer(ConfigurationFile & configurationFile)
 		ev.data.fd = blocServersFD;
 		if (epoll_ctl(this->_serverFD, EPOLL_CTL_ADD, blocServersFD, &ev) == -1)
 			throw FailureAddFDToEpollException();
-		this->_sockets[blocServersFD] = new Socket(blocServersFD); // rendre la socket non bloquante avec fcntl()
+		this->_sockets[blocServersFD] = new Socket(blocServersFD, parsed_config.second, parsed_config.first);
 	}
 	this->_isServerGreenlighted = true;
 	print(1, "[Info] - Webserv initialised");
