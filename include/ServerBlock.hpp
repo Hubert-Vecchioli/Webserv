@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerBlock.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:07:40 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/02 15:04:32 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/04 17:27:52 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@
 class ServerBlock
 {
 	private:
+		std::string 	_listen;
+		std::string 	_server_name;
+		std::string 	_root;
 
 	public:
 		ServerBlock(void);
