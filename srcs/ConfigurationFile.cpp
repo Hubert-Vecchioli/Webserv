@@ -63,3 +63,10 @@ void ConfigurationFile::parseServerBlock(void) {
 		this->_serverBlocks.push_back(block);
 	}
 }
+
+std::vector<pair<int, int> > ConfigurationFile::getserverIPandPorts(void) const {
+	std::vector<pair<int, int> > ip_ports;
+	for (std::vector<ServerBlock>::const_iterator it = this->_serverBlocks.begin(); it != this->_serverBlocks.end(); ++it)
+		ip_ports.push_back(it->getIPandPort());
+	return ip_ports;
+}
