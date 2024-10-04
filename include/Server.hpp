@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/03 07:03:03 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/04 16:29:45 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,9 @@ class Server
 		int						_serverFD;
 		std::map<int, Socket*>	_sockets;
 		std::map<int, Client*>	_clients;
+		
+		void _disconnectFD(int listenedFD);
+		void _triageEpollEvents(epoll_event & epollEvents);
 
 	public:
 		Server(void);
@@ -33,7 +36,6 @@ class Server
 		void startServer(ConfigurationFile & configurationFile);
 		void runServer(void);
 		void stopServer(void);
-		void triageEvents(epoll_event *epollEvents, int eventId);
 		static const Server & getInstance(void) {return _uniqueInstance};
 		
 		class FailureInitiateEpollInstanceException : public std::exception
@@ -46,12 +48,22 @@ class Server
 			public:
 				virtual const char* what() const throw();
 		};
-		class FailureAddFDToEpollException : public std::exception
+		class FailureAddFDEpollException : public std::exception
 		{
 			public:
 				virtual const char* what() const throw();
 		};
 		class FailureEpollWaitException : public std::exception
+		{
+			public:
+				virtual const char* what() const throw();
+		};
+		class DisconnectedClientFDException : public std::exception
+		{
+			public:
+				virtual const char* what() const throw();
+		};
+		class FailureDeleteFDEpollException : public std::exception
 		{
 			public:
 				virtual const char* what() const throw();
