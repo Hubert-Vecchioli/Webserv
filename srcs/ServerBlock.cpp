@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:08:49 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/04 18:35:49 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/05 15:29:59 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,7 @@
 ServerBlock::ServerBlock(std::string block) {
 	parseListen(block);
 	parseServerName(block);
-	while (pos < end) {
-		pos = block.find("root", pos);
-		if (pos == std::string::npos)
-			break;
-		prev = pos;
-		pos = block.find(";", pos);
-		if (pos == std::string::npos)
-			break;
-		this->_root = block.substr(prev + 5, pos - prev - 5);
-	}
+	//parseLocationBlock(block);
 }
 
 ServerBlock::ServerBlock(ServerBlock const & copy) {
@@ -76,14 +67,29 @@ void ServerBlock::parseServerName(std::string block) {
 	}
 }
 
-//need to add the parsing to Location blocks
+void ServerBlock::parseLocationBlock(std::string block) {
+	std::string::size_type pos = 0;
+	std::string::size_type prev = 0;
+	std::string::size_type end = block.size();
+	while (pos < end) {
+		pos = block.find("location ", pos);
+		if (pos == std::string::npos)
+			break;
+		prev = pos;
+		pos = block.find("}", pos);
+		if (pos == std::string::npos)
+			break;
+		std::string locationBlock = block.substr(prev, pos - prev);
+		LocationBlock block(locationBlock);
+		this->_locationBlocks.push_back(block);
+	}
+}
 
 void ServerBlock::parseIPandPort(std::string block) {
 	std::regex ip_regex(R"(listen (\d+\.\d+\.\d+\.\d+) (\d+);)");
 	std::smatch match;
 	if (std::regex_search(block, match, ip_regex)) {
-		this->_listen = std::make_pair(inet_addr(match[1].str().c_str()), //using inet_addr to convert string to int <arpa/inet.h> needed
-						std::atoi(match[2].str().c_str()));
+		this->_listen = std::make_pair(match[1].str(), std::atoi(match[2].str().c_str()));
 		return ;
 	}
 	throw std::runtime_error("Error: invalid listen directive");

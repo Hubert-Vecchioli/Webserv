@@ -24,6 +24,8 @@ ConfigurationFile &ConfigurationFile::operator=(ConfigurationFile const & copy) 
 	return *this;
 }
 
+ConfigurationFile::~ConfigurationFile(void) {}
+
 void ConfigurationFile::read(void) {
 	if (this->_filename.empty())
 		throw std::runtime_error("Error: no filename provided");
@@ -37,6 +39,7 @@ void ConfigurationFile::read(void) {
 }
 
 void ConfigurationFile::read(std::string filename) {
+	this->_filename = filename;
 	std::ifstream file(this->_filename.c_str());
 	if (!file.is_open())
 		throw std::runtime_error("Error: could not open file");
@@ -44,6 +47,12 @@ void ConfigurationFile::read(std::string filename) {
 	while (std::getline(file, line))
 		 this->_content.append(line);
 	file.close();
+}
+
+void ConfigurationFile::parseBase(void) {
+	parseUser();
+	parseWorkerProcesses();
+	parseErrorLog();
 }
 
 void ConfigurationFile::parseServerBlock(void) {
@@ -64,8 +73,56 @@ void ConfigurationFile::parseServerBlock(void) {
 	}
 }
 
-std::vector<pair<int, int> > ConfigurationFile::getserverIPandPorts(void) const {
-	std::vector<pair<int, int> > ip_ports;
+void ConfigurationFile::parseUser(void) {
+	std::string::size_type pos = 0;
+	std::string::size_type prev = 0;
+	std::string::size_type end = this->_content.size();
+	while (pos < end) {
+		pos = this->_content.find("user", pos);
+		if (pos == std::string::npos)
+			break;
+		prev = pos;
+		pos = this->_content.find(";", pos);
+		if (pos == std::string::npos)
+			break;
+		this->_user = this->_content.substr(prev + 5, pos - prev - 5);
+	}
+}
+
+void ConfigurationFile::parseWorkerProcesses(void) {
+	std::string::size_type pos = 0;
+	std::string::size_type prev = 0;
+	std::string::size_type end = this->_content.size();
+	while (pos < end) {
+		pos = this->_content.find("worker_processes", pos);
+		if (pos == std::string::npos)
+			break;
+		prev = pos;
+		pos = this->_content.find(";", pos);
+		if (pos == std::string::npos)
+			break;
+		this->_workers = std::atoi(this->_content.substr(prev + 16, pos - prev - 16).c_str());
+	}
+}
+
+void ConfigurationFile::parseErrorLog(void) {
+	std::string::size_type pos = 0;
+	std::string::size_type prev = 0;
+	std::string::size_type end = this->_content.size();
+	while (pos < end) {
+		pos = this->_content.find("error_log", pos);
+		if (pos == std::string::npos)
+			break;
+		prev = pos;
+		pos = this->_content.find(";", pos);
+		if (pos == std::string::npos)
+			break;
+		this->_error_log = this->_content.substr(prev + 10, pos - prev - 10);
+	}
+}
+
+std::vector<std::pair<std::string, int> > ConfigurationFile::getserverIPandPorts(void) const {
+	std::vector<pair<std::string, int> > ip_ports;
 	for (std::vector<ServerBlock>::const_iterator it = this->_serverBlocks.begin(); it != this->_serverBlocks.end(); ++it)
 		ip_ports.push_back(it->getIPandPort());
 	return ip_ports;
