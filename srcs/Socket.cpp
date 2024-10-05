@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:53:54 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/04 06:23:14 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/04 21:07:25 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,9 @@ Socket::Socket(int fd, unsigned int port, std::string ip) : _fd(fd), _port(port)
 			throw FailureUpdateSocketException();
 		if (bind(this->_fd, (struct sockaddr *)&this->_sockaddr, sizeof(this->_sockaddr)) == -1)
 			throw FailureBindSocketException();
-		if (listen(this->_fd, 100) == -1) // 100 here is the max number of incoming connections that can be queued up while the server is busy handling other connections
+		if (listen(this->_fd, 100) == -1) 
+			// this 
+			// 100 here is the max number of incoming connections that can be queued up while the server is busy handling other connections
 			throw FailureSocketListenException();
 	}
 	catch (std::exception &e)

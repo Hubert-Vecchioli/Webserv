@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/04 17:06:05 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/05 07:36:06 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,10 @@ void Server::startServer(ConfigurationFile & configurationFile)
 	std::vector<pair <std::string ip, unsigned int port> ip_port> &parsed_config = configurationFile.getIpPorts();
 	for (std::vector<BlocServer>::iterator it = parsed_config.begin(); it != parsed_config.end(); ++it)
 	{
-		if (socket(AF_INET, SOCK_STREAM, 0) == -1)
+		int blocServersFD = socket(AF_INET, SOCK_STREAM, 0);
+		if (blocServersFD == -1)
 			throw FailureInitiateSocketException();
-		epoll_event ev;
-		ev.events = EPOLLRDHUP | EPOLLHUP | EPOLLERR | EPOLLIN;
-		ev.data.fd = blocServersFD;
-		if (epoll_ctl(this->_serverFD, EPOLL_CTL_ADD, blocServersFD, &ev) == -1)
-			throw FailureAddFDToEpollException();
+		modifyEpollCTL(this->_serverFD, blocServersFD, EPOLL_CTL_ADD);
 		this->_sockets[blocServersFD] = new Socket(blocServersFD, parsed_config.second, parsed_config.first);
 	}
 	this->_isServerGreenlighted = true;
@@ -93,30 +90,22 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 }
 void Server::_addNewClient(int listenedFD)
 {
-	struct sockaddr	sockAddr;
+	struct sockaddr_in	sockAddr; // because it is an IPV4
 	socklen_t addrLen = sizeof(sockAddr);
 	int clientFD = accept(fd, &sockAddr, &addrLen);
 	if(clientFD == -1)
-		throw AcceptFailureException();
+		throw Server::AcceptFailureException();
 	this->_clients[clientFD] = new Client(); // create a client based on the fd and the initial socket
 	if(fcntl(clientFD, F_SETFL, O_NONBLOCK) == -1)
 		throw Socket::FailureSetNonBlockingSocketException();
-	// part below copy/pasted from the server initialisation method -> to be factorised in a function
-	epoll_event ev;
-	ev.events = EPOLLRDHUP | EPOLLHUP | EPOLLERR | EPOLLIN;
-	ev.data.fd = clientFD;
-	if (epoll_ctl(this->_serverFD, EPOLL_CTL_ADD, clientFD, &ev) == -1)
-		throw FailureAddFDToEpollException();
+	modifyEpollCTL(this->_serverFD, clientFD, EPOLL_CTL_ADD);
 	displayTimestamp(void);
 	std::cout << "[Info] - New client (using FD " << << "added on the FD: "<< listenedFD << std::endl;
 }
 
 void Server::_disconnectFD(int listenedFD)
 {
-	epoll_event ev;
-	ev.data.fd = listenedFD;
-	if (epoll_ctl(this->_serverFD, EPOLL_CTL_DEL, listenedFD, &ev) == -1)
-		throw FailureDeleteFDEpollException();
+	modifyEpollCTL(this->_serverFD, listenedFD, EPOLL_CTL_DEL);
 	if (this->_clients.count(listenedFD))
 	{
 		delete this->_clients[listenedFD];
@@ -135,14 +124,9 @@ const char* Server::FailureInitiateSocketException::what() const throw()
 	return ("[Error] - Failure to initiate a socket while initialising servers");
 }
 
-const char* Server::FailureAddFDToEpollException::what() const throw()
+const char* Server::FailureModifyFDEpollException::what() const throw()
 {
-	return ("[Error] - Failure to add the FD to the epoll listen list");
-}
-
-const char* Server::FailureDeleteFDEpollException::what() const throw()
-{
-	return ("[Error] - Failure to delete a FD from the epoll listen list");
+	return ("[Error] - Failure to update the FD from the epoll listen list");
 }
 
 const char* Server::FailureEpollWaitException::what() const throw()
@@ -153,4 +137,9 @@ const char* Server::FailureEpollWaitException::what() const throw()
 const char* Server::DisconnectedClientFDException::what() const throw()
 {
 	return ("[Error] - Client FD disconnected, associated clients are erased");
+}
+
+const char* Server::AcceptFailureException::what() const throw()
+{
+	return ("[Error] - Failure to accept the new client's FD");
 }
