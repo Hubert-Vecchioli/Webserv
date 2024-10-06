@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/05 07:36:06 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 09:34:01 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void Server::startServer(ConfigurationFile & configurationFile)
     if (this->_serverFD == -1)
 		throw FailureInitiateEpollInstanceException();
 	std::vector<pair <std::string ip, unsigned int port> ip_port> &parsed_config = configurationFile.getIpPorts();
-	for (std::vector<BlocServer>::iterator it = parsed_config.begin(); it != parsed_config.end(); ++it)
+	for (std::vector<pair <std::string ip, unsigned int port> ip_port>::iterator it = parsed_config.begin(); it != parsed_config.end(); ++it)
 	{
 		int blocServersFD = socket(AF_INET, SOCK_STREAM, 0);
 		if (blocServersFD == -1)
@@ -73,11 +73,13 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 {
 	try
 	{
-		if(epollEvents.events & (EPOLLHUP | EPOLLERR | EPOLLRDHUP))// Stop listening to this fd and remove the associated clients
-			this->_disconnectFD(epollEvents.data.fd);
+		if(epollEvents.events & (EPOLLHUP | EPOLLERR | EPOLLRDHUP))t
+			this->_disconnectClient(epollEvents.data.fd);// Stop listening to this clien
 		if (epollEvents.events & EPOLLIN)
 		{
-			if (!this->_clients.count(epollEvents.data.fd))
+			if (this->_clients[epollEvents.data.fd])
+				// handle request
+			else
 				this->_addNewClient(epollEvents.data.fd);
 		}
 			// Check it the client exists: Add a new client or manage the received request
@@ -103,7 +105,7 @@ void Server::_addNewClient(int listenedFD)
 	std::cout << "[Info] - New client (using FD " << << "added on the FD: "<< listenedFD << std::endl;
 }
 
-void Server::_disconnectFD(int listenedFD)
+void Server::_disconnectClient(int listenedFD)
 {
 	modifyEpollCTL(this->_serverFD, listenedFD, EPOLL_CTL_DEL);
 	if (this->_clients.count(listenedFD))

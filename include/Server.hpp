@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/05 07:29:25 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/05 07:39:27 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ class Server
 		std::map<int, Socket*>	_sockets;
 		std::map<int, Client*>	_clients;
 		
-		void _disconnectFD(int listenedFD);
+		void _disconnectClient(int listenedFD);
 		void _triageEpollEvents(epoll_event & epollEvents);
 
 	public:
