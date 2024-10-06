@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 09:48:01 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 09:55:11 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ void Server::runServer(void)
 				throw FailureEpollWaitException();
 			for (int eventId = 0; eventId < epollWaitResult; ++eventId)
 				this->_triageEpollEvents(epollEvents[eventId]);
+			this->_reviewClientsHaveNoTimeout();
 		}
 	}
 	catch(const std::exception& e)
@@ -68,12 +69,16 @@ void Server::runServer(void)
 		print(2, e.what());
 	}
 }
+void Server::_reviewClientsHaveNoTimeout(void)
+{
+	for(std::map<int, Client*>::iterator it = this->_clients.begin(); it != this->_clients.begin(); ++it)
+}
 
 void Server::_triageEpollEvents(epoll_event & epollEvents)
 {
 	try
 	{
-		if(epollEvents.events & (EPOLLHUP | EPOLLERR | EPOLLRDHUP)) // TODO: ajouter une fonction qui loop sur les clients et verifie si ils ne timeout pas
+		if(epollEvents.events & (EPOLLHUP | EPOLLERR | EPOLLRDHUP)) 
 			this->_disconnectClient(epollEvents.data.fd);// Stop listening to this client
 		if (epollEvents.events & EPOLLIN)
 		{

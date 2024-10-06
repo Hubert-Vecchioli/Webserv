@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:23:30 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/03 07:00:08 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 09:50:43 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,6 @@ int main(int ac, char **av)
 		print(2, e.what());
 		return (1);
 	}
-	print(1, "[Info] - Webserv is stopped");
+	print(1, "[Info] - Webserv is now stopped");
 	return (0);
 }

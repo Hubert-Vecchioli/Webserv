@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/09/29 21:26:57 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 10:00:42 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 class Client
 {
 	private:
-
+		std::time_t _lastActionTimeStamp;
 	public:
 		Client(void);
 		Client(Client const & rhs);
