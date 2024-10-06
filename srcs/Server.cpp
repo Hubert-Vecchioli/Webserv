@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 09:55:11 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 10:10:27 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,9 +69,25 @@ void Server::runServer(void)
 		print(2, e.what());
 	}
 }
+
+//the function below has an ugly use of exceptions, stucture to be reviewed
 void Server::_reviewClientsHaveNoTimeout(void)
 {
 	for(std::map<int, Client*>::iterator it = this->_clients.begin(); it != this->_clients.begin(); ++it)
+	{
+		if (std::time(nullptr) - it->second->_lastActionTimeStamp > TIMEOUT_LIMIT_SEC)
+		{
+			try
+			{
+				this->_disconnectClient(it->first);
+			}
+			catch(const std::exception& e)
+			{
+				print(2, e.what());
+			}
+			
+		}	
+	}
 }
 
 void Server::_triageEpollEvents(epoll_event & epollEvents)
@@ -84,11 +100,10 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 		{
 			if (this->_clients[epollEvents.data.fd])
 				// handle request
+				// update the client _lastActionTimeStamp
 			else
 				this->_addNewClient(epollEvents.data.fd);
 		}
-			// Check it the client exists: Add a new client or manage the received request
-			// EPOLLOUT?
 	}
 	catch(const std::exception& e)
 	{
