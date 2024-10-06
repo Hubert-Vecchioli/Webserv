@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 16:15:03 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 16:20:30 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,6 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 		{
 			if (Client::findInstanceWithFD(this->_clients, epollEvents.data.fd))
 				this->_receiveRequest(epollEvents.data.fd);
-				// handle request & update the client _lastActionTimeStamp
 			else
 				this->_addNewClient(epollEvents.data.fd);
 		}
