@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 09:34:01 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 09:48:01 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Server::~Server()
 {
 	if (this->_serverFD != -1)
 		close(_serverFD);
-	//close and delete all
+	//close and delete all the clients & sockets
 }
 
 void Server::startServer(ConfigurationFile & configurationFile)
@@ -73,8 +73,8 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 {
 	try
 	{
-		if(epollEvents.events & (EPOLLHUP | EPOLLERR | EPOLLRDHUP))t
-			this->_disconnectClient(epollEvents.data.fd);// Stop listening to this clien
+		if(epollEvents.events & (EPOLLHUP | EPOLLERR | EPOLLRDHUP)) // TODO: ajouter une fonction qui loop sur les clients et verifie si ils ne timeout pas
+			this->_disconnectClient(epollEvents.data.fd);// Stop listening to this client
 		if (epollEvents.events & EPOLLIN)
 		{
 			if (this->_clients[epollEvents.data.fd])
@@ -98,11 +98,11 @@ void Server::_addNewClient(int listenedFD)
 	if(clientFD == -1)
 		throw Server::AcceptFailureException();
 	this->_clients[clientFD] = new Client(); // create a client based on the fd and the initial socket
-	if(fcntl(clientFD, F_SETFL, O_NONBLOCK) == -1)
+	if(fcntl(clientFD, F_SETFL, O_NONBLOCK) == -1) // Set the socket to non-blocking
 		throw Socket::FailureSetNonBlockingSocketException();
 	modifyEpollCTL(this->_serverFD, clientFD, EPOLL_CTL_ADD);
 	displayTimestamp(void);
-	std::cout << "[Info] - New client (using FD " << << "added on the FD: "<< listenedFD << std::endl;
+	std::cout << "[Info] - New client added (connecting to FD " << listenedFD << ", accepted on the FD: "<< clientFD << " )" << std::endl;
 }
 
 void Server::_disconnectClient(int listenedFD)
