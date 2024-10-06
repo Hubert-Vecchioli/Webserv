@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 09:52:56 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 14:53:51 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,13 @@ class Server
 		Server &				_uniqueInstance;
 		bool 					_isServerGreenlighted;
 		int						_serverFD;
-		std::map<int, Socket*>	_sockets;
-		std::map<int, Client*>	_clients;
+		std::vector<Socket*>	_sockets;
+		std::vector<Client*>	_clients;
 		
 		void _disconnectClient(int listenedFD);
 		void _triageEpollEvents(epoll_event & epollEvents);
 		void _reviewClientsHaveNoTimeout(void);
+		void _receiveRequest(void);
 
 	public:
 		Server(void);

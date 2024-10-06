@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 10:06:25 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 14:53:35 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 
 # include <iostream>
 # include <map>
+# include <vector>
 # include <iomanip>
 # include <ctime>
 # include <string>

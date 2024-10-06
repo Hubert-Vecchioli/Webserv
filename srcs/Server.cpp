@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 10:10:27 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 15:06:56 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,13 @@ void Server::startServer(ConfigurationFile & configurationFile)
 		if (blocServersFD == -1)
 			throw FailureInitiateSocketException();
 		modifyEpollCTL(this->_serverFD, blocServersFD, EPOLL_CTL_ADD);
-		this->_sockets[blocServersFD] = new Socket(blocServersFD, parsed_config.second, parsed_config.first);
+		this->_sockets.push_back(new Socket(blocServersFD, parsed_config.second, parsed_config.first));
 	}
 	this->_isServerGreenlighted = true;
 	print(1, "[Info] - Webserv initialised");
 }
 
-void Server::stop( void )
+void Server::stop(void)
 {
 	this->_isServerGreenlighted(false);
 }
@@ -73,13 +73,13 @@ void Server::runServer(void)
 //the function below has an ugly use of exceptions, stucture to be reviewed
 void Server::_reviewClientsHaveNoTimeout(void)
 {
-	for(std::map<int, Client*>::iterator it = this->_clients.begin(); it != this->_clients.begin(); ++it)
+	for(std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.begin(); ++it)
 	{
-		if (std::time(nullptr) - it->second->_lastActionTimeStamp > TIMEOUT_LIMIT_SEC)
+		if (std::time(nullptr) - it->_lastActionTimeStamp > TIMEOUT_LIMIT_SEC)
 		{
 			try
 			{
-				this->_disconnectClient(it->first);
+				this->_disconnectClient(it->getFD());
 			}
 			catch(const std::exception& e)
 			{
@@ -98,9 +98,8 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 			this->_disconnectClient(epollEvents.data.fd);// Stop listening to this client
 		if (epollEvents.events & EPOLLIN)
 		{
-			if (this->_clients[epollEvents.data.fd])
-				// handle request
-				// update the client _lastActionTimeStamp
+			if (Client::findInstanceWithFD(this->_clients, epollEvents.data.fd))
+				// handle request & update the client _lastActionTimeStamp
 			else
 				this->_addNewClient(epollEvents.data.fd);
 		}
@@ -110,6 +109,14 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 		std::cerr << e.what() << '\n';
 	}
 }
+
+void Server::_receiveRequest(void)
+{
+	// receive the request via recv
+	
+	
+}
+
 void Server::_addNewClient(int listenedFD)
 {
 	struct sockaddr_in	sockAddr; // because it is an IPV4
@@ -117,7 +124,7 @@ void Server::_addNewClient(int listenedFD)
 	int clientFD = accept(fd, &sockAddr, &addrLen);
 	if(clientFD == -1)
 		throw Server::AcceptFailureException();
-	this->_clients[clientFD] = new Client(); // create a client based on the fd and the initial socket
+	this->_clients.push_back(new Client(clientFD)); // create a client based on the fd and the initial socket
 	if(fcntl(clientFD, F_SETFL, O_NONBLOCK) == -1) // Set the socket to non-blocking
 		throw Socket::FailureSetNonBlockingSocketException();
 	modifyEpollCTL(this->_serverFD, clientFD, EPOLL_CTL_ADD);
@@ -127,11 +134,12 @@ void Server::_addNewClient(int listenedFD)
 
 void Server::_disconnectClient(int listenedFD)
 {
+	Client clientToDisconnect = Client::findInstanceWithFD(this->_clients, listenedFD);
 	modifyEpollCTL(this->_serverFD, listenedFD, EPOLL_CTL_DEL);
-	if (this->_clients.count(listenedFD))
+	if (clientToDisconnect)
 	{
-		delete this->_clients[listenedFD];
-		this->_clients.erase(listenedFD);
+		delete *clientToDisconnect;
+		this->_clients.erase(clientToDisconnect);
 	}
 	throw DisconnectedClientFDException();
 }
