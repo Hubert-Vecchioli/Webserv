@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 15:06:56 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 15:14:38 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,11 +121,11 @@ void Server::_addNewClient(int listenedFD)
 {
 	struct sockaddr_in	sockAddr; // because it is an IPV4
 	socklen_t addrLen = sizeof(sockAddr);
-	int clientFD = accept(fd, &sockAddr, &addrLen);
+	int clientFD = accept(listenedFD, &sockAddr, &addrLen);
 	if(clientFD == -1)
 		throw Server::AcceptFailureException();
-	this->_clients.push_back(new Client(clientFD)); // create a client based on the fd and the initial socket
-	if(fcntl(clientFD, F_SETFL, O_NONBLOCK) == -1) // Set the socket to non-blocking
+	this->_clients.push_back(new Client(clientFD, Socket::findInstanceWithFD(this->_sockets, listenedFD)));
+	if(fcntl(clientFD, F_SETFL, O_NONBLOCK) == -1)
 		throw Socket::FailureSetNonBlockingSocketException();
 	modifyEpollCTL(this->_serverFD, clientFD, EPOLL_CTL_ADD);
 	displayTimestamp(void);

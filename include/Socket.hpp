@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:53:56 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/04 16:41:45 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 15:15:08 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,9 @@ class Socket
 		Socket(Socket const & rhs);
 		Socket &operator=(Socket const & rhs);
 		~Socket(void);
+		
+		static Socket* findInstanceWithFD(std::vector<Socket>& vector, int fd);
+
 
 		class FailureSetNonBlockingSocketException : public std::exception
 		{
