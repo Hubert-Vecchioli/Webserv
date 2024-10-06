@@ -6,13 +6,18 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:53:51 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 15:02:15 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 15:10:01 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-Client::Client() : _lastActionTimeStamp(std::time(nullptr))
+Client::Client() : _lastActionTimeStamp(std::time(nullptr)), _fd(-1)
+{
+	
+}
+
+Client::Client(int fd) : _lastActionTimeStamp(std::time(nullptr)), _fd(fd)
 {
 	
 }

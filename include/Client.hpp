@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 15:03:03 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 15:09:30 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ class Client
 		int			_fd;
 	public:
 		Client(void);
+		Client(int fd);
 		Client(Client const & rhs);
 		Client &operator=(Client const & rhs);
 		~Client(void);
