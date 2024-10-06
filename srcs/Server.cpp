@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 15:19:12 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 16:15:03 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Server::~Server()
 {
 	if (this->_serverFD != -1)
 		close(_serverFD);
-	//close and delete all the clients & sockets
+	//close and delete all the clients & sockets & requests
 }
 
 void Server::startServer(ConfigurationFile & configurationFile)
@@ -99,6 +99,7 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 		if (epollEvents.events & EPOLLIN)
 		{
 			if (Client::findInstanceWithFD(this->_clients, epollEvents.data.fd))
+				this->_receiveRequest(epollEvents.data.fd);
 				// handle request & update the client _lastActionTimeStamp
 			else
 				this->_addNewClient(epollEvents.data.fd);
@@ -110,11 +111,20 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 	}
 }
 
-void Server::_receiveRequest(void)
+void Server::_receiveRequest(int fd)
 {
-	// receive the request via recv
-	
-	
+	Client* clientSendingARequest = Client::findInstanceWithFD(this->_clients, fd);
+	clientSendingARequest->updateLastActionTimeStamp();
+	displayTimestamp(void);
+	std::cout << "[Info] - Receiving request from Client FD : " << fd << " )" << std::endl;
+	char rawHTTPRequest[MAX_REQUEST_SIZE + 1];
+	int sizeHTTPRequest = recv(fd, rawHTTPRequest, MAX_REQUEST_SIZE, 0);
+	if(sizeHTTPRequest == 0)
+		this->_disconnectClient(fd);
+	if(sizeHTTPRequest < 0)
+		throw FailureToReceiveData();
+	rawHTTPRequest[sizeHTTPRequest] = 0;
+	this->request.push_back(new HttpRequest(rawHTTPRequest, sizeHTTPRequest, clientSendingARequest, fd));
 }
 
 void Server::_addNewClient(int listenedFD)
@@ -134,7 +144,7 @@ void Server::_addNewClient(int listenedFD)
 
 void Server::_disconnectClient(int listenedFD)
 {
-	Client clientToDisconnect = Client::findInstanceWithFD(this->_clients, listenedFD);
+	Client* clientToDisconnect = Client::findInstanceWithFD(this->_clients, listenedFD);
 	modifyEpollCTL(this->_serverFD, listenedFD, EPOLL_CTL_DEL);
 	if (clientToDisconnect)
 	{
@@ -172,4 +182,9 @@ const char* Server::DisconnectedClientFDException::what() const throw()
 const char* Server::AcceptFailureException::what() const throw()
 {
 	return ("[Error] - Failure to accept the new client's FD");
+}
+
+const char* Server::FailureToReceiveData::what() const throw()
+{
+	return ("[Error] - The function recv failed"); //TBD if the client FD is required to debug
 }

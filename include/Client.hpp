@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 15:09:30 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/06 16:10:57 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ class Client
 		~Client(void);
 		
 		int getFD(void);
+		void updateLastActionTimeStamp();
 		static Client* findInstanceWithFD(std::vector<Client>& vector, int fd);
 };
 
