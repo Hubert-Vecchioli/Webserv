@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 16:38:50 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/07 16:57:45 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,9 @@ class Server
 		void _disconnectClient(int listenedFD);
 		void _triageEpollEvents(epoll_event & epollEvents);
 		void _reviewClientsHaveNoTimeout(void);
-		void _receiveRequest(void);
+		void _receiveRequest(int fd);
+		void _sendRequest(int fd)
+		void _reviewRequestsCompleted(void);
 
 	public:
 		Server(void);

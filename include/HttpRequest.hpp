@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 15:27:55 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/07 15:17:00 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,15 @@ class HttpRequest
 {
 	private:
 		Client*								_client;
-		Socket*								_socket;
+		HttpResponse*						_response;
 
 	public:
 		HttpRequest(void);
 		HttpRequest(HttpRequest const & rhs);
 		HttpRequest &operator=(HttpRequest const & rhs);
 		~HttpRequest(void);
+
+		HttpResponse* getResponse(void) {return _response};
 };
 
 #endif

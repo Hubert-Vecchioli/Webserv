@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 13:14:32 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/07 12:24:18 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/07 17:11:27 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,14 @@ void	print(int i, std::string message)
 		std::cerr << message << std::endl;
 }
 
-void	modifyEpollCTL(int EpollFD, int listendFD, int epollAction)
+void	modifyEpollCTL(int EpollFD, int listendFD, int epollAction, bool isReadyToSendResponse = false)
 {
 	epoll_event ev;
 	if (epollAction != EPOLL_CTL_DEL)
+		ev.events = EPOLLOUT | EPOLLRDHUP | EPOLLHUP | EPOLLERR | EPOLLIN;
+	if (epollAction == EPOLL_CTL_MOD && isReadyToSendResponse)
 		ev.events = EPOLLRDHUP | EPOLLHUP | EPOLLERR | EPOLLIN;
 	ev.data.fd = listendFD;
 	if (epoll_ctl(EpollFD, epollAction, listendFD, &ev) == -1)
-		throw FailureAddFDToEpollException();
+		throw Server::FailureModifyFDEpollException();
 }

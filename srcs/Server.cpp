@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/07 12:01:44 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/07 17:12:14 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Server::~Server()
 {
 	if (this->_serverFD != -1)
 		close(_serverFD);
-	//close and delete all the clients & sockets & requests
+	//close and delete all the clients & sockets & requests & responses
 }
 
 void Server::startServer(ConfigurationFile & configurationFile)
@@ -62,6 +62,7 @@ void Server::runServer(void)
 			for (int eventId = 0; eventId < epollWaitResult; ++eventId)
 				this->_triageEpollEvents(epollEvents[eventId]);
 			this->_reviewClientsHaveNoTimeout();
+			this->_reviewRequestsCompleted();
 		}
 	}
 	catch(const std::exception& e)
@@ -69,7 +70,6 @@ void Server::runServer(void)
 		print(2, e.what());
 	}
 }
-
 //the function below has an ugly use of exceptions, stucture to be reviewed
 void Server::_reviewClientsHaveNoTimeout(void)
 {
@@ -90,6 +90,26 @@ void Server::_reviewClientsHaveNoTimeout(void)
 	}
 }
 
+void Server::_reviewRequestsCompleted(void)
+{
+	for(std::vector<HttpRequest*>::iterator it = this->_requests.begin(); it != this->_requests.begin(); ++it)
+	{
+		if (it->getResponse()->getResponseStatus()) // Todo? Add a timeout review on requests as well?
+		{
+			try
+			{
+				delete *(it->getResponse());
+				delete *it;
+				this->_requests.erase(it);
+			}
+			catch(const std::exception& e)
+			{
+				print(2, e.what());
+			}
+		}	
+	}
+}
+
 void Server::_triageEpollEvents(epoll_event & epollEvents)
 {
 	try
@@ -103,12 +123,24 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 			else
 				this->_addNewClient(epollEvents.data.fd);
 		}
-		// Review if we need to send data
-	}
+		
+		if (epollEvents.events & EPOLLOUT)
+		{
+			if(/*!it->getResponse()->getResponseStatus() and response is ready*/)
+				this->_sendRequest(epollEvents.data.fd);
+		}
+	}		
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
 	}
+}
+
+void Server::_sendRequest(int fd)
+{
+	int sizeSent = send(FD, /* Method to get the response*/,/* Method to get the response size*/, 0);
+	//Protection on sizeSent
+	//set the right Epoll flags (= no EPOLLOUT)
 }
 
 void Server::_receiveRequest(int fd)
