@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/07 09:47:50 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/07 12:01:44 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,7 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 			else
 				this->_addNewClient(epollEvents.data.fd);
 		}
+		// Review if we need to send data
 	}
 	catch(const std::exception& e)
 	{
