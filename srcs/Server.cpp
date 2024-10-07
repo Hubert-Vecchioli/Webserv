@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 16:20:30 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/07 09:47:50 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ void Server::_receiveRequest(int fd)
 	if(sizeHTTPRequest < 0)
 		throw FailureToReceiveData();
 	rawHTTPRequest[sizeHTTPRequest] = 0;
-	this->request.push_back(new HttpRequest(rawHTTPRequest, sizeHTTPRequest, clientSendingARequest, fd));
+	this->_requests.push_back(new HttpRequest(rawHTTPRequest, sizeHTTPRequest, clientSendingARequest));
 }
 
 void Server::_addNewClient(int listenedFD)
