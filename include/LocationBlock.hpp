@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationBlock.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:07:40 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/09/29 21:27:19 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/05 15:37:24 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,9 @@ class LocationBlock
 	private:
 
 	public:
-		LocationBlock(void);
-		LocationBlock(LocationBlock const & rhs);
-		LocationBlock &operator=(LocationBlock const & rhs);
+		LocationBlock(std::string block);
+		LocationBlock(const LocationBlock &copy);
+		LocationBlock &operator=(const LocationBlock &copy);
 		~LocationBlock(void);
 };
 

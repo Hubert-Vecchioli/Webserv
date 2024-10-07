@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:07:40 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/05 15:30:49 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/05 15:36:11 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ class ServerBlock
 	private:
 		std::pair<std::string, int>	_listen;
 		std::string 	_server_name;
+		std::map<int, std::string> _error_pages;
 		std::vector<LocationBlock> _locationBlocks;
 
 		void parseListen(std::string block);  //get IP and Port -> listen

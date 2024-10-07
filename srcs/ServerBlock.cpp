@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:08:49 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/05 15:29:59 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/05 15:46:35 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 ServerBlock::ServerBlock(std::string block) {
 	parseListen(block);
 	parseServerName(block);
-	//parseLocationBlock(block);
+	parseLocationBlock(block);
 }
 
 ServerBlock::ServerBlock(ServerBlock const & copy) {
@@ -64,6 +64,26 @@ void ServerBlock::parseServerName(std::string block) {
 		if (pos == std::string::npos)
 			break;
 		this->_server_name = block.substr(prev + 12, pos - prev - 12);
+	}
+}
+
+void ServerBlock::parseErrorPages(std::string block) {
+	std::string::size_type pos = 0;
+	std::string::size_type prev = 0;
+	std::string::size_type end = block.size();
+	while (pos < end) {
+		pos = block.find("error_page", pos);
+		if (pos == std::string::npos)
+			break;
+		prev = pos;
+		pos = block.find(";", pos);
+		if (pos == std::string::npos)
+			break;
+		std::string errorPage = block.substr(prev + 10, pos - prev - 10);
+		std::string::size_type space = errorPage.find(" ");
+		int code = std::atoi(errorPage.substr(0, space).c_str());
+		std::string path = errorPage.substr(space + 1);
+		this->_error_pages[code] = path;
 	}
 }
 
