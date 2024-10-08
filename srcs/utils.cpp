@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 13:14:32 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/01 12:17:54 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/08 12:24:50 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,4 +34,15 @@ void	print(int i, std::string message)
 		std::cout << message << std::endl;
 	else
 		std::cerr << message << std::endl;
+}
+
+std::vector<std::string> tokenize(std::string s) {
+	std::stringstream ss(s);
+	std::string token;
+	std::vector<std::string> tokens;
+	while (std::getline(ss, token, ' ')) {
+		if (token != "")
+			tokens.push_back(token);
+	}
+	return tokens;
 }

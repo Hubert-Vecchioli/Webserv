@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:08:49 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/05 15:46:35 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/08 13:22:59 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 ServerBlock::ServerBlock(std::string block) {
 	parseListen(block);
 	parseServerName(block);
+	parseErrorPages(block);
 	parseLocationBlock(block);
 }
 
@@ -27,12 +28,12 @@ ServerBlock &ServerBlock::operator=(ServerBlock const & copy) {
 	if (this != &copy) {
 		this->_listen = copy._listen;
 		this->_server_name = copy._server_name;
-		this->_root = copy._root;
 	}
 	return *this;
 }
 
 ServerBlock::~ServerBlock(void) {}
+
 
 
 void ServerBlock::parseListen (std::string block) {
@@ -63,7 +64,8 @@ void ServerBlock::parseServerName(std::string block) {
 		pos = block.find(";", pos);
 		if (pos == std::string::npos)
 			break;
-		this->_server_name = block.substr(prev + 12, pos - prev - 12);
+		std::string servers = block.substr(prev + 12, pos - prev - 12);
+		this->_server_name =  tokenize(servers);
 	}
 }
 
@@ -80,10 +82,10 @@ void ServerBlock::parseErrorPages(std::string block) {
 		if (pos == std::string::npos)
 			break;
 		std::string errorPage = block.substr(prev + 10, pos - prev - 10);
-		std::string::size_type space = errorPage.find(" ");
-		int code = std::atoi(errorPage.substr(0, space).c_str());
-		std::string path = errorPage.substr(space + 1);
-		this->_error_pages[code] = path;
+		std::vector<std::string> tokens = tokenize(errorPage);
+		for (int i= 0; i < tokens.size() - 1; i++) {
+			this->_error_pages[std::atoi(tokens[i].c_str())] = tokens[tokens.size() - 1];
+		}
 	}
 }
 
@@ -118,4 +120,12 @@ void ServerBlock::parseIPandPort(std::string block) {
 
 std::pair<int, int> ServerBlock::getIPandPort(void) const {
 	return this->_listen;
+}
+
+std::vector<std::string> ServerBlock::getServerName(void) const {
+	return this->_server_name;
+}
+
+std::map<int, std::string> ServerBlock::getErrorPages(void) const {
+	return this->_error_pages;
 }

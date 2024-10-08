@@ -51,13 +51,13 @@ void ConfigurationFile::read(std::string filename) {
 
 void ConfigurationFile::parseBase(void) {
 	parseUser();
-	parseWorkerProcesses();
 	parseErrorLog();
 }
 
 void ConfigurationFile::parseServerBlock(void) {
 	std::string::size_type pos = 0;
 	std::string::size_type prev = 0;
+	std::string::size_type checkloc = 0;
 	std::string::size_type end = this->_content.size();
 	while (pos < end) {
 		pos = this->_content.find("server {", pos);
@@ -67,6 +67,11 @@ void ConfigurationFile::parseServerBlock(void) {
 		pos = this->_content.find("}", pos);
 		if (pos == std::string::npos)
 			break;
+		checkloc = prev;
+		if (this->_content.substr(checkloc, pos - checkloc).find("location") != std::string::npos) {
+			checkloc = pos;
+			pos = this._content.find("}", checkloc + 1);
+		}
 		std::string serverBlock = this->_content.substr(prev, pos - prev);
 		ServerBlock block(serverBlock);
 		this->_serverBlocks.push_back(block);
@@ -86,22 +91,6 @@ void ConfigurationFile::parseUser(void) {
 		if (pos == std::string::npos)
 			break;
 		this->_user = this->_content.substr(prev + 5, pos - prev - 5);
-	}
-}
-
-void ConfigurationFile::parseWorkerProcesses(void) {
-	std::string::size_type pos = 0;
-	std::string::size_type prev = 0;
-	std::string::size_type end = this->_content.size();
-	while (pos < end) {
-		pos = this->_content.find("worker_processes", pos);
-		if (pos == std::string::npos)
-			break;
-		prev = pos;
-		pos = this->_content.find(";", pos);
-		if (pos == std::string::npos)
-			break;
-		this->_workers = std::atoi(this->_content.substr(prev + 16, pos - prev - 16).c_str());
 	}
 }
 

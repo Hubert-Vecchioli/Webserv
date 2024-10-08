@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:55:36 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/05 15:32:19 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/08 13:32:32 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,10 @@ class ConfigurationFile
 		std::string 									_filename;
 		std::string 									_content;
 		std::string 									_user;
-		int 											_workers;
 		std::string										_error_log;
 		std::vector<ServerBlock> 						_serverBlocks;
 
 		void parseUser(void);				//get user
-		void parseWorkerProcesses(void);	//get worker_processes
 		void parseErrorLog(void);			//get error_log
 		
 	public:
