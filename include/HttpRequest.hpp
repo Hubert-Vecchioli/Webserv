@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/07 15:17:00 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/08 07:54:46 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ class HttpRequest
 		~HttpRequest(void);
 
 		HttpResponse* getResponse(void) {return _response};
+		static HttpRequest* findInstanceWithFD(std::vector<HttpRequest>& vector, int fd);
+
 };
 
 #endif

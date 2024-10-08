@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/07 16:57:45 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/08 06:57:19 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,12 @@ class Server
 {
 	private:
 		Server &					_uniqueInstance;
+		ConfigurationFile*			_configurationFile;
 		bool 						_isServerGreenlighted;
 		int							_serverFD;
 		std::vector<Socket*>		_sockets;
 		std::vector<Client*>		_clients;
-		std::vector<HttpRequest*>	_requests; // Gros defaut de cette approche: on sauvegarde toutes les requetes... Mecanisme de cleaning à ajouter?
+		std::vector<HttpRequest*>	_requests;
 		
 		void _disconnectClient(int listenedFD);
 		void _triageEpollEvents(epoll_event & epollEvents);

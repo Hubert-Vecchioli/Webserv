@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/07 17:12:14 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/08 08:00:05 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ Server::~Server()
 
 void Server::startServer(ConfigurationFile & configurationFile)
 {
+	this->_configurationFile = &configurationFile;
 	print(1, "[Info] - Initialising the webserv");
 	this->_serverFD(epoll_create(MAX_EVENTS));
     if (this->_serverFD == -1)
@@ -70,25 +71,6 @@ void Server::runServer(void)
 		print(2, e.what());
 	}
 }
-//the function below has an ugly use of exceptions, stucture to be reviewed
-void Server::_reviewClientsHaveNoTimeout(void)
-{
-	for(std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.begin(); ++it)
-	{
-		if (std::time(nullptr) - it->_lastActionTimeStamp > TIMEOUT_LIMIT_SEC)
-		{
-			try
-			{
-				this->_disconnectClient(it->getFD());
-			}
-			catch(const std::exception& e)
-			{
-				print(2, e.what());
-			}
-			
-		}	
-	}
-}
 
 void Server::_reviewRequestsCompleted(void)
 {
@@ -110,6 +92,26 @@ void Server::_reviewRequestsCompleted(void)
 	}
 }
 
+//the function below has an ugly use of exceptions, stucture to be reviewed
+void Server::_reviewClientsHaveNoTimeout(void)
+{
+	for(std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.begin(); ++it)
+	{
+		if (std::time(nullptr) - it->_lastActionTimeStamp > TIMEOUT_LIMIT_SEC)
+		{
+			try
+			{
+				this->_disconnectClient(it->getFD());
+			}
+			catch(const std::exception& e)
+			{
+				print(2, e.what());
+			}
+			
+		}	
+	}
+}
+
 void Server::_triageEpollEvents(epoll_event & epollEvents)
 {
 	try
@@ -123,10 +125,9 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 			else
 				this->_addNewClient(epollEvents.data.fd);
 		}
-		
 		if (epollEvents.events & EPOLLOUT)
 		{
-			if(/*!it->getResponse()->getResponseStatus() and response is ready*/)
+			if(HttpRequest::findInstanceWithFD(epollEvents.data.fd) && !HttpRequest::findInstanceWithFD(epollEvents.data.fd)->getResponse()->getResponseStatus())
 				this->_sendRequest(epollEvents.data.fd);
 		}
 	}		
@@ -138,13 +139,16 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 
 void Server::_sendRequest(int fd)
 {
+	//HttpRequest::findInstanceWithFD(fd)->getResponse()
 	int sizeSent = send(FD, /* Method to get the response*/,/* Method to get the response size*/, 0);
 	//Protection on sizeSent
-	//set the right Epoll flags (= no EPOLLOUT)
+	modifyEpollCTL(this->_serverFD, fd, EPOLL_CTL_MOD);
+	Client::findInstanceWithFD(this->_clients, fd)->updateLastActionTimeStamp();
 }
 
 void Server::_receiveRequest(int fd)
 {
+	//TODO: Have a review to prevent having 2 simultaneous requests from a single fd
 	Client* clientSendingARequest = Client::findInstanceWithFD(this->_clients, fd);
 	clientSendingARequest->updateLastActionTimeStamp();
 	displayTimestamp(void);
