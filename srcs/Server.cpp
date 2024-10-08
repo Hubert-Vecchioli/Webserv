@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/08 08:00:05 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/08 17:56:55 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void Server::_reviewRequestsCompleted(void)
 {
 	for(std::vector<HttpRequest*>::iterator it = this->_requests.begin(); it != this->_requests.begin(); ++it)
 	{
-		if (it->getResponse()->getResponseStatus()) // Todo? Add a timeout review on requests as well?
+		if (it->getResponse()->getResponseStatus() && std::time(nullptr) - it->->getResponse()->getLastActionTimeStamp() > REQUEST_TIMEOUT_LIMIT_SEC)
 		{
 			try
 			{
@@ -97,7 +97,7 @@ void Server::_reviewClientsHaveNoTimeout(void)
 {
 	for(std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.begin(); ++it)
 	{
-		if (std::time(nullptr) - it->_lastActionTimeStamp > TIMEOUT_LIMIT_SEC)
+		if (std::time(nullptr) - it->getLastActionTimeStamp() > CLIENT_TIMEOUT_LIMIT_SEC)
 		{
 			try
 			{
@@ -139,11 +139,16 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 
 void Server::_sendRequest(int fd)
 {
-	//HttpRequest::findInstanceWithFD(fd)->getResponse()
-	int sizeSent = send(FD, /* Method to get the response*/,/* Method to get the response size*/, 0);
-	//Protection on sizeSent
-	modifyEpollCTL(this->_serverFD, fd, EPOLL_CTL_MOD);
 	Client::findInstanceWithFD(this->_clients, fd)->updateLastActionTimeStamp();
+	print(1, "[Info] - Sending response to Client FD : ", fd);
+	HttpResponse *response = HttpRequest::findInstanceWithFD(fd)->getResponse();
+	int sizeHTTPResponseSent = send(fd, response->getResponseContent().c_str(), response->getResponseContent().size());// For info, send is equivalent to write as I am not using any flag
+	if(sizeHTTPResponseSent == 0 && response->getResponseContent().size() > 0)
+		this->_disconnectClient(fd);
+	if(sizeHTTPResponseSent < 0)
+		throw FailureToSendData();
+	modifyEpollCTL(this->_serverFD, fd, EPOLL_CTL_MOD);
+	print(1, "[Info] - Response successfully sent to Client FD : ", fd);
 }
 
 void Server::_receiveRequest(int fd)
@@ -151,8 +156,7 @@ void Server::_receiveRequest(int fd)
 	//TODO: Have a review to prevent having 2 simultaneous requests from a single fd
 	Client* clientSendingARequest = Client::findInstanceWithFD(this->_clients, fd);
 	clientSendingARequest->updateLastActionTimeStamp();
-	displayTimestamp(void);
-	std::cout << "[Info] - Receiving request from Client FD : " << fd << " )" << std::endl;
+	print(1, "[Info] - Receiving request from Client FD : ", fd);
 	char rawHTTPRequest[MAX_REQUEST_SIZE + 1];
 	int sizeHTTPRequest = recv(fd, rawHTTPRequest, MAX_REQUEST_SIZE, 0);
 	if(sizeHTTPRequest == 0)
@@ -161,6 +165,7 @@ void Server::_receiveRequest(int fd)
 		throw FailureToReceiveData();
 	rawHTTPRequest[sizeHTTPRequest] = 0;
 	this->_requests.push_back(new HttpRequest(rawHTTPRequest, sizeHTTPRequest, clientSendingARequest));
+	print(1, "[Info] - Request successfully received from Client FD : ", fd);
 }
 
 void Server::_addNewClient(int listenedFD)
@@ -222,5 +227,10 @@ const char* Server::AcceptFailureException::what() const throw()
 
 const char* Server::FailureToReceiveData::what() const throw()
 {
-	return ("[Error] - The function recv failed"); //TBD if the client FD is required to debug
+	return ("[Error] - The function recv() failed"); //TBD if the client FD is required to debug
+}
+
+const char* Server::FailureToSendData::what() const throw()
+{
+	return ("[Error] - The function send() failed"); //TBD if the client FD is required to debug
 }
