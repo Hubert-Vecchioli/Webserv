@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/09 01:11:52 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/09 18:36:02 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
 //# include "Server.hpp"
 //# include "Socket.hpp"
 //# include "Client.hpp"
-//# include "HttpRequest.hpp"
+# include "HttpRequest.hpp"
 //# include "HttpResponse.hpp"
 # include "ConfigurationFile.hpp"
 //# include "Client.hpp"
