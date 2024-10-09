@@ -30,7 +30,7 @@ class ConfigurationFile
 		void parseUser(void);				//get user
 		void parseErrorLog(void);			//get error_log
 		void parseBodySize(void);			//get body_size
-		
+
 	public:
 		ConfigurationFile(void);
 		ConfigurationFile(int numberArgs, char** args);

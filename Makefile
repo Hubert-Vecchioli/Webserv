@@ -33,7 +33,6 @@ OBJS = $(addprefix $(OBJDIRS)/, $(patsubst %.cpp, %.o, $(PATHS)))
 
 #******************************  COLORS  *************************************#
 
-
 GREEN			=	\033[0;32m
 END				=	\033[0m
 
