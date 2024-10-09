@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:53:56 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/08 14:07:09 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/09 14:05:06 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 #include "webserv.hpp"
 
-// That can almost be replaced by a struct 
 class Socket
 {
 	private:
