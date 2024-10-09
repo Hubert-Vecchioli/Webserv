@@ -33,6 +33,6 @@ int main(int ac, char **av)
 		print(2, e.what());
 		return (1);
 	}
-	print(1, "[Info] - Webserv is stopped");
+	print(1, "[Info] - Webserv is now stopped");
 	return (0);
 }

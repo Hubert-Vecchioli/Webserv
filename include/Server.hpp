@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/08 14:05:37 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/08 11:36:03 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,20 @@ class BlocServer;
 class Server
 {
 	private:
-		Server &				_uniqueInstance;
-		bool 					_isServerGreenlighted;
-		int						_serverFD;
-		std::map<int, Socket*>	_sockets;
-		std::map<int, Client*>	_clients;
+		Server &					_uniqueInstance;
+		ConfigurationFile*			_configurationFile;
+		bool 						_isServerGreenlighted;
+		int							_serverFD;
+		std::vector<Socket*>		_sockets;
+		std::vector<Client*>		_clients;
+		std::vector<HttpRequest*>	_requests;
+		
+		void _disconnectClient(int listenedFD);
+		void _triageEpollEvents(epoll_event & epollEvents);
+		void _reviewClientsHaveNoTimeout(void);
+		void _receiveRequest(int fd);
+		void _sendRequest(int fd)
+		void _reviewRequestsCompleted(void);
 
 	public:
 		Server(void);
@@ -38,7 +47,6 @@ class Server
 		void startServer(ConfigurationFile & configurationFile);
 		void runServer(void);
 		void stopServer(void);
-		void triageEvents(epoll_event *epollEvents, int eventId);
 		static const Server & getInstance(void) {return _uniqueInstance};
 		
 		class FailureInitiateEpollInstanceException : public std::exception
@@ -51,12 +59,32 @@ class Server
 			public:
 				virtual const char* what() const throw();
 		};
-		class FailureAddFDToEpollException : public std::exception
+		class FailureEpollWaitException : public std::exception
 		{
 			public:
 				virtual const char* what() const throw();
 		};
-		class FailureEpollWaitException : public std::exception
+		class DisconnectedClientFDException : public std::exception
+		{
+			public:
+				virtual const char* what() const throw();
+		};
+		class FailureModifyFDEpollException : public std::exception
+		{
+			public:
+				virtual const char* what() const throw();
+		};
+		class AcceptFailureException : public std::exception
+		{
+			public:
+				virtual const char* what() const throw();
+		};
+		class FailureToReceiveData : public std::exception
+		{
+			public:
+				virtual const char* what() const throw();
+		};
+		class FailureToSendData : public std::exception
 		{
 			public:
 				virtual const char* what() const throw();

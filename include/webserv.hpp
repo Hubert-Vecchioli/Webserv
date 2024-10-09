@@ -25,6 +25,7 @@
 # include <limits>
 # include <netinet/in.h>
 # include <sys/epoll.h>
+# include <fcntl.h>
 
 //# include "Server.hpp"
 //# include "Socket.hpp"
@@ -42,6 +43,9 @@
 
 #define MAX_EVENTS 50 // to be increassed later on
 #define EPOLL_MAX_WAIT_TIME_MS 1000 // to be modified later on
+#define CLIENT_TIMEOUT_LIMIT_SEC 10
+#define REQUEST_TIMEOUT_LIMIT_SEC 10
+#define MAX_REQUEST_SIZE 5120
 
 void	displayTimestamp(void);
 void	print(int i, std::string message);

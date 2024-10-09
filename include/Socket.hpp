@@ -19,18 +19,42 @@
 class Socket
 {
 	private:
-		//Placeholder - check if all are needed - any are mising
+		std::string					_ip;
 		int							_fd;
-		std::vector<BlocServer>*	_serverBlocks;
-		struct sockaddr_in	_sockaddr;
+		unsigned int				_port;
+		struct sockaddr_in			_sockaddr;
+		bool						_isClientSocket;
 
 	public:
 		Socket(void);
-		Socket(int fd, std::vector<BlocServer>* servers);
+		Socket(int fd, unsigned int port, std::string ip);
 		Socket(Socket const & rhs);
 		Socket &operator=(Socket const & rhs);
 		~Socket(void);
-		//Todo: Add getters or move the attribute to public?
+		
+		static Socket* findInstanceWithFD(std::vector<Socket>& vector, int fd);
+
+
+		class FailureSetNonBlockingSocketException : public std::exception
+		{
+			public:
+				virtual const char* what() const throw();
+		};
+		class FailureUpdateSocketException : public std::exception
+		{
+			public:
+				virtual const char* what() const throw();
+		};
+		class FailureBindSocketException : public std::exception
+		{
+			public:
+				virtual const char* what() const throw();
+		};
+		class FailureSocketListenException : public std::exception
+		{
+			public:
+				virtual const char* what() const throw();
+		};
 };
 
 #endif
