@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/08 11:36:03 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/09 14:15:27 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,10 @@ class Server
 		std::vector<Socket*>		_sockets;
 		std::vector<Client*>		_clients;
 		std::vector<HttpRequest*>	_requests;
-		
+
+		Server(Server const & rhs);
+		Server &operator=(Server const & rhs);
+
 		void _disconnectClient(int listenedFD);
 		void _triageEpollEvents(epoll_event & epollEvents);
 		void _reviewClientsHaveNoTimeout(void);
@@ -40,8 +43,6 @@ class Server
 
 	public:
 		Server(void);
-		Server(Server const & rhs);
-		Server &operator=(Server const & rhs);
 		~Server(void);
 		
 		void startServer(ConfigurationFile & configurationFile);
