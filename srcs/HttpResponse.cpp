@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/08 19:13:28 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/09 14:03:49 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,6 @@ void HttpResponse::_generateResponseContent(void)
 			break;
 		case "POST":
 			this->_generatePOSTResponse();
-			break;
-		case "PUT":
-			this->_generatePUTResponse();
 			break;
 		case "DEL":
 			this->_generateDELResponse();
@@ -76,31 +73,6 @@ void HttpResponse::_generateGETResponse(void)
 
 //Assuming POST is only to upload files
 void HttpResponse::_generatePOSTResponse(void)
-{
-	std::ostringstream oss;
-	oss << /*TODO: Get the file size*/;
-    std::string sizeStr = oss.str();
-	
-	std::string reponseBody = "{\n";
-	reponseBody += "\"message\": \"File uploaded successfully.\",\n";
-	reponseBody += "\"filename\": \"" + /*Path file*/ + "\",\n";
-	reponseBody += "\"uploadedAt\": \""+ displayTimestampResponseFormat()+ "\",\n";
-	reponseBody += "\"size\": " + sizeStr + "\n";
-	reponseBody += "}\n";
-
-	std::ostringstream oss2;
-	oss2 << reponseBody.size();
-    std::string sizeStr = oss2.str();
-
-	this->_reponseContent = "HTTP/1.1 201 Created\r\n";
-	this->_reponseContent += "Content-Type: application/json\r\n";
-	this->_reponseContent += "Content-Length: " + sizeStr + "\r\n";
-	this->_reponseContent += "\r\n";
-	this->_reponseContent += reponseBody
-}
-
-//Assuming PUT is only to upload files
-void HttpResponse::_generatePUTResponse(void)
 {
 	std::ostringstream oss;
 	oss << /*TODO: Get the file size*/;
