@@ -6,13 +6,13 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/08 17:56:55 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/09 14:22:51 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-Server::Server() : _isServerGreenlighted(false), _serverFD(-1)
+Server::Server(void) : _isServerGreenlighted(false), _serverFD(-1)
 {
 	this->_uniqueInstance = *this;
 }
@@ -22,6 +22,27 @@ Server::~Server()
 	if (this->_serverFD != -1)
 		close(_serverFD);
 	//close and delete all the clients & sockets & requests & responses
+}
+
+Server::Server(Server const & rhs)
+{
+	*this = rhs;
+	return ;
+}
+
+Server::Server &operator=(Server const & rhs)
+{
+	if (this != &rhs)
+	{
+		this->_uniqueInstance = rhs._uniqueInstance;
+		this->_configurationFile = rhs._configurationFile;
+		this->_isServerGreenlighted = rhs._isServerGreenlighted;
+		this->_serverFD = rhs._serverFD;
+		this->_sockets = rhs._sockets;
+		this->_clients = rhs._clients;
+		this->_requests = rhs._requests;
+	}
+	return (*this);
 }
 
 void Server::startServer(ConfigurationFile & configurationFile)
