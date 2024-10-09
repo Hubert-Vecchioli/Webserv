@@ -6,25 +6,43 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:53:51 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/06 16:11:34 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/09 14:30:35 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-Client::Client() : _lastActionTimeStamp(std::time(nullptr)), _fd(-1)
+Client::Client(void): _lastActionTimeStamp(std::time(nullptr)), _fd(-1)
 {
-	
 }
 
 Client::Client(int fd) : _lastActionTimeStamp(std::time(nullptr)), _fd(fd)
 {
-	
+}
+
+Client::~Client(void)
+{
+}
+
+Client::Client(Client const & rhs)
+{
+	*this = rhs;
+	return ;
+}
+
+Client::Client &operator=(Client const & rhs)
+{
+	if (this != &rhs)
+	{
+		this->_lastActionTimeStamp = rhs._lastActionTimeStamp;
+		this->_fd = rhs._fd;
+	}
+	return (*this);
 }
 
 int Client::getFD(void)
 {
-	return (_fd);
+	return (this->_fd);
 }
 
 void Client::updateLastActionTimeStamp(void)
