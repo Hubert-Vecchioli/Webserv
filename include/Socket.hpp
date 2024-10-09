@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:53:56 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/03 06:51:36 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/08 14:07:09 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ class Socket
 		//Placeholder - check if all are needed - any are mising
 		int							_fd;
 		std::vector<BlocServer>*	_serverBlocks;
-		struct sockaddr_in	_sockaddr
+		struct sockaddr_in	_sockaddr;
 
 	public:
 		Socket(void);
