@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/09 14:03:49 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/09 14:45:32 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,12 @@ void HttpResponse::_generateResponseContent(void)
 			this->_generateDELResponse();
 			break;
 		default:
-			throw this->_generateInvalidResponse(405);
+			throw this->_generateInvalidMethod();
 	}
 	
 }
 
-void HttpResponse::_generateInvalidResponse(int code)
+void HttpResponse::_generateInvalidMethod(void)
 {
 /*
 Example
@@ -58,7 +58,7 @@ Allow: GET, POST
 	oss << reponseBody.size();
     std::string sizeStr = oss.str();
 
-	this->_reponseContent = "HTTP/1.1 "/*code and its message*/"\r\n";
+	this->_reponseContent = "HTTP/1.1 405 Method Not Allowed\r\n";
 	this->_reponseContent += "Content-Type: application/json\r\n";
 	this->_reponseContent += "Content-Length: " + sizeStr + "\r\n";
 	this->_reponseContent += "Allow: " + /*Allowed Methods*/ + "\r\n";
