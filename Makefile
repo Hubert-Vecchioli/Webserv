@@ -12,7 +12,17 @@ CFLAGS 			= -Wall -Werror -Wextra -Wshadow -Wno-shadow -std=c++98
 
 INCS = ./include
 PATHS = main.cpp \
-		[...]
+		ConfigurationFile.cpp \
+		LocationBlock.cpp \
+		ServerBlock.cpp \
+		utils.cpp \
+		#Client.cpp \
+		#HttpRequest.cpp \
+		#HttpResponse.cpp \
+		#signal.cpp \
+		#Socket.cpp \
+		#Server.cpp
+
 SRCS = $(addprefix $(SRCDIRS)/, $(PATHS))
 SRCDIRS = srcs
 

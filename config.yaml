@@ -1,0 +1,31 @@
+
+user www;
+error_log /var/log/nginx/error.log;
+body_size 1 MB;
+
+server {
+    listen 127.0.0.1 8080;
+    server_name ebesnoin.com;
+    error_page 404 504 418 error.html;
+
+    location /photos {
+    root /var/www/photos;
+    index index.html;
+    dirlisting on;
+    methods GET;
+    redirect /photos /images;
+    }
+}
+
+server {
+    listen 127.0.0.8 8080;
+    server_name admin.ebesnoin.com admin.ebesnoin.fr;
+    error_page 404 504 418 tomato.html;
+
+    location \  {
+    root /var/www/admin;
+    index index.html;
+    dirlisting off;
+    methods GET POST;
+    }
+}

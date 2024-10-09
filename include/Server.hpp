@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
 /*   Updated: 2024/10/08 11:36:03 by hvecchio         ###   ########.fr       */
@@ -14,6 +14,11 @@
 # define SERVER_HPP
 
 #include "webserv.hpp"
+
+class Socket;
+class Client;
+class ConfigurationFile;
+class BlocServer;
 
 class Server
 {

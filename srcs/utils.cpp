@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 13:14:32 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/08 18:41:10 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/08 12:24:50 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,18 @@ void	print(int i, std::string message, int fd = -2)
 		std::cout << message << fd << std::endl;
 	else
 		std::cerr << message << std::endl;
+}
+
+
+std::vector<std::string> tokenize(std::string s) {
+	std::stringstream ss(s);
+	std::string token;
+	std::vector<std::string> tokens;
+	while (std::getline(ss, token, ' ')) {
+		if (token != "")
+			tokens.push_back(token);
+	}
+	return tokens;
 }
 
 void	modifyEpollCTL(int EpollFD, int listendFD, int epollAction, bool isReadyToSendResponse = false)
