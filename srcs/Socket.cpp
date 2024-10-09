@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:53:54 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/07 12:22:59 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/09 14:26:23 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,31 @@
 
 Socket::Socket(void) : _fd(-1)
 {
+}
+
+Socket::~Socket(void)
+{
+	if (this->_fd != -1)
+		close(this->_fd); // should it be protected?
+}
+
+Socket::Socket(Socket const & rhs)
+{
+	*this = rhs;
+	return ;
+}
+
+Socket::Socket &operator=(Socket const & rhs)
+{
+	if (this != &rhs)
+	{
+		this->_ip = rhs._ip;
+		this->_fd = rhs._fd;
+		this->_port = rhs._port;
+		this->_sockaddr = rhs._sockaddr;
+		this->_isClientSocket = rhs._isClientSocket;
+	}
+	return (*this);
 }
 
 Socket::Socket(int fd, unsigned int port, std::string ip) : _fd(fd), _port(port), _ip(ip)
@@ -52,11 +77,6 @@ Socket* Socket::findInstanceWithFD(std::vector<Socket>& vector, int fd) {
     return (nullptr);
 }
 
-Socket::~Socket(void)
-{
-	if (this->_fd != -1)
-		close(this->_fd); // should it be protected?
-}
 
 const char* Socket::FailureSetNonBlockingSocketException::what() const throw()
 {
