@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/09 14:22:51 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/09 19:07:55 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,6 +191,7 @@ void Server::_receiveRequest(int fd)
 
 void Server::_addNewClient(int listenedFD)
 {
+	// TODO: check the nb of clients
 	struct sockaddr_in	sockAddr; // because it is an IPV4
 	socklen_t addrLen = sizeof(sockAddr);
 	int clientFD = accept(listenedFD, &sockAddr, &addrLen);
