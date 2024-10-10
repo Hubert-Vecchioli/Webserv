@@ -1,0 +1,55 @@
+body {
+	font-family: Helvetica, sans-serif;
+	text-align: center;
+	background: linear-gradient(90deg, #8360c3, #faae5a);
+	color: white;
+}
+
+main {
+    justify-content: center;
+	width: 50%;
+	margin: 20px auto;
+	padding: 20px;
+}
+
+h1 {
+	color: #1ee4fe;
+}
+
+strong {
+	font-weight: 700;
+}
+
+header {
+    padding: 10px 0;
+}
+
+.navbar {
+    /*display: flex;*/
+    justify-content: center;
+}
+
+.navbar ul {
+    list-style-type: none;
+    display: flex;
+}
+
+.navbar li {
+    margin: 0 20px;
+    color: rgba(255, 255, 255, 0.7); /* Couleur claire */
+    transition: color 0.3s, transform 0.3s; /* Animation douce pour le changement */
+}
+
+.navbar li.active {
+    color: rgba(255, 255, 255, 1); /* Titre de la page active plus foncé */
+}
+
+.navbar li:hover {
+    color: rgba(255, 255, 255, 1); /* Couleur au survol */
+    transform: scale(1.2); /* Augmenter la taille au survol */
+}
+
+a, a:hover, a:visited, a:active {
+	color: inherit;
+	text-decoration: none;
+}
