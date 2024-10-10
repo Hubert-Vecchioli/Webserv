@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/09 18:33:42 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/10 15:28:53 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define HTTPREQUEST_HPP
 
 #include "webserv.hpp"
+#include "HttpRequest.hpp"
 
 typedef enum e_method {
 	GET,
@@ -30,19 +31,23 @@ typedef enum e_connection {
 class HttpRequest
 {
 	private:
-		Client*								_client;
-		HttpResponse*						_response;
-		t_method							_method;
-		bool								_http1;
-		std::string							_queryString;
-		std::string							_requestURI;
-		std::string							_HTTPVersion;
-		std::string							_host;
-		t_connection						_connection;
-		std::string							_content_type;
-		size_t								_content_len;
-		std::string							_content_body;
-		std::string							_accept;
+		// Client*								_client;
+		// HttpResponse*						_response;
+		t_method							_method; //requestLine
+		bool								_http1; //requestLine
+		std::string							_queryString; //requestLine
+		std::string							_requestURI; //requestLine
+		std::string							_host; //header
+		std::string							_accept; //header
+		t_connection						_connection; //header
+		std::string							_content_type; //header
+		size_t								_content_len; //header
+		std::string							_content_body; //body
+		
+		std::string getValue(std::string request, std::string key);
+		void parseRequestLine(char *request);
+		void parseRequestHeader(char *request);
+    	void parseRequestBody(char *request);
 
 	public:
 		HttpRequest(char *request);
@@ -50,13 +55,12 @@ class HttpRequest
 		HttpRequest &operator=(HttpRequest const & rhs);
 		~HttpRequest(void);
 
-		parseHeader(char *request);
-		parseRequestLine(char *request);
-    	parseBody(char *request);
+		void displayRequestLine(std::ostream & o);
+		void displayRequestHeader(std::ostream & o);
+		void displayRequestBody(std::ostream & o);
 
-		HttpResponse* getResponse(void) {return _response};
-		static HttpRequest* findInstanceWithFD(std::vector<HttpRequest>& vector, int fd);
-
+		// HttpResponse* getResponse(void) {return _response};
+		//static HttpRequest* findInstanceWithFD(std::vector<HttpRequest>& vector, int fd);
 };
 
 #endif
