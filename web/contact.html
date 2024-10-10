@@ -17,11 +17,13 @@
 		</header>
 		<main>
 			<h1>Contact us, if you dare.</h1>
-			<ul>
-				<li><a href="mailto: hvecchio@student.42.fr">Hubert-Cool</a></li>
-				<li><a href="mailto: ebesnoin@student.42.fr">Emmagnifique</a></li>
-				<li><a href="mailto: jblaye@student.42.fr">Ju-no-lie-mit</a></li>
-			</ul>
+			<form class="styled-form" method="get" action="">
+				<input type="text" name="name" placeholder="name" autofocus>
+				<input type="text" name="lastname" placeholder="lastname">
+				<input type="email" name="email" placeholder="name@gmail.com" required>
+				<textarea name="message" id="message" placeholder="message" required></textarea>
+				<button type="submit">Submit</button>
+			</form>
 		</main>
 	</body>
 </html>
