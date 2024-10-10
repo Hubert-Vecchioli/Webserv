@@ -5,7 +5,8 @@ LocationBlock::LocationBlock(std::string block) {
 	parseRoot(block);
 	parseIndex(block);
 	parseDirlisting(block);
-	parseMethods(block);	
+	parseMethods(block);
+	parseRedirect(block);
 }
 
 LocationBlock::LocationBlock(LocationBlock const & copy) {
