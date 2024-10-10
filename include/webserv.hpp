@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/09 18:36:02 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/10 13:25:47 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@
 
 //# include "Server.hpp"
 //# include "Socket.hpp"
-//# include "Client.hpp"
+# include "Client.hpp"
 # include "HttpRequest.hpp"
-//# include "HttpResponse.hpp"
+# include "HttpResponse.hpp"
 # include "ConfigurationFile.hpp"
 //# include "Client.hpp"
 # include "LocationBlock.hpp"
