@@ -6,23 +6,23 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/10 15:39:39 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/12 18:39:25 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
 
-// HttpRequest* HttpRequest::findInstanceWithFD(std::vector<HttpRequest>& vector, int fd) {
-//     for (std::vector<HttpRequest>::iterator it = vector.begin(); it != vector.end(); ++it) {
-//         if (it->_client->_fd == fd) {
-//             return &(*it);
-//         }
-//     }
-//     return (nullptr);
-// }
+HttpRequest* HttpRequest::findInstanceWithFD(std::vector<HttpRequest>& vector, int fd) {
+    for (std::vector<HttpRequest>::iterator it = vector.begin(); it != vector.end(); ++it) {
+        if (it->_client->getFD() == fd) {
+            return &(*it);
+        }
+    }
+    return (0);
+}
 
-HttpRequest::HttpRequest(char *request) {
+HttpRequest::HttpRequest(Client *client, HttpResponse *response, char *request) : _client(client), _response(response) {
     parseRequestLine(request);
     parseRequestHeader(request);
     parseRequestBody(request);

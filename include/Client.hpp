@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/09 14:29:08 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/12 17:56:25 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ class Client
 		
 		int getFD(void);
 		void updateLastActionTimeStamp();
-		std::time_t getLastActionTimeStamp(void) const {return _lastActionTimeStamp};
+		std::time_t getLastActionTimeStamp(void) const {return _lastActionTimeStamp;};
 		static Client* findInstanceWithFD(std::vector<Client>& vector, int fd);
 };
 

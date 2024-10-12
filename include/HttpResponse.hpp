@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/09 14:45:27 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/12 17:56:40 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ class HttpResponse
 		HttpResponse &operator=(HttpResponse const & rhs);
 		~HttpResponse(void);
 		
-		bool getResponseStatus(void) const {return _isResponseSent};
-		std::time_t getLastActionTimeStamp(void) const {return _lastActionTimeStamp};
+		bool getResponseStatus(void) const {return _isResponseSent;};
+		std::time_t getLastActionTimeStamp(void) const {return _lastActionTimeStamp;};
 		std::string getResponseContent(void);
 };
 

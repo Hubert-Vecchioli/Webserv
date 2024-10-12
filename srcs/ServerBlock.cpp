@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:08:49 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/09 01:30:32 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/12 18:02:17 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,11 @@ void ServerBlock::parseListen (std::string block) {
 	std::string::size_type prev = 0;
 	pos = block.find("listen", pos);
 	if (pos == std::string::npos)
-		break;
+		return;
 	prev = pos;
 	pos = block.find(";", pos);
 	if (pos == std::string::npos)
-		break;
+		return;
 	std::vector<std::string> tokens = tokenize(block.substr(prev + 7, pos - prev - 7));
 	if (tokens.size() == 2) {
 		this->_listen = std::make_pair(tokens[0], std::atoi(tokens[1].c_str()));
@@ -58,11 +58,11 @@ void ServerBlock::parseServerName(std::string block) {
 	while (pos < end) {
 		pos = block.find("server_name", pos);
 		if (pos == std::string::npos)
-			break;
+			return;
 		prev = pos;
 		pos = block.find(";", pos);
 		if (pos == std::string::npos)
-			break;
+			return;
 		std::string servers = block.substr(prev + 12, pos - prev - 12);
 		this->_server_name =  tokenize(servers);
 	}
@@ -75,11 +75,11 @@ void ServerBlock::parseErrorPages(std::string block) {
 	while (pos < end) {
 		pos = block.find("error_page", pos);
 		if (pos == std::string::npos)
-			break;
+			return;
 		prev = pos;
 		pos = block.find(";", pos);
 		if (pos == std::string::npos)
-			break;
+			return;
 		std::string errorPage = block.substr(prev + 10, pos - prev - 10);
 		std::vector<std::string> tokens = tokenize(errorPage);
 		for (unsigned long i = 0; i < tokens.size() - 1; i++) {
@@ -95,11 +95,11 @@ void ServerBlock::parseLocationBlock(std::string block) {
 	while (pos < end) {
 		pos = block.find("location ", pos);
 		if (pos == std::string::npos)
-			break;
+			return;
 		prev = pos;
 		pos = block.find("}", pos);
 		if (pos == std::string::npos)
-			break;
+			return;
 		std::string locationBlock = block.substr(prev, pos - prev);
 		LocationBlock block(locationBlock);
 		this->_locationBlocks.push_back(block);

@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/09 19:07:30 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/12 18:40:14 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@ void HttpResponse::_generateResponseContent(void)
 	//Check redirect and prepare the response
 	// TODO: add a pointer to HTTPrequest
 	
-	if(/*request is CGI*/)
-		// trigger the CGI
+	// if(/*request is CGI*/)
+	// 	// trigger the CGI
 	switch(/*Request Method*/)
 	{
 		case "GET":
