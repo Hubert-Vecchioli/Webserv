@@ -38,6 +38,7 @@ void LocationBlock::parseLocationBlock(std::vector<std::string> block) {
 	parseFunctions["dirlisting"] = &parseDirlisting;
 	parseFunctions["methods"] = &parseMethods;
 	parseFunctions["redirect"] = &parseRedirect;
+	parseFunctions["cgi_extension"] = &parseCgiIndex;
 
 	parseLocation(tokenize(block[0]));
 	for (size_t i = 1; i < block.size(); i++) {
@@ -111,6 +112,15 @@ void LocationBlock::parseRedirect(std::vector<std::string> args) {
 	if (args[1].find(";") != args[1].size() - 1)
 		throw std::runtime_error("Error: invalid dirlisting directive");
 	this->_redirect = std::make_pair(std::atoi(args[0].c_str()), args[1].substr(0, args[1].size() - 1));
+}
+
+void LocationBlock::parseCgiExtension(std::vector<std::string> args) {
+	std::string line;
+	for (int i = 0; i < args.size(); i++)
+		line += args[i] + " ";
+	if (line.find(";") != line.size() - 2 || args.size() != 2)
+		throw std::runtime_error("Error: invalid cgi_extension directive");
+	this->cgi_extension[args[0]] = args[1].substr(0, args[1].size() - 1);
 }
 
 //  Getters for the LocationBlock class
