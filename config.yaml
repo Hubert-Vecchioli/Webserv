@@ -1,4 +1,32 @@
 
+# Available directives:
+# -- in General:
+#   - user "username";
+#   - error_log "path";
+#   - body_size "size in bytes" [KB | MB | GB];
+
+# -- in Server:
+#   - listen "ip" "port";
+#   - server_name "domain" [domain, ...];
+#   - error_page "code" [code, ...] "path";
+
+# -- in Location:
+#   - location "path" {
+#   - root "path";
+#   - index "file";
+#   - dirlisting on|off;
+#   - methods [GET &| POST &| DELETE];
+#   - redirect "code" "url";
+#   - cgi_extension ".ext" "path";
+#   - upload_path "path";
+
+# comments work, but only one line comments are supported.
+# Comments must be on their own line, starting with a "#".
+# Comments can be placed anywhere in the file.
+# Invalid directives will throw and error and stop the parsing.
+
+# Example of a configuration file:
+
 user www;
 error_log /var/log/nginx/error.log;
 body_size 1 MB;
@@ -8,10 +36,10 @@ server {
     server_name ebesnoin.com;
     error_page 404 504 418 error.html;
     error_page 500 test.html;
-    error_page 404 test.html;
+    error_page 404 error404.html;
 
     location /photos {
-    root /var/www/photos;
+    root /var/www/; 
     index index.html;
     dirlisting on;
     methods GET;
@@ -22,7 +50,10 @@ server {
     }
 
     location /photos/chien {
-    methods POST DELETE
+    methods POST DELETE GET;
+    index doggo.html;
+    root /var/www/;
+    upload_path /var/www/photos/uploads;
     }
 }
 
@@ -31,7 +62,7 @@ server {
     server_name admin.ebesnoin.com admin.ebesnoin.fr;
     error_page 404 504 418 tomato.html;
 
-    location \  {
+    location /  {
     root /var/www/admin;
     index index.html;
     dirlisting off;
@@ -39,7 +70,9 @@ server {
     }
 
     location /friends/chat/ {
-    
-    
+    index home.py;
+    cgi_extension .py /usr/bin/python3;
+    cgi_extension .php /usr/bin/php-cgi;
+    root /var/www/chatting;
     }
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/12 18:04:30 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/15 15:48:58 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,6 @@
 
 void	displayTimestamp(void);
 void	print(int i, std::string message);
-std::vector<std::string> tokenize(std::string s);
+std::vector<std::string> tokenize(std::string s, char delimiter);
 
 #endif

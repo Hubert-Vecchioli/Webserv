@@ -3,31 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/12 18:39:25 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/15 16:25:47 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-
-HttpRequest* HttpRequest::findInstanceWithFD(std::vector<HttpRequest>& vector, int fd) {
-    for (std::vector<HttpRequest>::iterator it = vector.begin(); it != vector.end(); ++it) {
-        if (it->_client->getFD() == fd) {
-            return &(*it);
-        }
-    }
-    return (0);
-}
+// Constructors and Destructors for the HttpRequest class
 
 HttpRequest::HttpRequest(Client *client, HttpResponse *response, char *request) : _client(client), _response(response) {
-    parseRequestLine(request);
-    parseRequestHeader(request);
-    parseRequestBody(request);
+    std::string str_request = request;
+	parseRequestLine(str_request);
+    parseRequestHeader(str_request);
+    parseRequestBody(str_request);
 }
-
 
 HttpRequest::HttpRequest(HttpRequest const & rhs) {
     *this = rhs;
@@ -45,6 +37,7 @@ HttpRequest & HttpRequest::operator=(HttpRequest const & rhs) {
         _content_len = rhs._content_len;
         _content_body = rhs._content_body;
         _accept = rhs._accept;
+		_cookie = rhs._cookie;
         // delete _client;
         // delete _HttpResponse;
         // _client = Client(rhs._client);
@@ -52,9 +45,12 @@ HttpRequest & HttpRequest::operator=(HttpRequest const & rhs) {
     }
     return *this;
 }
+
 HttpRequest::~HttpRequest(void) {};
 
-void HttpRequest::parseRequestLine(char *request) {
+// GETTERS
+
+void HttpRequest::parseRequestLine(std::string request) {
     std::string str_request = request;
     
     size_t pos1 = str_request.find(' ');
@@ -87,6 +83,75 @@ void HttpRequest::parseRequestLine(char *request) {
     }
 }
 
+void HttpRequest::parseRequestHeader(std::string request) {
+        _host = getValue(request, "Host: ");
+        _accept = getValue(request, "Accept: ");
+        _content_type = getValue(request, "Content-Type: ");
+        std::string len = getValue(request, "Content-Length: ");
+        _content_len = atol(len.c_str());
+		parseConnection(request);
+		parseCookie(request);
+}
+
+void HttpRequest::parseRequestBody(std::string request) {
+    std::string str_request = request;
+
+    size_t pos = str_request.find("\r\n");
+    if (pos != std::string::npos) {
+        _content_body = str_request.substr(pos + 2);
+    }
+}
+
+void HttpRequest::parseConnection(std::string request) {
+	if (getValue(request, "Connection: ") == "keep-alive")
+		this->_connection = KEEP_ALIVE;
+	else
+		this->_connection = CLOSE;
+}
+
+void HttpRequest::parseCookie(std::string request) {
+	std::string cookie = getValue(request, "Cookie: ");
+		std::vector<std::string> cookies = tokenize(cookie, ';');
+		for (size_t i = 0; i < cookies.size(); i++) {
+			std::vector<std::string> key_value = tokenize(cookies[i], '=');
+			if (key_value.size() == 2)
+				this->_cookie[key_value[0]] = key_value[1];
+			else if (key_value.size() == 1)
+				this->_cookie[key_value[0]] = "";
+			else
+				throw std::runtime_error("Error: invalid cookie");
+		}
+}
+
+// Helper functions
+
+std::string HttpRequest::getValue(std::string request, std::string key_with_sep) {
+    std::string value;
+    
+    size_t pos_key = request.find(key_with_sep);
+    if (pos_key != std::string::npos) {
+        size_t endline = request.find('\n', pos_key);
+            if (endline != std::string::npos)
+                value = request.substr(pos_key + key_with_sep.size(), endline - pos_key - key_with_sep.size());
+            else 
+                value = request.substr(pos_key + key_with_sep.size());
+    }
+    else
+        value = "";
+    return value;
+}
+
+HttpRequest* HttpRequest::findInstanceWithFD(std::vector<HttpRequest>& vector, int fd) {
+    for (std::vector<HttpRequest>::iterator it = vector.begin(); it != vector.end(); ++it) {
+        if (it->_client->getFD() == fd) {
+            return &(*it);
+        }
+    }
+    return (0);
+}
+
+// DEBUG
+
 void HttpRequest::displayRequestLine(std::ostream &o) {
     switch (_method)
     {
@@ -114,34 +179,8 @@ void HttpRequest::displayRequestLine(std::ostream &o) {
     //     o << _queryString << std::endl; // DEBUG
 }
 
-std::string HttpRequest::getValue(std::string request, std::string key_with_sep) {
-    std::string value;
-    
-    size_t pos_key = request.find(key_with_sep);
-    if (pos_key != std::string::npos) {
-        size_t endline = request.find('\n', pos_key);
-            if (endline != std::string::npos)
-                value = request.substr(pos_key + key_with_sep.size(), endline - pos_key - key_with_sep.size());
-            else 
-                value = request.substr(pos_key + key_with_sep.size());
-    }
-    else
-        value = "";
-    return value;
-}
-
-void HttpRequest::parseRequestHeader(char *request) {
-        std::string str_request = request;
-
-        _host = getValue(str_request, "Host: ");
-        _accept = getValue(str_request, "Accept: ");
-        if (getValue(str_request, "Connection: ") == "keep-alive")
-            _connection = KEEP_ALIVE;
-        else
-            _connection = CLOSE;
-        _content_type = getValue(str_request, "Content-Type: ");
-        std::string len = getValue(str_request, "Content-Length: ");
-        _content_len = atol(len.c_str());
+void HttpRequest::displayRequestBody(std::ostream & o) {
+    o << _content_body << std::endl;
 }
 
 void HttpRequest::displayRequestHeader(std::ostream & o) {
@@ -153,17 +192,4 @@ void HttpRequest::displayRequestHeader(std::ostream & o) {
         o << "Connection: keep-alive" << std::endl;
     else
         o << "Connection: close" << std::endl;
-}
-
-void HttpRequest::parseRequestBody(char *request) {
-    std::string str_request = request;
-
-    size_t pos = str_request.find("\r\n");
-    if (pos != std::string::npos) {
-        _content_body = str_request.substr(pos + 2);
-    }
-}
-
-void HttpRequest::displayRequestBody(std::ostream & o) {
-    o << _content_body << std::endl;
 }
