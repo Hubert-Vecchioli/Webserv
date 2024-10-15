@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 10:32:32 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/15 16:24:28 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ void HttpResponse::_generateResponseContent(HttpRequest  & request)
 	
 	// if(/*request is CGI*/)
 	// 	// trigger the CGI
+
+	//will need to add the try & catch
 	switch(request.getMethod())
 	{
 		case GET:
@@ -69,7 +71,9 @@ Allow: GET, POST
 
 void HttpResponse::_generateGETResponse(HttpRequest & request)
 {
-	/*TODO*/
+	if (request.getHTTP == false)
+		throw ServerError(505);
+	if ()
 }
 
 //Assuming POST is only to upload files
@@ -97,6 +101,42 @@ void HttpResponse::_generatePOSTResponse(void)
 	this->_reponseContent += reponseBody
 }
 
+LocationBlock &	HttpResponse::_fetchLocationBlock(HttpRequest & request) {
+	std::string host = request.getHost();
+	std::vector<ServerBlock> server_blocks = _server.getConfigurationFile().getServerBlocks();
+	ServerBlock server_block;
+	
+	// Fecthing the appropriate server block;
+	for (size_t i = 0; i < server_blocks.size(); i++) {
+		std::vector<std::string> server_name = server_blocks[i].getServerName();
+		for (size_t j = 0; j < server_name.size(); j++) {
+			if (host == server_name[j])
+				server_block = server_blocks[i];
+				break;
+		}
+	}
+	if !(server_block)
+		throw ServerError(400);
+
+	std::string uri = request.getRequestURI();
+	std::vector<LocationBlock> location_blocks = server_block.getLocationBlocks();
+	LocationBlock location_block;
+
+	// Searching for the exact location
+	for (size_t i = 0; i < location_blocks.size(); i++) {
+		if (location_blocks[i].getLocation() == uri) {
+			location_block = location_blocks[i];
+			break;
+		}
+	}
+	if (!location_block) {
+		// Searching for the closest location
+		while (uri.size() > 1) {
+			
+		}
+	}
+}
+
 //Assuming DEL is only to del files
 void HttpResponse::_generateDELResponse(void)
 {
@@ -112,4 +152,22 @@ std::string HttpResponse::getResponseContent(void)
 	if (this->_reponseContent.empty())
 		this->_generateResponseContent();
 	return (this->_reponseContent);
+}
+
+const char *HttpResponse::ServerError::what() const throw() {
+	if (code < 500 || code > 505)
+		return "Unknown error\n";
+	else {
+		std::string errorMessage = _errorMap[_errorCode];
+		return errorMessage.c_str();
+	}
+}
+
+const char *HttpResponse::ClientError::what() const throw() {
+	if (code < 400 || (code > 415 && code != 429))
+		return "Unknown error\n";
+	else {
+		std::string errorMessage = _errorCode[_errorCode];
+		return errorMessage.c_str();
+	}
 }
