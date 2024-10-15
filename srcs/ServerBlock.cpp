@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:08:49 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 12:12:28 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/15 14:58:28 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void ServerBlock::parseServer(std::vector<std::string> block) {
 		std::vector<std::string> tokens = tokenize(block[i]);
 		if (tokens.empty())
 			continue;
-		if (tokens[0].size >= 2 && tokens[0].substr(0, 2) == "//")
+		if (tokens[0][0] == '#')
 			continue;
 		if (tokens[0] == "location")
 			i = parseLocationBlock(block, i);
