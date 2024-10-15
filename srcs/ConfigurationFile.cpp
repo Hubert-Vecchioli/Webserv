@@ -79,7 +79,7 @@ void ConfigurationFile::parseFile(void) {
 		std::vector<std::string> tokens = tokenize(line);
 		if (tokens.empty())
 			continue;
-		if (tokens[0].size >= 2 && tokens[0].substr(0, 2) == "//")
+		if (tokens[0][0] == '#')
 			continue;
 		if (tokens[0] == "server" && tokens.size() > 1 && tokens[1] == "{")
 			parseServerBlock(iss);
