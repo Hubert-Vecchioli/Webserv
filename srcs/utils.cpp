@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 13:14:32 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/08 12:24:50 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/15 15:48:29 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,11 +63,11 @@ void	print(int i, std::string message, int fd = -2)
 }
 
 
-std::vector<std::string> tokenize(std::string s) {
+std::vector<std::string> tokenize(std::string s, char delimiter) {
 	std::stringstream ss(s);
 	std::string token;
 	std::vector<std::string> tokens;
-	while (std::getline(ss, token, ' ')) {
+	while (std::getline(ss, token, delimiter)) {
 		if (token != "")
 			tokens.push_back(token);
 	}

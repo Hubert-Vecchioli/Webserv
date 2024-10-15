@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:08:49 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 14:58:28 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/15 15:49:48 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void ServerBlock::parseServer(std::vector<std::string> block) {
 	parseFunctions["error_page"] = &parseErrorPages;
 
 	for (size_t i = 0; i < block.size(); i++) {
-		std::vector<std::string> tokens = tokenize(block[i]);
+		std::vector<std::string> tokens = tokenize(block[i], ' ');
 		if (tokens.empty())
 			continue;
 		if (tokens[0][0] == '#')
