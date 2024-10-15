@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:53:51 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/09 14:30:35 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/12 18:32:06 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-Client::Client(void): _lastActionTimeStamp(std::time(nullptr)), _fd(-1)
+Client::Client(void): _lastActionTimeStamp(time(0)), _fd(-1)
 {
 }
 
-Client::Client(int fd) : _lastActionTimeStamp(std::time(nullptr)), _fd(fd)
+Client::Client(int fd) : _lastActionTimeStamp(time(0)), _fd(fd)
 {
 }
 
@@ -30,7 +30,7 @@ Client::Client(Client const & rhs)
 	return ;
 }
 
-Client::Client &operator=(Client const & rhs)
+Client & Client::operator=(Client const & rhs)
 {
 	if (this != &rhs)
 	{
@@ -47,7 +47,7 @@ int Client::getFD(void)
 
 void Client::updateLastActionTimeStamp(void)
 {
-	this->_lastActionTimeStamp(std::time(nullptr));
+	this->_lastActionTimeStamp = time(0);
 }
 
 Client* Client::findInstanceWithFD(std::vector<Client>& vector, int fd) {
@@ -56,5 +56,5 @@ Client* Client::findInstanceWithFD(std::vector<Client>& vector, int fd) {
             return &(*it);
         }
     }
-    return (nullptr);
+    return (0);
 }
