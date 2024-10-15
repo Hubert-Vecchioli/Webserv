@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:07:40 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 12:10:35 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/15 14:53:36 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ class LocationBlock
 		bool						_dirlisting;
 		std::vector<std::string>	_methods;
 		std::pair<int, std::string>	_redirect;
+		std::map<std::string, std::string> cgi_extension;
+		std::string					_upload_path;
 
 		void parseLocationBlock(std::vector<std::string> block);
 		void parseLocation(std::vector<std::string> args);
@@ -33,8 +35,9 @@ class LocationBlock
 		void parseDirlisting(std::vector<std::string> args);
 		void parseMethods(std::vector<std::string> args);
 		void parseRedirect(std::vector<std::string> args);
+		void parseCgiExtension(std::vector<std::string> args);
+		void parseUploadPath(std::vector<std::string> args);
 		
-
 	public:
 		LocationBlock(std::vector<std::string> block);
 		LocationBlock(const LocationBlock &copy);
@@ -47,6 +50,9 @@ class LocationBlock
 		bool getDirlisting(void) const;
 		std::vector<std::string> getMethods(void) const;
 		std::pair<int, std::string> getRedirect(void) const;
+		std::map<std::string, std::string> getCgiExtension(void) const;
+		std::string getUploadPath(void) const;
+
 };
 
 #endif
