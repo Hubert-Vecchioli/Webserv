@@ -1,5 +1,7 @@
 #include "webserv.hpp"
 
+// Constructors and Destructos for the ConfigurationFile class
+
 ConfigurationFile::ConfigurationFile(void) : _filename("") {
 	this->_user = "www www";
 	this->_error_log = "/var/log/webserv/error.log";
@@ -14,8 +16,7 @@ ConfigurationFile::ConfigurationFile(int numberArgs, char** args) {
 	this->_error_log = "/var/log/webserv/error.log";
 	this->_body_size = 1000000;
 	read();
-	parseBase();
-	parseServerBlock();
+	parseFile();
 }
 
 ConfigurationFile::ConfigurationFile(ConfigurationFile const & copy) {
@@ -35,6 +36,10 @@ ConfigurationFile &ConfigurationFile::operator=(ConfigurationFile const & copy) 
 }
 
 ConfigurationFile::~ConfigurationFile(void) {}
+
+// Main Parsing Functions for the ConfigurationFile class
+
+typedef void (*parseFunction)(const std::vector<std:string> &);
 
 void ConfigurationFile::read(void) {
 	if (this->_filename.empty())
@@ -59,86 +64,88 @@ void ConfigurationFile::read(std::string filename) {
 	file.close();
 }
 
-void ConfigurationFile::parseBase(void) {
-	parseUser();
-	parseErrorLog();
-	parseBodySize();
-}
+void ConfigurationFile::parseFile(void) {
+	std::map<std::string, parseFunction> parseFunctions;
+	parseFunctions["user"] = &parseUser;
+	parseFunctions["error_log"] = &parseErrorLog;
+	parseFunctions["body_size"] = &parseBodySize;
 
-void ConfigurationFile::parseServerBlock(void) {
-	std::string::size_type pos = 0;
-	std::string::size_type prev = 0;
-	std::string::size_type checkloc = 0;
-	std::string::size_type end = this->_content.size();
-	while (pos < end) {
-		pos = this->_content.find("server {", pos);
-		if (pos == std::string::npos)
-			break;
-		prev = pos;
-		pos = this->_content.find("}", pos);
-		if (pos == std::string::npos)
-			break;
-		checkloc = prev;
-		if (this->_content.substr(checkloc, pos - checkloc).find("location") != std::string::npos) {
-			checkloc = pos;
-			pos = this->_content.find("}", checkloc + 1);
+	std::istringstream iss(this->_content);
+	std::string line;
+
+	while (std::getline(iss, line)) {
+		if (line.empty())
+			continue;
+		std::vector<std::string> tokens = tokenize(line);
+		if (tokens.empty())
+			continue;
+		if (tokens[0].size >= 2 && tokens[0].substr(0, 2) == "//")
+			continue;
+		if (tokens[0] == "server" && tokens.size() > 1 && tokens[1] == "{")
+			parseServerBlock(iss);
+		else if (parseFunctions.find(tokens[0]) != parseFunctions.end()) {
+			std::vector<std::string> args(tokens.begin() + 1, tokens.end());
+			parseFunctions[tokens[0]](args);
 		}
-		std::string serverBlock = this->_content.substr(prev, pos - prev);
-		ServerBlock block(serverBlock);
-		this->_serverBlocks.push_back(block);
+		else {
+			std::string error =  "Error: invalid directive : " + tokens[0];
+			throw std::runtime_error(error);
+		}	
 	}
 }
 
-void ConfigurationFile::parseUser(void) {
-	std::string::size_type pos = 0;
-	std::string::size_type prev = 0;
-	pos = this->_content.find("user", pos);
-	if (pos == std::string::npos)
-		return ;
-	prev = pos;
-	pos = this->_content.find(";", pos);
-	if (pos == std::string::npos)
+void ConfigurationFile::parseUser(std::vector<std::string> args) {
+	if (args.size() != 1)
 		throw std::runtime_error("Error: invalid user directive");
-	this->_user = this->_content.substr(prev + 5, pos - prev - 5);
+	this->_user = args[0].substr(0, args[0].find(";"));
 }
 
-void ConfigurationFile::parseErrorLog(void) {
-	std::string::size_type pos = 0;
-	std::string::size_type prev = 0;
-	pos = this->_content.find("error_log", pos);
-	if (pos == std::string::npos)
-		return ;
-	prev = pos;
-	pos = this->_content.find(";", pos);
-	if (pos == std::string::npos)
+void ConfigurationFile::parseErrorLog(std::vector<std::string> args) {
+	if (args.size() != 1)
 		throw std::runtime_error("Error: invalid error_log directive");
-	this->_error_log = this->_content.substr(prev + 10, pos - prev - 10);
+	this->_error_log = args[0].substr(0, args[0].find(";"));
 }
 
-void ConfigurationFile::parseBodySize(void) {
-	std::string::size_type pos = 0;
-	std::string::size_type prev = 0;
-	pos = this->_content.find("body_size", pos);
-	if (pos == std::string::npos) {
-		this->_body_size = 1000000;
-		return ;
-	}
-	prev = pos;
-	pos = this->_content.find(";", pos);
-	if (pos == std::string::npos)
-		throw std::runtime_error("Error: invalid body_size directive");
-	std::vector<std::string> size = tokenize(this->_content.substr(prev + 9, pos - prev - 9));
-	if (size.size() != 2)
+void ConfigurationFile::parseBodySize(std::vector<std::string> args) {
+	if (args.size() != 2)
 		throw std::runtime_error("Error: invalid body_size directive");
 	unsigned long multiplier = 1;
-	if (size[1] == "KB")
+	std::string size = args[1].substr(0, args[0].find(";"));
+	if (size == "KB")
 		multiplier = 1024;
-	else if (size[1] == "MB")
+	else if (size == "MB")
 		multiplier = 1024 * 1024;
-	else if (size[1] == "GB")
+	else if (size == "GB")
 		multiplier = 1024 * 1024 * 1024;
-	this->_body_size = std::atoi(size[0].c_str()) * multiplier;
+	else
+		throw std::runtime_error("Error: invalid body_size directive");
+	this->_body_size = std::atoi(args[0].c_str()) * multiplier;
 }
+
+void ConfigurationFile::parseServerBlock(std::istringstream &iss) {
+	std::string line;
+	std::vector<std::string> blockLines;
+	int openBrackets = 1;
+
+	while (std::getline(iss, line)) {
+		for (size_t i = 0; i < line.size(); i++) {
+			for (size_t j = 0; j < line.size(); j++) {
+				if (line[i][j] == '{')
+					openBrackets++;
+				else if (line[i][j] == '}')
+					openBrackets--;
+			}
+		}
+		blockLines.push_back(line);
+		if (openBrackets == 0) {
+			ServerBlock block(blockLines);
+			this->_serverBlocks.push_back(block);
+			return ;
+		}
+	}
+}
+
+// Getter Functions for the ConfigurationFile class
 
 std::string ConfigurationFile::getUser(void) const {
 	return this->_user;
@@ -155,6 +162,8 @@ unsigned long ConfigurationFile::getBody_size(void) const {
 std::vector<ServerBlock> ConfigurationFile::getServerBlocks(void) const {
 	return this->_serverBlocks;
 }
+
+// IP and Port Getter Function for the ConfigurationFile class
 
 std::vector<std::pair<std::string, int> > ConfigurationFile::getserverIPandPorts(void) const {
 	std::vector<std::pair<std::string, int> > ip_ports;

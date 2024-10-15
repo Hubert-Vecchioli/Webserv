@@ -15,7 +15,14 @@ server {
     index index.html;
     dirlisting on;
     methods GET;
-    redirect 301 /images;
+    }
+
+    location /farfadet {
+    redirect 301 rickroll.com;
+    }
+
+    location /photos/chien {
+    methods POST DELETE
     }
 }
 
