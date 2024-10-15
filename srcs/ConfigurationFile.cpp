@@ -76,7 +76,7 @@ void ConfigurationFile::parseFile(void) {
 	while (std::getline(iss, line)) {
 		if (line.empty())
 			continue;
-		std::vector<std::string> tokens = tokenize(line);
+		std::vector<std::string> tokens = tokenize(line, ' ');
 		if (tokens.empty())
 			continue;
 		if (tokens[0][0] == '#')

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/12 18:39:25 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/15 15:55:38 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,7 @@ void HttpRequest::parseRequestHeader(char *request) {
         _content_type = getValue(str_request, "Content-Type: ");
         std::string len = getValue(str_request, "Content-Length: ");
         _content_len = atol(len.c_str());
+		parseCookie(str_request);
 }
 
 void HttpRequest::displayRequestHeader(std::ostream & o) {
@@ -166,4 +167,18 @@ void HttpRequest::parseRequestBody(char *request) {
 
 void HttpRequest::displayRequestBody(std::ostream & o) {
     o << _content_body << std::endl;
+}
+
+void HttpRequest::parseCookie(std::string str_request) {
+	std::string cookie = getValue(str_request, "Cookie: ");
+		std::vector<std::string> cookies = tokenize(cookie, ';');
+		for (size_t i = 0; i < cookies.size(); i++) {
+			std::vector<std::string> key_value = tokenize(cookies[i], '=');
+			if (key_value.size() == 2)
+				_cookie[key_value[0]] = key_value[1];
+			else if (key_value.size() == 1)
+				_cookie[key_value[0]] = "";
+			else
+				throw std::runtime_error("Error: invalid cookie");
+		}
 }

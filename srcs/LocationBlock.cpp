@@ -4,7 +4,7 @@
 
 LocationBlock::LocationBlock(std::vector<std::string> block) : 
 _location(""), _root(""), _index(""), _dirlisting(false),
-_methods(tokenize("GET")), _redirect(), cgi_extension(), _upload_path("")
+_methods(tokenize("GET", ' ')), _redirect(), cgi_extension(), _upload_path("")
 {
 	parseLocationBlock(block);
 }
@@ -41,9 +41,9 @@ void LocationBlock::parseLocationBlock(std::vector<std::string> block) {
 	parseFunctions["cgi_extension"] = &parseCgiExtension;
 	parseFunctions["upload_path"] = &parseUploadPath;
 
-	parseLocation(tokenize(block[0]));
+	parseLocation(tokenize(block[0], ' '));
 	for (size_t i = 1; i < block.size(); i++) {
-		std::vector<std::string> tokens = tokenize(block[i]);
+		std::vector<std::string> tokens = tokenize(block[i], ' ');
 		if (tokens.empty())
 			continue;
 		if (tokens[0][0] == '#')
@@ -101,7 +101,7 @@ void LocationBlock::parseMethods(std::vector<std::string> args) {
 		line += args[i] + " ";
 	if (line.find(";") != line.size() - 2)
 		throw std::runtime_error("Error: invalid methods directive");
-	this->_methods = tokenize(line.substr(0, line.size() - 2));
+	this->_methods = tokenize(line.substr(0, line.size() - 2), ' ');
 	for (size_t i = 0; i < this->_methods.size(); i++)
 		if (this->_methods[i] != "GET" || this->_methods[i] != "POST" || this->_methods[i] != "DELETE")
 			throw std::runtime_error("Error: invalid methods directive");
