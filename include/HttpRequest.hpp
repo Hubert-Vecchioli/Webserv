@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 15:56:49 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/15 16:26:20 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,10 @@ class HttpRequest
 		std::string							_content_body; //body
 		
 		std::string getValue(std::string request, std::string key);
-		void parseRequestLine(char *request);
-		void parseRequestHeader(char *request);
-    	void parseRequestBody(char *request);
+		void parseRequestLine(std::string request);
+		void parseRequestHeader(std::string request);
+    	void parseRequestBody(std::string request);
+		void parseConnection(std::string request);
 		void parseCookie(std::string str_request);
 
 	public:
