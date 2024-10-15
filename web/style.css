@@ -36,7 +36,7 @@ li {
 }
 
 h1 {
-	color: #5f458f;
+	color: #55228f;
 }
 
 strong {
@@ -128,4 +128,16 @@ input::placeholder, textarea::placeholder {
 
 .styled-form button:hover {
     background-color: #ffffff10;
+}
+.error-container {
+    text-align: center;
+}
+.error-code {
+    font-size: 10em;
+    font-weight: bold;
+    color: #55228f;
+}
+.error-text {
+    font-size: 1em;
+    color: #ffffff;
 }
