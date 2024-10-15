@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 16:24:28 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/15 16:38:31 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,25 +116,34 @@ LocationBlock &	HttpResponse::_fetchLocationBlock(HttpRequest & request) {
 		}
 	}
 	if !(server_block)
-		throw ServerError(400);
+		throw ClientError(400);
 
 	std::string uri = request.getRequestURI();
+	if (uri.size() > 65536)
+		throw ClientError(414);
+
 	std::vector<LocationBlock> location_blocks = server_block.getLocationBlocks();
 	LocationBlock location_block;
 
-	// Searching for the exact location
-	for (size_t i = 0; i < location_blocks.size(); i++) {
-		if (location_blocks[i].getLocation() == uri) {
-			location_block = location_blocks[i];
-			break;
+	while (!location_block  && uri.size() > 0) {
+		for (size_t i = 0; i < location_blocks.size(); i++) {
+			if (location_blocks[i].getLocation() == uri) {
+				location_block = location_blocks[i];
+				break;
+			}
 		}
+		size_t pos = uri.find_last_of('/')
+		if (pos != std::string::npos && pos != 0)
+			uri = uri.substr(pos);
+		else if (pos == 0)
+			uri = "/";
+		else
+			throw ClientError(404);
 	}
-	if (!location_block) {
-		// Searching for the closest location
-		while (uri.size() > 1) {
-			
-		}
-	}
+
+	if (!location_block)
+		throw ClientError(404);
+	return location_block;
 }
 
 //Assuming DEL is only to del files
