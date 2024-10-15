@@ -6,28 +6,28 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/12 18:40:14 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/15 10:32:32 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-void HttpResponse::_generateResponseContent(void)
+void HttpResponse::_generateResponseContent(HttpRequest  & request)
 {
 	//Check redirect and prepare the response
 	// TODO: add a pointer to HTTPrequest
 	
 	// if(/*request is CGI*/)
 	// 	// trigger the CGI
-	switch(/*Request Method*/)
+	switch(request.getMethod())
 	{
-		case "GET":
+		case GET:
 			this->_generateGETResponse();
 			break;
-		case "POST":
+		case POST:
 			this->_generatePOSTResponse();
 			break;
-		case "DEL":
+		case DELETE:
 			this->_generateDELResponse();
 			break;
 		default:
@@ -67,7 +67,7 @@ Allow: GET, POST
 	this->_reponseContent += reponseBody
 }
 
-void HttpResponse::_generateGETResponse(void)
+void HttpResponse::_generateGETResponse(HttpRequest & request)
 {
 	/*TODO*/
 }
