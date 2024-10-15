@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:07:40 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/09 01:31:02 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/15 12:10:35 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,18 +24,19 @@ class LocationBlock
 		std::string					_index;
 		bool						_dirlisting;
 		std::vector<std::string>	_methods;
-		std::string					_redirect;
+		std::pair<int, std::string>	_redirect;
 
-		void parseLocation(std::string block);
-		void parseRoot(std::string block);
-		void parseIndex(std::string block);
-		void parseDirlisting(std::string block);
-		void parseMethods(std::string block);
-		void parseRedirect(std::string block);
+		void parseLocationBlock(std::vector<std::string> block);
+		void parseLocation(std::vector<std::string> args);
+		void parseRoot(std::vector<std::string> args);
+		void parseIndex(std::vector<std::string> args);
+		void parseDirlisting(std::vector<std::string> args);
+		void parseMethods(std::vector<std::string> args);
+		void parseRedirect(std::vector<std::string> args);
 		
 
 	public:
-		LocationBlock(std::string block);
+		LocationBlock(std::vector<std::string> block);
 		LocationBlock(const LocationBlock &copy);
 		LocationBlock &operator=(const LocationBlock &copy);
 		~LocationBlock(void);
@@ -45,7 +46,7 @@ class LocationBlock
 		std::string getIndex(void) const;
 		bool getDirlisting(void) const;
 		std::vector<std::string> getMethods(void) const;
-		std::string getRedirect(void) const;
+		std::pair<int, std::string> getRedirect(void) const;
 };
 
 #endif
