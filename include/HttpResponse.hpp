@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/12 17:56:40 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/14 14:33:40 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 class HttpResponse
 {
 	private:
+	
 		bool		_isResponseSent;
 		std::string	_reponseContent;
 		std::time_t _lastActionTimeStamp;
