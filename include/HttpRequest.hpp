@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/10 15:28:53 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/12 18:36:41 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 # define HTTPREQUEST_HPP
 
 #include "webserv.hpp"
-#include "HttpRequest.hpp"
+
+class HttpResponse;
 
 typedef enum e_method {
 	GET,
@@ -31,8 +32,8 @@ typedef enum e_connection {
 class HttpRequest
 {
 	private:
-		// Client*								_client;
-		// HttpResponse*						_response;
+		Client*								_client;
+		HttpResponse*						_response;
 		t_method							_method; //requestLine
 		bool								_http1; //requestLine
 		std::string							_queryString; //requestLine
@@ -50,7 +51,7 @@ class HttpRequest
     	void parseRequestBody(char *request);
 
 	public:
-		HttpRequest(char *request);
+		HttpRequest(Client *client, HttpResponse *response, char *request);
 		HttpRequest(HttpRequest const & rhs);
 		HttpRequest &operator=(HttpRequest const & rhs);
 		~HttpRequest(void);
@@ -59,8 +60,8 @@ class HttpRequest
 		void displayRequestHeader(std::ostream & o);
 		void displayRequestBody(std::ostream & o);
 
-		// HttpResponse* getResponse(void) {return _response};
-		//static HttpRequest* findInstanceWithFD(std::vector<HttpRequest>& vector, int fd);
+		HttpResponse* getResponse(void) {return _response;};
+		static HttpRequest* findInstanceWithFD(std::vector<HttpRequest>& vector, int fd);
 };
 
 #endif

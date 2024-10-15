@@ -16,12 +16,12 @@ PATHS = main.cpp \
 		LocationBlock.cpp \
 		ServerBlock.cpp \
 		utils.cpp \
-		#Client.cpp \
-		#HttpRequest.cpp \
-		#HttpResponse.cpp \
-		#signal.cpp \
-		#Socket.cpp \
-		#Server.cpp
+		Client.cpp \
+		HttpRequest.cpp \
+		HttpResponse.cpp \
+		signal.cpp \
+		Socket.cpp \
+		Server.cpp
 
 SRCS = $(addprefix $(SRCDIRS)/, $(PATHS))
 SRCDIRS = srcs
