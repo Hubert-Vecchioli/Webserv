@@ -7,13 +7,22 @@ server {
     listen 127.0.0.1 8080;
     server_name ebesnoin.com;
     error_page 404 504 418 error.html;
+    error_page 500 test.html;
+    error_page 404 test.html;
 
     location /photos {
     root /var/www/photos;
     index index.html;
     dirlisting on;
     methods GET;
-    redirect /photos /images;
+    }
+
+    location /farfadet {
+    redirect 301 rickroll.com;
+    }
+
+    location /photos/chien {
+    methods POST DELETE
     }
 }
 
@@ -27,5 +36,10 @@ server {
     index index.html;
     dirlisting off;
     methods GET POST;
+    }
+
+    location /friends/chat/ {
+    
+    
     }
 }
