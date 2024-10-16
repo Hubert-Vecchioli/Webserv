@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/16 16:55:23 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/16 18:03:07 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,11 +49,11 @@ void Server::startServer(ConfigurationFile & configurationFile)
 {
 	this->_configurationFile = &configurationFile;
 	print(1, "[Info] - Initialising the webserv");
-	this->_serverFD(epoll_create(MAX_EVENTS));
+	this->_serverFD = epoll_create(MAX_EVENTS);
     if (this->_serverFD == -1)
 		throw FailureInitiateEpollInstanceException();
-	std::vector<pair <std::string ip, unsigned int port> ip_port> &parsed_config = configurationFile.getIpPorts();
-	for (std::vector<pair <std::string ip, unsigned int port> ip_port>::iterator it = parsed_config.begin(); it != parsed_config.end(); ++it)
+	const std::vector<std::pair <std::string, int> > &parsed_config = configurationFile.getserverIPandPorts();
+	for (std::vector<std::pair <std::string, int> >::const_iterator it = parsed_config.begin(); it != parsed_config.end(); ++it)
 	{
 		int blocServersFD = socket(AF_INET, SOCK_STREAM, 0);
 		if (blocServersFD == -1)

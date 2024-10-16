@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 13:14:32 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 15:48:29 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/16 18:03:52 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ std::vector<std::string> tokenize(std::string s, char delimiter) {
 	return tokens;
 }
 
-void	modifyEpollCTL(int EpollFD, int listendFD, int epollAction, bool isReadyToSendResponse = false)
+void	modifyEpollCTL(int EpollFD, int listendFD, int epollAction, bool isReadyToSendResponse)
 {
 	epoll_event ev;
 	if (epollAction != EPOLL_CTL_DEL)
