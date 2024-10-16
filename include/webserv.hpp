@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/16 17:02:40 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/16 18:03:45 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,5 +52,6 @@
 void	displayTimestamp(void);
 void	print(int i, std::string message);
 std::vector<std::string> tokenize(std::string s, char delimiter);
+void	modifyEpollCTL(int EpollFD, int listendFD, int epollAction, bool isReadyToSendResponse = false);
 
 #endif
