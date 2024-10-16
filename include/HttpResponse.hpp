@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 15:52:39 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/16 14:40:08 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@ class HttpResponse
 		void 			_generatePOSTResponse(void);
 		void 			_generateDELResponse(void);
 		void 			_generateInvalidMethod(void);
-		LocationBlock	&_fetchLocationBlock(HttpRequest & request);
+		ServerBlock		&_fetchServerBlock(HttpRequest & request);
+		LocationBlock	&_fetchLocationBlock(HttpRequest & request, ServerBlock & server_block);
 		
 
 	public:
