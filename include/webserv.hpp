@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 15:48:58 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/16 17:02:40 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@
 # include <netinet/in.h>
 # include <sys/epoll.h>
 # include <fcntl.h>
+# include <unistd.h>
+#include <arpa/inet.h>
 
 # include "Server.hpp"
 # include "Socket.hpp"
