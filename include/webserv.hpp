@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/16 14:57:54 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/16 17:01:21 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,9 @@
 # include <netinet/in.h>
 # include <sys/epoll.h>
 # include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 # include "Server.hpp"
 # include "Socket.hpp"

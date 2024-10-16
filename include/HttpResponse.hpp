@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/16 14:40:08 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/16 17:58:01 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,18 +18,20 @@
 class HttpResponse
 {
 	private:
-		Server			&_server;
-		bool			_isResponseSent;
-		std::string		_reponseContent;
-		std::time_t 	_lastActionTimeStamp;
-		void 			_generateResponseContent(HttpRequest & request);
-		void 			_generateGETResponse(HttpRequest & request);
-		void 			_generatePOSTResponse(void);
-		void 			_generateDELResponse(void);
-		void 			_generateInvalidMethod(void);
-		ServerBlock		&_fetchServerBlock(HttpRequest & request);
-		LocationBlock	&_fetchLocationBlock(HttpRequest & request, ServerBlock & server_block);
-		
+		Server				&_server;
+		bool				_isResponseSent;
+		std::string			_responseContent;
+		std::time_t		 	_lastActionTimeStamp;
+		void 				_generateResponseContent(HttpRequest & request);
+		void 				_generateGETResponse(HttpRequest & request);
+		void 				_generatePOSTResponse(void);
+		void 				_generateDELResponse(void);
+		void 				_generateInvalidMethod(void);
+		void				_generateErrorResponse(int errorCode, char *errorMessage, ServerBlock & server_block);
+		void				_generateGenericErrorResponse(int errorCode, char *errorMessage);
+		std::stringstream	_displayTimeStamp(void);
+		ServerBlock			&_fetchServerBlock(HttpRequest & request);
+		LocationBlock		&_fetchLocationBlock(HttpRequest & request, ServerBlock & server_block);
 
 	public:
 		HttpResponse(void);
@@ -47,13 +49,14 @@ class HttpResponse
 				std::map<int, std::string>	_errorMap;
 			public:
 				ServerError(int code): _errorCode(code) {
-					_errorMap[500] = "Internal Server Error\n";
-					_errorCode[501] = "Not Implemented\n";
-					_errorCode[502] = "Bad Gateway\n";
-					_errorCode[503] = "Service Unavailable\n";
-					_errorCode[504] = "Gateway Timeout\n";
-					_errorCode[505] = "HTTP Version Not Supported\n";
+					_errorMap[500] = "Internal Server Error";
+					_errorMap[501] = "Not Implemented";
+					_errorMap[502] = "Bad Gateway";
+					_errorMap[503] = "Service Unavailable";
+					_errorMap[504] = "Gateway Timeout";
+					_errorMap[505] = "HTTP Version Not Supported";
 				}
+				int	getErrorCode() {return _errorCode;};
 				virtual const char *what() const throw();
 		};
 
@@ -63,23 +66,24 @@ class HttpResponse
 				std::map<int, std::string>	_errorMap;
 			public:
 				ClientError(int code): _errorCode(code) {
-					_errorCode[400] = "Bad Request\n";
-					_errorCode[401] = "Unauthorized\n";
-					_errorCode[403] = "Forbidden\n";
-					_errorCode[404] = "Not Found\n";
-					_errorCode[405] = "Method Not Allowed\n";
-					_errorCode[406] = "Not Acceptable\n";
-					_errorCode[407] = "Proxy Authentication Required\n"
-					_errorCode[408] = "Request Timeout\n";;
-					_errorCode[409] = "Conflict\n";
-					_errorCode[410] = "Gone\n";
-					_errorCode[411] = "Length Required\n";
-					_errorCode[412] = "Precondition Failed\n";
-					_errorCode[413] = "Payload Too Large\n";
-					_errorCode[414] = "URI Too Long\n";
-					_errorCode[415] = "Unsupported Media Type\n";
-					_errorCode[429] = "Too Many Requests\n";
+					_errorMap[400] = "Bad Request";
+					_errorMap[401] = "Unauthorized";
+					_errorMap[403] = "Forbidden";
+					_errorMap[404] = "Not Found";
+					_errorMap[405] = "Method Not Allowed";
+					_errorMap[406] = "Not Acceptable";
+					_errorMap[407] = "Proxy Authentication Required";
+					_errorMap[408] = "Request Timeout";
+					_errorMap[409] = "Conflict";
+					_errorMap[410] = "Gone";
+					_errorMap[411] = "Length Required";
+					_errorMap[412] = "Precondition Failed";
+					_errorMap[413] = "Payload Too Large";
+					_errorMap[414] = "URI Too Long";
+					_errorMap[415] = "Unsupported Media Type";
+					_errorMap[429] = "Too Many Requests";
 				}
+				int	getErrorCode() {return _errorCode;};
 				virtual const char *what() const throw();
 		}
 };
