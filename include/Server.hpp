@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/12 18:22:54 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/16 16:53:14 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ class HttpRequest;
 class Server
 {
 	private:
-		static Server &					_uniqueInstance;
+		static Server &				_uniqueInstance;
 		ConfigurationFile*			_configurationFile;
 		bool 						_isServerGreenlighted;
 		int							_serverFD;
@@ -49,7 +49,7 @@ class Server
 		void startServer(ConfigurationFile & configurationFile);
 		void runServer(void);
 		void stopServer(void);
-		static const Server & getInstance(void) {return _uniqueInstance;};
+		static Server & getInstance(void) {return _uniqueInstance;};
 		
 		class FailureInitiateEpollInstanceException : public std::exception
 		{

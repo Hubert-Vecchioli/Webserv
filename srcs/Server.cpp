@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/09 19:07:55 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/16 16:52:15 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void Server::startServer(ConfigurationFile & configurationFile)
 	print(1, "[Info] - Webserv initialised");
 }
 
-void Server::stop(void)
+void Server::stopServer(void)
 {
 	this->_isServerGreenlighted(false);
 }
