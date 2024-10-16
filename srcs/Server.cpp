@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/16 16:52:15 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/16 16:55:23 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ Server::Server(Server const & rhs)
 	return ;
 }
 
-Server::Server &operator=(Server const & rhs)
+Server &Server::operator=(Server const & rhs)
 {
 	if (this != &rhs)
 	{
