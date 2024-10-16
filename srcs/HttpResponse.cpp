@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 16:38:31 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/16 14:58:04 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,49 +101,43 @@ void HttpResponse::_generatePOSTResponse(void)
 	this->_reponseContent += reponseBody
 }
 
-LocationBlock &	HttpResponse::_fetchLocationBlock(HttpRequest & request) {
+ServerBlock	& HttpResponse::_fetchServerBlock(HttpRequest & request) {
 	std::string host = request.getHost();
 	std::vector<ServerBlock> server_blocks = _server.getConfigurationFile().getServerBlocks();
 	ServerBlock server_block;
-	
-	// Fecthing the appropriate server block;
+
 	for (size_t i = 0; i < server_blocks.size(); i++) {
-		std::vector<std::string> server_name = server_blocks[i].getServerName();
-		for (size_t j = 0; j < server_name.size(); j++) {
-			if (host == server_name[j])
-				server_block = server_blocks[i];
-				break;
+		std::vector<std::string> server_names = server_blocks[i].getServerName();
+		for (size_t j = 0; j < server_names.size(); j++) {
+			if (host == server_names[j])
+				return server_blocks[i];
 		}
 	}
 	if !(server_block)
 		throw ClientError(400);
+}
 
+LocationBlock &	HttpResponse::_fetchLocationBlock(HttpRequest & request, ServerBlock & server_block) {
 	std::string uri = request.getRequestURI();
-	if (uri.size() > 65536)
+	if (uri.size() > MAX_URI_SIZE)
 		throw ClientError(414);
 
 	std::vector<LocationBlock> location_blocks = server_block.getLocationBlocks();
-	LocationBlock location_block;
-
-	while (!location_block  && uri.size() > 0) {
+	
+	while (uri.size() > 0) {
 		for (size_t i = 0; i < location_blocks.size(); i++) {
-			if (location_blocks[i].getLocation() == uri) {
-				location_block = location_blocks[i];
-				break;
-			}
+			if (location_blocks[i].getLocation() == uri)
+				return location_blocks[i];
 		}
 		size_t pos = uri.find_last_of('/')
 		if (pos != std::string::npos && pos != 0)
 			uri = uri.substr(pos);
-		else if (pos == 0)
+		else if (pos == 0 && uri.size() > 1)
 			uri = "/";
 		else
 			throw ClientError(404);
 	}
-
-	if (!location_block)
-		throw ClientError(404);
-	return location_block;
+	throw ClientError(404);
 }
 
 //Assuming DEL is only to del files
