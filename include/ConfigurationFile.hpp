@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigurationFile.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:55:36 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/14 15:05:14 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/16 15:13:03 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,9 @@ class ConfigurationFile
 		unsigned long 									_body_size;
 		std::vector<ServerBlock> 						_serverBlocks;
 
-		void parseUser(std::vector<std::string> args);				//get user
-		void parseErrorLog(std::vector<std::string> args);			//get error_log
-		void parseBodySize(std::vector<std::string> args);			//get body_size
+		void parseUser(std::vector<std::string> &args);				//get user
+		void parseErrorLog(std::vector<std::string> &args);			//get error_log
+		void parseBodySize(std::vector<std::string> &args);			//get body_size
 		void parseServerBlock(std::istringstream &iss);								//parse server blocks inside config file
 
 	public:
@@ -41,7 +41,7 @@ class ConfigurationFile
 
 		void read(void);					//read file if one was already provided
 		void read(std::string filename);	//read file if one was not provided or rewrite file to read
-		void ConfigurationFile::parseFile(void)
+		void parseFile(void);
 		
 		
 		std::string getUser(void) const;	//get user
