@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/16 17:58:01 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/16 19:06:52 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ class HttpResponse
 		void 				_generateGETResponse(HttpRequest & request);
 		void 				_generatePOSTResponse(void);
 		void 				_generateDELResponse(void);
-		void 				_generateInvalidMethod(void);
 		void				_generateErrorResponse(int errorCode, char *errorMessage, ServerBlock & server_block);
 		void				_generateGenericErrorResponse(int errorCode, char *errorMessage);
 		std::stringstream	_displayTimeStamp(void);

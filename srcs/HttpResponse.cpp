@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/16 18:05:17 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/16 19:19:15 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,81 +33,9 @@ void HttpResponse::_generateResponseContent(HttpRequest  & request)
 			this->_generateDELResponse();
 			break;
 		default:
-			throw this->_generateInvalidMethod();
+			throw this->_generateErrorResponse(405, ClientError(405).what());
 	}
 	
-}
-
-void HttpResponse::_generateInvalidMethod(void)
-{
-/*
-Example
-HTTP/1.1 405 Method Not Allowed
-Content-Type: application/json
-Content-Length: 88
-Allow: GET, POST
-
-{
-  "error": "Method Not Allowed",
-  "message": "The DELETE method is not allowed for the requested resource."
-}*/
-	
-	std::string reponseBody = "{\n";
-	reponseBody += "\"error\": \"Method Not Allowed\",\n";
-	reponseBody += "\"message\": \"The " + /*Request Method*/ + " method is not allowed for the requested resource.\",\n";
-	reponseBody += "}\n";
-
-	std::ostringstream oss;
-	oss << reponseBody.size();
-    std::string sizeStr = oss.str();
-
-	this->_reponseContent = "HTTP/1.1 405 Method Not Allowed\r\n";
-	this->_reponseContent += "Content-Type: application/json\r\n";
-	this->_reponseContent += "Content-Length: " + sizeStr + "\r\n";
-	this->_reponseContent += "Allow: " + /*Allowed Methods*/ + "\r\n";
-	this->_reponseContent += "\r\n";
-	this->_reponseContent += reponseBody
-}
-
-void HttpResponse::_generateGETResponse(HttpRequest & request)
-{
-	std::stringstream ss;
-	if (request.getHTTP == false)
-		throw ServerError(505);
-	_reponseContent = "HTTP/1.1 ";
-	try {
-		ServerBlock server_block = _fetchServerBlock(request);
-		try {
-			LocationBlock location_block = _fetchLocationBlock(request, server_block);
-		}
-	}
-	catch (HttpResponse::ClientError & e) {
-	}
-}
-
-//Assuming POST is only to upload files
-void HttpResponse::_generatePOSTResponse(void)
-{
-	std::ostringstream oss;
-	oss << /*TODO: Get the file size*/;
-    std::string sizeStr = oss.str();
-	
-	std::string reponseBody = "{\n";
-	reponseBody += "\"message\": \"File uploaded successfully.\",\n";
-	reponseBody += "\"filename\": \"" + /*Path file*/ + "\",\n";
-	reponseBody += "\"uploadedAt\": \""+ displayTimestampResponseFormat()+ "\",\n";
-	reponseBody += "\"size\": " + sizeStr + "\n";
-	reponseBody += "}\n";
-
-	std::ostringstream oss2;
-	oss2 << reponseBody.size();
-    std::string sizeStr = oss2.str();
-
-	this->_reponseContent = "HTTP/1.1 201 Created\r\n";
-	this->_reponseContent += "Content-Type: application/json\r\n";
-	this->_reponseContent += "Content-Length: " + sizeStr + "\r\n";
-	this->_reponseContent += "\r\n";
-	this->_reponseContent += reponseBody
 }
 
 ServerBlock	& HttpResponse::_fetchServerBlock(HttpRequest & request) {
@@ -149,6 +77,34 @@ LocationBlock &	HttpResponse::_fetchLocationBlock(HttpRequest & request, ServerB
 	throw ClientError(404);
 }
 
+// CURRENT WORK => GET CONTENT TYPE
+// std::string getContentType(HttpRequest & request) {
+// 	std::string uri = request.getRequestURI();
+// 	if ((size_t pos = uri.find('?')) != std::string::npos) {
+// 		uri = uri.substr(pos);
+// 	}
+// }
+
+void HttpResponse::_generateGETResponse(HttpRequest & request)
+{
+	std::stringstream ss;
+	if (request.getHTTP == false)
+		return _generateErrorResponse(505, ServerError(505).what());
+	try {
+		ServerBlock server_block = _fetchServerBlock(request);
+		try {
+			LocationBlock location_block = _fetchLocationBlock(request, server_block);
+			std::vector<std::string> methods = location_block.getMethods();
+			if (methods.find(request.getMethod) == methods.end())
+				return _generateErrorResponse(405, ClientError(405).what());
+			
+		}
+	}
+	catch (HttpResponse::ClientError & e) {
+		return _generateErrorResponse(e.getErrorCode(), e.what());
+	}
+}
+
 //Assuming DEL is only to del files
 void HttpResponse::_generateDELResponse(void)
 {
@@ -156,6 +112,31 @@ void HttpResponse::_generateDELResponse(void)
 	// TODO: Review if the file can be deleted, if not error 403
 
 	this->_reponseContent = "HTTP/1.1 204 No Content\r\n";
+}
+
+//Assuming POST is only to upload files
+void HttpResponse::_generatePOSTResponse(void)
+{
+	std::ostringstream oss;
+	oss << /*TODO: Get the file size*/;
+    std::string sizeStr = oss.str();
+	
+	std::string reponseBody = "{\n";
+	reponseBody += "\"message\": \"File uploaded successfully.\",\n";
+	reponseBody += "\"filename\": \"" + /*Path file*/ + "\",\n";
+	reponseBody += "\"uploadedAt\": \""+ displayTimestampResponseFormat()+ "\",\n";
+	reponseBody += "\"size\": " + sizeStr + "\n";
+	reponseBody += "}\n";
+
+	std::ostringstream oss2;
+	oss2 << reponseBody.size();
+    std::string sizeStr = oss2.str();
+
+	this->_reponseContent = "HTTP/1.1 201 Created\r\n";
+	this->_reponseContent += "Content-Type: application/json\r\n";
+	this->_reponseContent += "Content-Length: " + sizeStr + "\r\n";
+	this->_reponseContent += "\r\n";
+	this->_reponseContent += reponseBody
 }
 
 void HttpResponse::_generateErrorResponse(int errorCode, char *errorMessage, ServerBlock & server_block) {
