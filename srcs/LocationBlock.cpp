@@ -49,7 +49,7 @@ void LocationBlock::parseLocationBlock(std::vector<std::string> block) {
 		if (tokens[0][0] == '#')
 			continue;
 		if (parseFunctions.find(tokens[0]) != parseFunctions.end()) {
-			std::vector<std::string> args(tokens.begin() + 1, tokens.end());;
+			std::vector<std::string> args(tokens.begin() + 1, tokens.end());
 			(this->*parseFunctions[tokens[0]])(args);
 		}
 		else {
