@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:07:40 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/16 15:10:43 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/16 16:16:55 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,10 @@ class ServerBlock
 		std::map<int, std::string> _error_pages;
 		std::vector<LocationBlock> _locationBlocks;
 
-		void parseListen(std::vector<std::string> args);  //get IP and Port -> listen
-		void parseServerName(std::vector<std::string> args); //get server name
-		void parseErrorPages(std::vector<std::string> args); //get error pages
-		void parseLocationBlock(std::vector<std::string> block, int i); //get location blocks in the server block
+		void parseListen(std::vector<std::string> &args);  //get IP and Port -> listen
+		void parseServerName(std::vector<std::string> &args); //get server name
+		void parseErrorPages(std::vector<std::string> &args); //get error pages
+		int parseLocationBlock(std::vector<std::string> block, size_t i); //get location blocks in the server block
 		void parseServer(std::vector<std::string> block);
 
 	public:
