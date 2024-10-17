@@ -4,7 +4,7 @@
 
 LocationBlock::LocationBlock(std::vector<std::string> block) : 
 _location(""), _root(""), _index(""), _dirlisting(false),
-_methods(tokenize("GET")), _redirect()
+_methods(tokenize("GET", ' ')), _redirect(), cgi_extension(), _upload_path("")
 {
 	parseLocationBlock(block);
 }
@@ -38,13 +38,15 @@ void LocationBlock::parseLocationBlock(std::vector<std::string> block) {
 	parseFunctions["dirlisting"] = &parseDirlisting;
 	parseFunctions["methods"] = &parseMethods;
 	parseFunctions["redirect"] = &parseRedirect;
+	parseFunctions["cgi_extension"] = &parseCgiExtension;
+	parseFunctions["upload_path"] = &parseUploadPath;
 
-	parseLocation(tokenize(block[0]));
+	parseLocation(tokenize(block[0], ' '));
 	for (size_t i = 1; i < block.size(); i++) {
-		std::vector<std::string> tokens = tokenize(block[i]);
+		std::vector<std::string> tokens = tokenize(block[i], ' ');
 		if (tokens.empty())
 			continue;
-		if (tokens[0].size >= 2 && tokens[0].substr(0, 2) == "//")
+		if (tokens[0][0] == '#')
 			continue;
 		if (parseFunctions.find(tokens[0]) != parseFunctions.end()) {
 			std::vector<std::string> args(tokens.begin() + 1, tokens.end());
@@ -72,11 +74,12 @@ void LocationBlock::parseRoot(std::vector<std::string> args) {
 }
 
 void LocationBlock::parseIndex(std::vector<std::string> args) {
-	if (args.size() != 1)
+	std::string line;
+	for (int i = 0; i < args.size(); i++)
+		line += args[i] + " ";
+	if (line.find(";") != line.size() - 2 || args.size() != 2)
 		throw std::runtime_error("Error: invalid index directive");
-	if (args[0].find(";") != args[0].size() - 1)
-		throw std::runtime_error("Error: invalid index directive");
-	this->_index = args[0].substr(0, args[0].size() - 2);
+	this->_index = tokenize(line.substr(0, line.size() - 2), ' ');
 }
 
 void LocationBlock::parseDirlisting(std::vector<std::string> args) {
@@ -99,7 +102,7 @@ void LocationBlock::parseMethods(std::vector<std::string> args) {
 		line += args[i] + " ";
 	if (line.find(";") != line.size() - 2)
 		throw std::runtime_error("Error: invalid methods directive");
-	this->_methods = tokenize(line.substr(0, line.size() - 2));
+	this->_methods = tokenize(line.substr(0, line.size() - 2), ' ');
 	for (size_t i = 0; i < this->_methods.size(); i++)
 		if (this->_methods[i] != "GET" || this->_methods[i] != "POST" || this->_methods[i] != "DELETE")
 			throw std::runtime_error("Error: invalid methods directive");
@@ -111,6 +114,23 @@ void LocationBlock::parseRedirect(std::vector<std::string> args) {
 	if (args[1].find(";") != args[1].size() - 1)
 		throw std::runtime_error("Error: invalid dirlisting directive");
 	this->_redirect = std::make_pair(std::atoi(args[0].c_str()), args[1].substr(0, args[1].size() - 1));
+}
+
+void LocationBlock::parseCgiExtension(std::vector<std::string> args) {
+	std::string line;
+	for (int i = 0; i < args.size(); i++)
+		line += args[i] + " ";
+	if (line.find(";") != line.size() - 2 || args.size() != 2)
+		throw std::runtime_error("Error: invalid cgi_extension directive");
+	this->cgi_extension[args[0]] = args[1].substr(0, args[1].size() - 1);
+}
+
+void LocationBlock::parseUploadPath(std::vector<std::strings> args) {
+	if (args.size() != 1)
+		throw std::runtime_error("Error: invalid upload_path directive");
+	if (args[0].find(";") != args[0].size() - 1)
+		throw std::runtime_error("Error: invalid upload_path directive");
+	this->_upload_path = args[0].substr(0, args[0].size() - 1);
 }
 
 //  Getters for the LocationBlock class
@@ -135,6 +155,14 @@ std::vector<std::string> LocationBlock::getMethods(void) const {
 	return this->_methods;
 }
 
-std::pair<int std::string> LocationBlock::getRedirect(void) const {
+std::pair<int, std::string> LocationBlock::getRedirect(void) const {
 	return this->_redirect;
+}
+
+std::map<std::string, std::string> LocationBlock::getCgiExtension(void) const {
+	return this->cgi_extension;
+}
+
+std::string LocationBlock::getUploadPath(void) const {
+	return this->_upload_path;
 }

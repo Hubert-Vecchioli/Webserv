@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/17 15:30:31 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/17 18:29:30 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,6 @@
 
 void	displayTimestamp(void);
 void	print(int i, std::string message);
-std::vector<std::string> tokenize(std::string s);
+std::vector<std::string> tokenize(std::string s, char delimiter);
 
 #endif
