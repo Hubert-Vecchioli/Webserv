@@ -76,10 +76,10 @@ void ConfigurationFile::parseFile(void) {
 	while (std::getline(iss, line)) {
 		if (line.empty())
 			continue;
-		std::vector<std::string> tokens = tokenize(line);
+		std::vector<std::string> tokens = tokenize(line, ' ');
 		if (tokens.empty())
 			continue;
-		if (tokens[0].size >= 2 && tokens[0].substr(0, 2) == "//")
+		if (tokens[0][0] == '#')
 			continue;
 		if (tokens[0] == "server" && tokens.size() > 1 && tokens[1] == "{")
 			parseServerBlock(iss);
@@ -92,6 +92,8 @@ void ConfigurationFile::parseFile(void) {
 			throw std::runtime_error(error);
 		}	
 	}
+	if (this->_serverBlocks.empty())
+		throw std::runtime_error("Error: no server block found");
 }
 
 void ConfigurationFile::parseUser(std::vector<std::string> args) {
