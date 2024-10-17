@@ -92,6 +92,8 @@ void ConfigurationFile::parseFile(void) {
 			throw std::runtime_error(error);
 		}	
 	}
+	if (this->_serverBlocks.empty())
+		throw std::runtime_error("Error: no server block found");
 }
 
 void ConfigurationFile::parseUser(std::vector<std::string> args) {
