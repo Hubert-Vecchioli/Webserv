@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/17 18:00:24 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/17 18:23:56 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,13 +54,13 @@ void HttpResponse::_generateResponseContent(void)
 void	HttpResponse::_fetchServerBlock(void) {
 	std::string host = _request.getHost();
 	std::vector<ServerBlock> server_blocks = _server.getConfigurationFile().getServerBlocks();
-	ServerBlock server_block;
+	_server_block = 0;
 
 	for (size_t i = 0; i < server_blocks.size(); i++) {
 		std::vector<std::string> server_names = server_blocks[i].getServerName();
 		for (size_t j = 0; j < server_names.size(); j++) {
 			if (host == server_names[j]) {
-				_server_block = server_blocks[i];
+				_server_block = &server_blocks[i];
 				return ;
 			}
 		}
@@ -71,6 +71,7 @@ void	HttpResponse::_fetchServerBlock(void) {
 
 void	HttpResponse::_fetchLocationBlock(void) {
 	std::string uri = _request.getRequestURI();
+	_location_block = 0;
 	if (uri.size() > MAX_URI_SIZE)
 		throw ClientError(414);
 
@@ -79,7 +80,7 @@ void	HttpResponse::_fetchLocationBlock(void) {
 	while (uri.size() > 0) {
 		for (size_t i = 0; i < location_blocks.size(); i++) {
 			if (location_blocks[i].getLocation() == uri) {
-				_location_block = location_blocks[i];
+				_location_block = &location_blocks[i];
 				return ;
 			}
 		}
@@ -91,6 +92,7 @@ void	HttpResponse::_fetchLocationBlock(void) {
 		else
 			throw ClientError(404);
 	}
+	_location_block = 0;
 	throw ClientError(404);
 }
 
