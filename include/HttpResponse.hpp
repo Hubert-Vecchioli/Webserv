@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/17 18:00:30 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/17 18:14:12 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,11 @@
 # define HTTPRESPONSE_HPP
 
 #include "webserv.hpp"
+
+class Server;
+class ServerBlock;
+class HttpRequest;
+class LocationBlock;
 
 class HttpResponse
 {
@@ -45,7 +50,7 @@ class HttpResponse
 		void				_fetchGETResource(void);
 
 	public:
-		HttpResponse(HttpRequest &request) : _request(request) {_generateMimeMap();};
+		HttpResponse(Server &server, HttpRequest &request) : _server(server), _request(request) {_generateMimeMap();};
 		HttpResponse(HttpResponse const & rhs);
 		HttpResponse &operator=(HttpResponse const & rhs);
 		~HttpResponse(void);
@@ -96,7 +101,7 @@ class HttpResponse
 				}
 				int	getErrorCode() {return _errorCode;};
 				virtual const char *what() const throw();
-		}
+		};
 };
 
 #endif
