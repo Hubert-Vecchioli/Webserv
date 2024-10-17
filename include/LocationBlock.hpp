@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:07:40 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 14:53:36 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/17 16:02:07 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ class LocationBlock
 	private:
 		std::string					_location;
 		std::string					_root;
-		std::string					_index;
+		std::vector<std::string>	_index;
 		bool						_dirlisting;
 		std::vector<std::string>	_methods;
 		std::pair<int, std::string>	_redirect;
