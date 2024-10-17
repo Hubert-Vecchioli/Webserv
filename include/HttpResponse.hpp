@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/16 19:06:52 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/17 18:00:30 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,22 +18,34 @@
 class HttpResponse
 {
 	private:
-		Server				&_server;
-		bool				_isResponseSent;
-		std::string			_responseContent;
-		std::time_t		 	_lastActionTimeStamp;
-		void 				_generateResponseContent(HttpRequest & request);
-		void 				_generateGETResponse(HttpRequest & request);
+		Server								&_server;
+		HttpRequest							&_request;
+		ServerBlock							&_server_block;
+		LocationBlock						&_location_block;
+		bool								_isResponseSent;
+		std::string							_responseContent;
+		std::time_t		 					_lastActionTimeStamp;
+		std::map<std::string, std::string>	_mimeMap;
+	
+	private:
+		void				_generateMimeMap(void);
+		void 				_generateResponseContent(void);
+		void 				_generateGETResponse(void);
 		void 				_generatePOSTResponse(void);
 		void 				_generateDELResponse(void);
-		void				_generateErrorResponse(int errorCode, char *errorMessage, ServerBlock & server_block);
+		void				_generateErrorResponse(int errorCode, char *errorMessage);
 		void				_generateGenericErrorResponse(int errorCode, char *errorMessage);
+		void				_generateDirlistingResponse(void);
 		std::stringstream	_displayTimeStamp(void);
-		ServerBlock			&_fetchServerBlock(HttpRequest & request);
-		LocationBlock		&_fetchLocationBlock(HttpRequest & request, ServerBlock & server_block);
+		void				_fetchServerBlock(void);
+		void				_fetchLocationBlock(void);
+		void				_checkAllowedMethod(void);
+		bool				_checkAcceptedFormat(std::string path);
+		int					_fetchDirectoryRessource(std::string path);
+		void				_fetchGETResource(void);
 
 	public:
-		HttpResponse(void);
+		HttpResponse(HttpRequest &request) : _request(request) {_generateMimeMap();};
 		HttpResponse(HttpResponse const & rhs);
 		HttpResponse &operator=(HttpResponse const & rhs);
 		~HttpResponse(void);
