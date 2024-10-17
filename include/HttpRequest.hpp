@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 10:28:16 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/17 11:10:13 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ class HttpRequest
 		std::string							_queryString; //requestLine
 		std::string							_requestURI; //requestLine
 		std::string							_host; //header
-		std::string							_accept; //header
+		std::vector<std::string>			_accept; //header
 		t_connection						_connection; //header
 		std::string							_content_type; //header
 		size_t								_content_len; //header

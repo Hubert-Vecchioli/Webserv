@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/12 18:39:25 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/17 11:12:22 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,7 @@ void HttpRequest::parseRequestHeader(char *request) {
         std::string str_request = request;
 
         _host = getValue(str_request, "Host: ");
-        _accept = getValue(str_request, "Accept: ");
+        _accept = tokenize(getValue(str_request, "Accept: "));
         if (getValue(str_request, "Connection: ") == "keep-alive")
             _connection = KEEP_ALIVE;
         else
