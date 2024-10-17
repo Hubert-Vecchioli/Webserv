@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/12 18:22:54 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/17 18:25:57 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ class Server
 		void runServer(void);
 		void stopServer(void);
 		static const Server & getInstance(void) {return _uniqueInstance;};
+		//ConfigurationFile &getConfigurationFile() {return _configurationFile;};
 		
 		class FailureInitiateEpollInstanceException : public std::exception
 		{
