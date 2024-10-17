@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigurationFile.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:55:36 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/14 15:05:14 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/17 18:25:02 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ class ConfigurationFile
 
 		void read(void);					//read file if one was already provided
 		void read(std::string filename);	//read file if one was not provided or rewrite file to read
-		void ConfigurationFile::parseFile(void)
+		void parseFile(void);
 		
 		
 		std::string getUser(void) const;	//get user

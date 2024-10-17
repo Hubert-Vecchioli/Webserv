@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/17 18:14:12 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/17 18:27:19 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ class HttpResponse
 	private:
 		Server								&_server;
 		HttpRequest							&_request;
-		ServerBlock							&_server_block;
-		LocationBlock						&_location_block;
+		ServerBlock							*_server_block;
+		LocationBlock						*_location_block;
 		bool								_isResponseSent;
 		std::string							_responseContent;
 		std::time_t		 					_lastActionTimeStamp;
@@ -74,6 +74,7 @@ class HttpResponse
 				}
 				int	getErrorCode() {return _errorCode;};
 				virtual const char *what() const throw();
+				virtual ~ServerError() throw() {}; 
 		};
 
 		class ClientError : public std::exception {
@@ -101,6 +102,7 @@ class HttpResponse
 				}
 				int	getErrorCode() {return _errorCode;};
 				virtual const char *what() const throw();
+				virtual ~ClientError() throw() {};
 		};
 };
 
