@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/17 18:23:56 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/18 14:19:24 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,7 +194,10 @@ bool HttpResponse::_checkAcceptedFormat(std::string path) {
 void HttpResponse::_generateGETResponse(void)
 {
 	std::stringstream ss;
-	
+	//if LocationBlock exists
+	//	_getWithLocation();
+	// else
+	//	_getWithoutLocation();
 }
 
 //Assuming DEL is only to del files
