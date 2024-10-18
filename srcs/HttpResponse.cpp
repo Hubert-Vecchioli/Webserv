@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/18 14:19:24 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/18 17:05:37 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,7 @@ void HttpResponse::_fetchGETResource(void) {
 	int fd;
 	if (S_ISDIR(st.st_mode)) {
 		try {
-			fd = _fetchDirectoryRessource(_request, path);
+			fd = _fetchDirectoryRessource(path);
 		}
 		catch (ClientError &e) {
 			throw e;
@@ -134,7 +134,7 @@ void HttpResponse::_fetchGETResource(void) {
 	}
 }
 
-
+// TODOfrom HV: attention a bien clore les FDs
 int	HttpResponse::_fetchDirectoryRessource(std::string path) {
 	std::vector<std::string> index = _location_block.getIndex();
 
@@ -149,14 +149,39 @@ int	HttpResponse::_fetchDirectoryRessource(std::string path) {
 		}
 	}
 	if (_location_block.getDirlisting() == true) {
-		_generateDirlistingResponse(_request);
+		_generateDirlistingResponse(path);
 		return 0;
 	}
 	throw ClientError(404);
 }
 
-void	HttpResponse::_generateDirlistingResponse(void) {
-	/* To do parce que tbh j en ai marre*/
+bool HttpResponse::_isPathWithinRoot(std::string path)
+{
+		std::string root = this->_location_block->_root;
+		if (path.size() < root.size())
+			return (false);
+		for(size_t i = 0; i < root.size(); ++i)
+		{
+			if (root[i] != path[i])
+				return (false);
+		}
+		return (true);
+}
+
+void	HttpResponse::_generateDirlistingResponse(std::string path)
+{
+	if (!this->_isPathWithinRoot(path))
+		throw ClientError(403);
+	DIR *dp = opendir(path.c_str());
+	if (!dp)
+	{
+		print(1, "[Error] - WImpossible to open the directory");
+		throw ClientError(404);
+	}
+	// TODO; get a vector of files
+	// Build the HTTP page
+	// Build the header
+	// get it to _response content
 }
 
 bool HttpResponse::_checkAcceptedFormat(std::string path) {
@@ -194,11 +219,10 @@ bool HttpResponse::_checkAcceptedFormat(std::string path) {
 void HttpResponse::_generateGETResponse(void)
 {
 	std::stringstream ss;
-	//if LocationBlock exists
-	//	_getWithLocation();
-	// else
-	//	_getWithoutLocation();
+
 }
+
+void HttpResponse::_generateGETResponse(void)
 
 //Assuming DEL is only to del files
 void HttpResponse::_generateDELResponse(void)
