@@ -27,7 +27,9 @@
 # include <sys/epoll.h>
 # include <fcntl.h>
 # include <unistd.h>
-#include <arpa/inet.h>
+# include <arpa/inet.h>
+# include <sys/types.h>
+# include <sys/stat.h>
 
 # include "Server.hpp"
 # include "Socket.hpp"
@@ -48,6 +50,7 @@
 #define CLIENT_TIMEOUT_LIMIT_SEC 10
 #define REQUEST_TIMEOUT_LIMIT_SEC 10
 #define MAX_REQUEST_SIZE 5120
+#define	MAX_URI_SIZE 65536
 
 void	displayTimestamp(void);
 void	print(int i, std::string message, int fd = -2);

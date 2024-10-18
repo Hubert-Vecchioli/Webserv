@@ -39,7 +39,7 @@ class HttpRequest
 		std::string							_queryString; //requestLine
 		std::string							_requestURI; //requestLine
 		std::string							_host; //header
-		std::string							_accept; //header
+		std::vector<std::string>			_accept; //header
 		t_connection						_connection; //header
 		std::string							_content_type; //header
 		size_t								_content_len; //header
@@ -65,6 +65,13 @@ class HttpRequest
 
 		HttpResponse* getResponse(void) {return _response;};
 		static HttpRequest* findInstanceWithFD(std::vector<HttpRequest*>& vector, int fd);
+
+		t_method getMethod() {return _method;};
+		bool getHTTP() {return _http1;};
+		std::string getQueryString() {return _queryString;};
+		std::string getRequestURI() {return _requestURI;};
+		std::string getHost() {return _host;};
+		std::vector<std::string> getAccept() {return _accept;};
 };
 
 #endif

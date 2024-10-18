@@ -74,11 +74,12 @@ void LocationBlock::parseRoot(std::vector<std::string> &args) {
 }
 
 void LocationBlock::parseIndex(std::vector<std::string> &args) {
-	if (args.size() != 1)
+	std::string line;
+	for (size_t i = 0; i < args.size(); i++)
+		line += args[i] + " ";
+	if (line.find(";") != line.size() - 2)
 		throw std::runtime_error("Error: invalid index directive");
-	if (args[0].find(";") != args[0].size() - 1)
-		throw std::runtime_error("Error: invalid index directive");
-	this->_index = args[0].substr(0, args[0].size() - 2);
+	this->_index = tokenize(line.substr(0, line.size() - 2), ' ');
 }
 
 void LocationBlock::parseDirlisting(std::vector<std::string> &args) {
