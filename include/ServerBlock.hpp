@@ -26,10 +26,10 @@ class ServerBlock
 		std::map<int, std::string> _error_pages;
 		std::vector<LocationBlock> _locationBlocks;
 
-		void parseListen(std::vector<std::string> args);  //get IP and Port -> listen
-		void parseServerName(std::vector<std::string> args); //get server name
-		void parseErrorPages(std::vector<std::string> args); //get error pages
-		void parseLocationBlock(std::vector<std::string> block, int i); //get location blocks in the server block
+		void parseListen(std::vector<std::string> &args);  //get IP and Port -> listen
+		void parseServerName(std::vector<std::string> &args); //get server name
+		void parseErrorPages(std::vector<std::string> &args); //get error pages
+		size_t parseLocationBlock(std::vector<std::string> block, size_t i); //get location blocks in the server block
 		void parseServer(std::vector<std::string> block);
 
 	public:
