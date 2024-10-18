@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/18 17:05:37 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/18 17:06:29 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,7 @@ void	HttpResponse::_generateDirlistingResponse(std::string path)
 	DIR *dp = opendir(path.c_str());
 	if (!dp)
 	{
-		print(1, "[Error] - WImpossible to open the directory");
+		print(1, "[Error] - Impossible to open the directory");
 		throw ClientError(404);
 	}
 	// TODO; get a vector of files
