@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/18 12:13:36 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/18 13:37:48 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,7 +193,7 @@ void Server::_receiveRequest(int fd)
 void Server::_addNewClient(int listenedFD)
 {
 	// TODO: check the nb of clients
-	struct sockaddr_in	sockAddr; // because it is an IPV4
+	struct sockaddr	sockAddr; // because it is an IPV4
 	socklen_t addrLen = sizeof(sockAddr);
 	int clientFD = accept(listenedFD, &sockAddr, &addrLen);
 	if(clientFD == -1)
@@ -202,7 +202,7 @@ void Server::_addNewClient(int listenedFD)
 	if(fcntl(clientFD, F_SETFL, O_NONBLOCK) == -1)
 		throw Socket::FailureSetNonBlockingSocketException();
 	modifyEpollCTL(this->_serverFD, clientFD, EPOLL_CTL_ADD);
-	displayTimestamp(void);
+	displayTimestamp();
 	std::cout << "[Info] - New client added (connecting to FD " << listenedFD << ", accepted on the FD: "<< clientFD << " )" << std::endl;
 }
 
@@ -212,8 +212,16 @@ void Server::_disconnectClient(int listenedFD)
 	modifyEpollCTL(this->_serverFD, listenedFD, EPOLL_CTL_DEL);
 	if (clientToDisconnect)
 	{
-		delete *clientToDisconnect;
-		this->_clients.erase(clientToDisconnect);
+		
+		delete clientToDisconnect;
+        for (std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
+        {
+            if (*it == clientToDisconnect)
+            {
+                this->_clients.erase(it);
+                break;
+            }
+        }
 	}
 	throw DisconnectedClientFDException();
 }
