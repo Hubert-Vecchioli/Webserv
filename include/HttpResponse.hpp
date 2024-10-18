@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/17 18:27:19 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/18 16:55:40 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ class HttpResponse
 		std::time_t		 					_lastActionTimeStamp;
 		std::map<std::string, std::string>	_mimeMap;
 	
-	private:
 		void				_generateMimeMap(void);
 		void 				_generateResponseContent(void);
 		void 				_generateGETResponse(void);
@@ -48,6 +47,7 @@ class HttpResponse
 		bool				_checkAcceptedFormat(std::string path);
 		int					_fetchDirectoryRessource(std::string path);
 		void				_fetchGETResource(void);
+		bool 				_isPathWithinRoot(std::string path);
 
 	public:
 		HttpResponse(Server &server, HttpRequest &request) : _server(server), _request(request) {_generateMimeMap();};
