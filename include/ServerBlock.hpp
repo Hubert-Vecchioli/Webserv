@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerBlock.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:07:40 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/16 16:16:55 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/17 18:25:16 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ class ServerBlock
 		void parseListen(std::vector<std::string> &args);  //get IP and Port -> listen
 		void parseServerName(std::vector<std::string> &args); //get server name
 		void parseErrorPages(std::vector<std::string> &args); //get error pages
-		int parseLocationBlock(std::vector<std::string> block, size_t i); //get location blocks in the server block
+		size_t parseLocationBlock(std::vector<std::string> block, size_t i); //get location blocks in the server block
 		void parseServer(std::vector<std::string> block);
 
 	public:

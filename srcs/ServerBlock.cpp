@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:08:49 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/16 16:16:38 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/17 15:50:50 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void ServerBlock::parseServer(std::vector<std::string> block) {
 			continue;
 		if (tokens[0][0] == '#')
 			continue;
-		if (tokens[0] == "location")
+		if (tokens[0] == "location" && tokens.size() > 2 && tokens[2] == "{")
 			i = parseLocationBlock(block, i);
 		else if (parseFunctions.find(tokens[0]) != parseFunctions.end()) {
 			std::vector<std::string> args(tokens.begin() + 1, tokens.end());
@@ -62,6 +62,12 @@ void ServerBlock::parseServer(std::vector<std::string> block) {
 			throw std::runtime_error(error);
 		}
 	}
+	if (this->_listen.first.empty() || this->_listen.second == 0)
+		throw std::runtime_error("Error: no listen directive found");
+	else if (this->_server_name.empty())
+		throw std::runtime_error("Error: no server name directive found");
+	else if (this->_locationBlocks.empty())
+		throw std::runtime_error("Error: no location block found");
 }
 
 void ServerBlock::parseListen (std::vector<std::string> &args) {
@@ -97,7 +103,7 @@ void ServerBlock::parseErrorPages(std::vector<std::string> &args) {
 		this->_error_pages[std::atoi(args[i].c_str())] = args[args.size() - 1];
 }
 
-int ServerBlock::parseLocationBlock(std::vector<std::string> block, size_t i) {
+size_t ServerBlock::parseLocationBlock(std::vector<std::string> block, size_t i) {
 	std::vector<std::string> lBlock;
 	size_t openBrackets = 0;
 	size_t start = i;

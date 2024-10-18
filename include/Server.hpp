@@ -51,6 +51,7 @@ class Server
 		void runServer(void);
 		void stopServer(void);
 		static Server & getInstance(void) {return _uniqueInstance;};
+		//ConfigurationFile &getConfigurationFile() {return _configurationFile;};
 		
 		class FailureInitiateEpollInstanceException : public std::exception
 		{
