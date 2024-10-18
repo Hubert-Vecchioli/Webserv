@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/16 18:03:45 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/18 11:50:21 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@
 #define MAX_REQUEST_SIZE 5120
 
 void	displayTimestamp(void);
-void	print(int i, std::string message);
+void	print(int i, std::string message, int fd = -2);
 std::vector<std::string> tokenize(std::string s, char delimiter);
 void	modifyEpollCTL(int EpollFD, int listendFD, int epollAction, bool isReadyToSendResponse = false);
 
