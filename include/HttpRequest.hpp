@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 16:26:20 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/18 11:31:29 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ class HttpRequest
 		void displayRequestBody(std::ostream & o);
 
 		HttpResponse* getResponse(void) {return _response;};
-		static HttpRequest* findInstanceWithFD(std::vector<HttpRequest>& vector, int fd);
+		static HttpRequest* findInstanceWithFD(std::vector<HttpRequest*>& vector, int fd);
 };
 
 #endif

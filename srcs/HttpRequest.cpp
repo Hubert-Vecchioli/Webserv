@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 16:25:47 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/18 11:42:01 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,10 +141,10 @@ std::string HttpRequest::getValue(std::string request, std::string key_with_sep)
     return value;
 }
 
-HttpRequest* HttpRequest::findInstanceWithFD(std::vector<HttpRequest>& vector, int fd) {
-    for (std::vector<HttpRequest>::iterator it = vector.begin(); it != vector.end(); ++it) {
-        if (it->_client->getFD() == fd) {
-            return &(*it);
+HttpRequest* HttpRequest::findInstanceWithFD(std::vector<HttpRequest*>& vector, int fd) {
+    for (std::vector<HttpRequest*>::iterator it = vector.begin(); it != vector.end(); ++it) {
+        if ((*it)->_client->getFD() == fd) {
+            return (*it);
         }
     }
     return (0);

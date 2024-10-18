@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/16 18:03:07 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/18 12:13:36 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void Server::startServer(ConfigurationFile & configurationFile)
 		if (blocServersFD == -1)
 			throw FailureInitiateSocketException();
 		modifyEpollCTL(this->_serverFD, blocServersFD, EPOLL_CTL_ADD);
-		this->_sockets.push_back(new Socket(blocServersFD, parsed_config.second, parsed_config.first));
+		this->_sockets.push_back(new Socket(blocServersFD, it->second, it->first));
 	}
 	this->_isServerGreenlighted = true;
 	print(1, "[Info] - Webserv initialised");
@@ -67,7 +67,7 @@ void Server::startServer(ConfigurationFile & configurationFile)
 
 void Server::stopServer(void)
 {
-	this->_isServerGreenlighted(false);
+	this->_isServerGreenlighted = false;
 }
 
 void Server::runServer(void)
@@ -97,11 +97,11 @@ void Server::_reviewRequestsCompleted(void)
 {
 	for(std::vector<HttpRequest*>::iterator it = this->_requests.begin(); it != this->_requests.begin(); ++it)
 	{
-		if (it->getResponse()->getResponseStatus() && std::time(nullptr) - it->->getResponse()->getLastActionTimeStamp() > REQUEST_TIMEOUT_LIMIT_SEC)
+		if ((*it)->getResponse()->getResponseStatus() && std::time(0) - (*it)->getResponse()->getLastActionTimeStamp() > REQUEST_TIMEOUT_LIMIT_SEC)
 		{
 			try
 			{
-				delete *(it->getResponse());
+				delete (*it)->getResponse();
 				delete *it;
 				this->_requests.erase(it);
 			}
@@ -118,11 +118,11 @@ void Server::_reviewClientsHaveNoTimeout(void)
 {
 	for(std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.begin(); ++it)
 	{
-		if (std::time(nullptr) - it->getLastActionTimeStamp() > CLIENT_TIMEOUT_LIMIT_SEC)
+		if (std::time(0) - (*it)->getLastActionTimeStamp() > CLIENT_TIMEOUT_LIMIT_SEC)
 		{
 			try
 			{
-				this->_disconnectClient(it->getFD());
+				this->_disconnectClient((*it)->getFD());
 			}
 			catch(const std::exception& e)
 			{
@@ -148,7 +148,7 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 		}
 		if (epollEvents.events & EPOLLOUT)
 		{
-			if(HttpRequest::findInstanceWithFD(epollEvents.data.fd) && !HttpRequest::findInstanceWithFD(epollEvents.data.fd)->getResponse()->getResponseStatus())
+			if(HttpRequest::findInstanceWithFD(this->_requests, epollEvents.data.fd) && !HttpRequest::findInstanceWithFD(this->_requests, epollEvents.data.fd)->getResponse()->getResponseStatus())
 				this->_sendRequest(epollEvents.data.fd);
 		}
 	}		
@@ -162,8 +162,8 @@ void Server::_sendRequest(int fd)
 {
 	Client::findInstanceWithFD(this->_clients, fd)->updateLastActionTimeStamp();
 	print(1, "[Info] - Sending response to Client FD : ", fd);
-	HttpResponse *response = HttpRequest::findInstanceWithFD(fd)->getResponse();
-	int sizeHTTPResponseSent = send(fd, response->getResponseContent().c_str(), response->getResponseContent().size());// For info, send is equivalent to write as I am not using any flag
+	HttpResponse *response = HttpRequest::findInstanceWithFD(this->_requests, fd)->getResponse();
+	int sizeHTTPResponseSent = send(fd, response->getResponseContent().c_str(), response->getResponseContent().size(), 0);// For info, send is equivalent to write as I am not using any flag
 	if(sizeHTTPResponseSent == 0 && response->getResponseContent().size() > 0)
 		this->_disconnectClient(fd);
 	if(sizeHTTPResponseSent < 0)
@@ -185,7 +185,8 @@ void Server::_receiveRequest(int fd)
 	if(sizeHTTPRequest < 0)
 		throw FailureToReceiveData();
 	rawHTTPRequest[sizeHTTPRequest] = 0;
-	this->_requests.push_back(new HttpRequest(rawHTTPRequest, sizeHTTPRequest, clientSendingARequest));
+	HttpResponse* response = new HttpResponse();
+	this->_requests.push_back(new HttpRequest(clientSendingARequest, response, rawHTTPRequest));
 	print(1, "[Info] - Request successfully received from Client FD : ", fd);
 }
 

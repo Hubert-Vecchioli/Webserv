@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 13:14:32 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/16 18:03:52 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/18 11:50:10 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ std::string	displayTimestampResponseFormat(void)
     return oss.str();
 }
 
-void	print(int i, std::string message, int fd = -2)
+void	print(int i, std::string message, int fd)
 {
 	displayTimestamp();
 	if(i == 1 && fd == -2)
