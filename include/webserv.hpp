@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/17 18:29:30 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/18 11:50:21 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,10 @@
 # include <netinet/in.h>
 # include <sys/epoll.h>
 # include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+# include <unistd.h>
+# include <arpa/inet.h>
+# include <sys/types.h>
+# include <sys/stat.h>
 
 # include "Server.hpp"
 # include "Socket.hpp"
@@ -52,7 +53,8 @@
 #define	MAX_URI_SIZE 65536
 
 void	displayTimestamp(void);
-void	print(int i, std::string message);
+void	print(int i, std::string message, int fd = -2);
 std::vector<std::string> tokenize(std::string s, char delimiter);
+void	modifyEpollCTL(int EpollFD, int listendFD, int epollAction, bool isReadyToSendResponse = false);
 
 #endif

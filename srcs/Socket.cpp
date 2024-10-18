@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:53:54 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/09 14:26:23 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/18 11:42:19 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ Socket::Socket(Socket const & rhs)
 	return ;
 }
 
-Socket::Socket &operator=(Socket const & rhs)
+Socket &Socket::operator=(Socket const & rhs)
 {
 	if (this != &rhs)
 	{
@@ -41,7 +41,7 @@ Socket::Socket &operator=(Socket const & rhs)
 	return (*this);
 }
 
-Socket::Socket(int fd, unsigned int port, std::string ip) : _fd(fd), _port(port), _ip(ip)
+Socket::Socket(int fd, unsigned int port, std::string ip) : _ip(ip), _fd(fd), _port(port)
 {
 	try
 	{
@@ -68,13 +68,13 @@ Socket::Socket(int fd, unsigned int port, std::string ip) : _fd(fd), _port(port)
 	print(1, "[Info] - Listening Socket created and well set-up");
 }
 
-Socket* Socket::findInstanceWithFD(std::vector<Socket>& vector, int fd) {
-    for (std::vector<Socket>::iterator it = vector.begin(); it != vector.end(); ++it) {
-        if (it->_fd == fd) {
-            return &(*it);
+Socket* Socket::findInstanceWithFD(std::vector<Socket*>& vector, int fd) {
+    for (std::vector<Socket*>::iterator it = vector.begin(); it != vector.end(); ++it) {
+        if ((*it)->_fd == fd) {
+            return (*it);
         }
     }
-    return (nullptr);
+    return (NULL);
 }
 
 
