@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/18 17:06:29 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/19 09:29:25 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,16 +172,39 @@ void	HttpResponse::_generateDirlistingResponse(std::string path)
 {
 	if (!this->_isPathWithinRoot(path))
 		throw ClientError(403);
+
 	DIR *dp = opendir(path.c_str());
 	if (!dp)
-	{
-		print(1, "[Error] - Impossible to open the directory");
 		throw ClientError(404);
+
+	std::vector<std::string> files;
+	struct dirent *dirContent;
+	while ((dirContent = readdir(dp)) != NULL)
+	{
+		files.push_back(dirContent->d_name);
 	}
-	// TODO; get a vector of files
-	// Build the HTTP page
-	// Build the header
-	// get it to _response content
+	closedir(dp);
+
+	std::string reponseBody = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Directory listing</title><style>body {font-family: 'Arial', sans-serif;background: linear-gradient(90deg, #8360c3, #faae5a);color: #fff;margin: 0;padding: 0;}h1 {text-align: center;color: #5d5fef;margin-top: 50px;}.container {max-width: 800px;margin: 20px auto;padding: 20px;box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);border-radius: 8px;}ul {list-style-type: none;padding: 0;}ul li {padding: 10px;border-bottom: 1px solid #ddd;}ul li a {text-decoration: none;color: #fff;}ul li:hover {background-color: #f0f0f5;}footer {text-align: center;margin-top: 20px;padding: 10px 0;background-color: #5d5fef;color: white;}</style></head><body><h1>Liste des fichiers</h1><div class=\"container\"><ul>";
+	for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); ++it)
+	{
+		reponseBody += "<li><a href=\"";
+		reponseBody += *it;
+		reponseBody += "\">";
+		reponseBody += *it;
+		reponseBody += "</a></li>";
+	}
+	reponseBody +="</ul></div><footer><p>Brought to you by JB, EB & HV</p></footer></body></html>";
+	
+	std::ostringstream oss2;
+	oss2 << reponseBody.size();
+    std::string sizeStr = oss2.str();
+
+	this->_reponseContent = "HTTP/1.1 200 OK\r\n";
+	this->_reponseContent += "Content-Type: text/html\r\n";
+	this->_reponseContent += "Content-Length: " + sizeStr + "\r\n";
+	this->_reponseContent += "\r\n";
+	this->_reponseContent += reponseBody;
 }
 
 bool HttpResponse::_checkAcceptedFormat(std::string path) {
