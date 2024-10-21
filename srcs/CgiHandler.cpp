@@ -31,6 +31,8 @@ CgiHandler::CgiHandler(CgiHandler const & rhs) {
 CgiHandler & CgiHandler::operator=(CgiHandler const & rhs) {
 	if (this != &rhs) {
 		_env = rhs._env;
+		_status = rhs._status;
+		_output = rhs._output;
 	}
 	return *this;
 }
