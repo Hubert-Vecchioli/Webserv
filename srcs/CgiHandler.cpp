@@ -66,7 +66,7 @@ void CgiHandler::executeCgi(HttpResponse const &response) {
 		execChild(argv, envp, fd);
 	else
 		try {
-			execParent(pid);
+			execParent(pid, fd);
 		}
 		catch (std::exception &e) {
 			delete[] envp;
@@ -101,9 +101,9 @@ void CgiHandler::execChild(char **argv, char **envp, int fd[2]) {
 	exit(1);
 }
 
-void CgiHandler::execParent(pid_t pid) {
+void CgiHandler::execParent(pid_t pid, int fd[2]) {
 	close(fd[1]);
-	signal(SIGALRM, timeout);
+	signal(SIGALRM, timeout(pid));
 	alarm(5);
 
 	int status;
