@@ -3,7 +3,7 @@
 // Constructors and Destructos for the LocationBlock class
 
 LocationBlock::LocationBlock(std::vector<std::string> block) : 
-_location(""), _root(""), _index(""), _dirlisting(false),
+_location(""), _root(""), _index(), _dirlisting(false),
 _methods(tokenize("GET", ' ')), _redirect(), cgi_extension(), _upload_path("")
 {
 	parseLocationBlock(block);
@@ -143,7 +143,7 @@ std::string LocationBlock::getRoot(void) const {
 	return this->_root;
 }
 
-std::string LocationBlock::getIndex(void) const {
+std::vector<std::string> LocationBlock::getIndex(void) const {
 	return this->_index;
 }
 

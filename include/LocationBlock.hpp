@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationBlock.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cuteness_ <cuteness_@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:07:40 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/17 16:02:07 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/21 16:54:17 by cuteness_        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ class LocationBlock
 
 		std::string getLocation(void) const;
 		std::string getRoot(void) const;
-		std::string getIndex(void) const;
+		std::vector<std::string> getIndex(void) const;
 		bool getDirlisting(void) const;
 		std::vector<std::string> getMethods(void) const;
 		std::pair<int, std::string> getRedirect(void) const;
