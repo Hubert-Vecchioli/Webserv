@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/19 09:29:25 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/21 10:48:20 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,12 @@ void HttpResponse::_fetchGETResource(void) {
 		if (fd == -1)
 			throw ClientError(403);
 		try {
-			_checkAcceptedFormat(_request, path);}
+			_checkAcceptedFormat(_request, path);
+			if (_isFileAboveThreshold(path))
+				_generateChunkedGETResponseContent(path); //_isResponseSent en fcontion de la ou on en est
+			else
+				_generateGETResponseContent(path); //this->_isResponseSent = true && to be added in the error page, POST & DEL
+			}
 		catch (ClientError &e) {
 			throw e;
 		}
@@ -134,7 +139,14 @@ void HttpResponse::_fetchGETResource(void) {
 	}
 }
 
-// TODOfrom HV: attention a bien clore les FDs
+bool HttpResponse::_isFileAboveThreshold(std::string &path)
+{
+	struct stat stats;
+	if (stat(path.c_str(), &stats) != 0)
+		return false;
+	return stats.st_size > FILE_CHUNK_THRESHOLD;
+}
+
 int	HttpResponse::_fetchDirectoryRessource(std::string path) {
 	std::vector<std::string> index = _location_block.getIndex();
 
@@ -152,6 +164,7 @@ int	HttpResponse::_fetchDirectoryRessource(std::string path) {
 		_generateDirlistingResponse(path);
 		return 0;
 	}
+	//close(fd); Propsotion to add this (from HV)
 	throw ClientError(404);
 }
 
@@ -168,9 +181,9 @@ bool HttpResponse::_isPathWithinRoot(std::string path)
 		return (true);
 }
 
-void	HttpResponse::_generateDirlistingResponse(std::string path)
+void HttpResponse::_generateDirlistingResponse(std::string path)
 {
-	if (!this->_isPathWithinRoot(path))
+	if (!this->_isPathWithinRoot(path)) //
 		throw ClientError(403);
 
 	DIR *dp = opendir(path.c_str());
@@ -241,11 +254,10 @@ bool HttpResponse::_checkAcceptedFormat(std::string path) {
 
 void HttpResponse::_generateGETResponse(void)
 {
-	std::stringstream ss;
+	// can we find the exact path?
+		// Yes then 
 
 }
-
-void HttpResponse::_generateGETResponse(void)
 
 //Assuming DEL is only to del files
 void HttpResponse::_generateDELResponse(void)
@@ -344,7 +356,7 @@ std::string HttpResponse::getResponseContent(void)
 {
 	if (this->_reponseContent.empty())
 		this->_generateResponseContent();
-	return (this->_reponseContent());
+	return (this->_reponseContent);
 }
 
 void	HttpResponse::_generateMimeMap(void) {
