@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 16:27:10 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/21 17:26:52 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ class HttpRequest
 		void parseCookie(std::string str_request);
 
 	public:
-		HttpRequest(Client *client, HttpResponse *response, char *request);
+		HttpRequest(Client *client, char *request);
 		HttpRequest(HttpRequest const & rhs);
 		HttpRequest &operator=(HttpRequest const & rhs);
 		~HttpRequest(void);
@@ -63,6 +63,7 @@ class HttpRequest
 		void displayRequestHeader(std::ostream & o);
 		void displayRequestBody(std::ostream & o);
 
+		void setResponse(HttpResponse *response) {_response = response;};
 		HttpResponse* getResponse(void) {return _response;};
 		static HttpRequest* findInstanceWithFD(std::vector<HttpRequest*>& vector, int fd);
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/18 11:43:54 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/21 17:49:49 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,8 @@ class Server
 		void stopServer(void);
 		static Server & getInstance(void) {return _uniqueInstance;};
 		//ConfigurationFile &getConfigurationFile() {return _configurationFile;};
+
+		ConfigurationFile &getConfigurationFile(void) {return *_configurationFile;};
 		
 		class FailureInitiateEpollInstanceException : public std::exception
 		{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/18 11:42:01 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/21 17:27:55 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 // Constructors and Destructors for the HttpRequest class
 
-HttpRequest::HttpRequest(Client *client, HttpResponse *response, char *request) : _client(client), _response(response) {
+HttpRequest::HttpRequest(Client *client, char *request) : _client(client) {
     std::string str_request = request;
 	parseRequestLine(str_request);
     parseRequestHeader(str_request);
@@ -85,7 +85,7 @@ void HttpRequest::parseRequestLine(std::string request) {
 
 void HttpRequest::parseRequestHeader(std::string request) {
         _host = getValue(request, "Host: ");
-        _accept = getValue(request, "Accept: ");
+        _accept = tokenize(getValue(request, "Accept: "), ' ');
         _content_type = getValue(request, "Content-Type: ");
         std::string len = getValue(request, "Content-Length: ");
         _content_len = atol(len.c_str());
@@ -179,39 +179,15 @@ void HttpRequest::displayRequestLine(std::ostream &o) {
     //     o << _queryString << std::endl; // DEBUG
 }
 
-std::string HttpRequest::getValue(std::string request, std::string key_with_sep) {
-    std::string value;
-    
-    size_t pos_key = request.find(key_with_sep);
-    if (pos_key != std::string::npos) {
-        size_t endline = request.find('\n', pos_key);
-            if (endline != std::string::npos)
-                value = request.substr(pos_key + key_with_sep.size(), endline - pos_key - key_with_sep.size());
-            else 
-                value = request.substr(pos_key + key_with_sep.size());
-    }
-    else
-        value = "";
-    return value;
-}
-
-void HttpRequest::parseRequestHeader(char *request) {
-        std::string str_request = request;
-
-        _host = getValue(str_request, "Host: ");
-        _accept = getValue(str_request, "Accept: ");
-        if (getValue(str_request, "Connection: ") == "keep-alive")
-            _connection = KEEP_ALIVE;
-        else
-            _connection = CLOSE;
-        _content_type = getValue(str_request, "Content-Type: ");
-        std::string len = getValue(str_request, "Content-Length: ");
-        _content_len = atol(len.c_str());
-}
-
 void HttpRequest::displayRequestHeader(std::ostream & o) {
     o << "Host: " << _host << std::endl;
-    o << "Accept: " << _accept << std::endl;
+    o << "Accept: ";
+    for (size_t i = 0; i < _accept.size(); i++) {
+        o << _accept[i];
+        if (i < _accept.size() - 1)
+            o << " ";
+    }
+    o << std::endl;
     o << "Content-Type: " << _content_type << std::endl;
     o << "Content-Length: " << _content_len << std::endl;
     if (_connection == KEEP_ALIVE)

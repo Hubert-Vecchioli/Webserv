@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 16:28:50 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/21 18:08:49 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,9 @@ class HttpResponse
 		void 				_generateGETResponse(void);
 		void 				_generatePOSTResponse(void);
 		void 				_generateDELResponse(void);
-		void				_generateErrorResponse(int errorCode, char *errorMessage);
+		void				_generateErrorResponse(int errorCode, const char *errorMessage);
 		void				_generateGenericErrorResponse(int errorCode, char *errorMessage);
-		void				_generateDirlistingResponse(void);
+		void				_generateDirlistingResponse(std::string path);
 		std::stringstream	_displayTimeStamp(void);
 		void				_fetchServerBlock(void);
 		void				_fetchLocationBlock(void);

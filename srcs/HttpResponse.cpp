@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cuteness_ <cuteness_@student.42.fr>        +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 15:18:44 by cuteness_        ###   ########.fr       */
+/*   Updated: 2024/10/21 19:00:53 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,15 @@ void HttpResponse::_generateResponseContent(void)
 	
 	
 
-	if (_request.getHTTP == false)
-		return _generateErrorResponse(505, ServerError(505).what());
+	if (_request.getHTTP() == false) {
+		ServerError error(505);
+		return _generateErrorResponse(505, error.what());
+	}
 
 	try {
-		_fetchServerBlock(_request);
-		_fetchLocationBlock(_request);
-		_checkAllowedMethod(_request);
+		_fetchServerBlock();
+		_fetchLocationBlock();
+		_checkAllowedMethod();
 	}
 	catch (HttpResponse::ClientError & e) {
 		return _generateErrorResponse(e.getErrorCode(), e.what());
@@ -54,7 +56,7 @@ void HttpResponse::_generateResponseContent(void)
 			this->_generateDELResponse();
 			break;
 		default:
-			throw this->_generateErrorResponse(405, ClientError(405).what());
+			_generateErrorResponse(405, ClientError(405).what());
 	}
 	
 }
@@ -73,7 +75,7 @@ void	HttpResponse::_fetchServerBlock(void) {
 			}
 		}
 	}
-	if !(server_block)
+	if (!_server_block)
 		throw ClientError(400);
 }
 
@@ -83,7 +85,7 @@ void	HttpResponse::_fetchLocationBlock(void) {
 	if (uri.size() > MAX_URI_SIZE)
 		throw ClientError(414);
 
-	std::vector<LocationBlock> location_blocks = _server_block.getLocationBlocks();
+	std::vector<LocationBlock> location_blocks = _server_block->getLocationBlocks();
 	
 	while (uri.size() > 0) {
 		for (size_t i = 0; i < location_blocks.size(); i++) {
@@ -92,7 +94,7 @@ void	HttpResponse::_fetchLocationBlock(void) {
 				return ;
 			}
 		}
-		size_t pos = uri.find_last_of('/')
+		size_t pos = uri.find_last_of('/');
 		if (pos != std::string::npos && pos != 0)
 			uri = uri.substr(pos);
 		else if (pos == 0 && uri.size() > 1)
@@ -105,18 +107,19 @@ void	HttpResponse::_fetchLocationBlock(void) {
 }
 
 void HttpResponse::_checkAllowedMethod(void) {
-	std::vector<std::string> methods = _location_block.getMethods();
-	if (methods.find(_request.getMethod) == methods.end())
+	std::vector<std::string> methods = _location_block->getMethods();
+	if (std::find(methods.begin(), methods.end(), _request.getMethod()) == methods.end())
 		throw ClientError(405);
 }
 
 void HttpResponse::_fetchGETResource(void) {
 	std::string uri_no_query = _request.getRequestURI();
 	
-	if((size_t pos = uri_no_query.find('?')) != std::string::npos)
+	size_t pos = uri_no_query.find('?');
+	if(pos != std::string::npos)
 		uri_no_query = uri_no_query.substr(pos);
 	
-	std::string path = _location_block.getRoot() + uri_no_query;
+	std::string path = _location_block->getRoot() + uri_no_query;
 	struct stat st;
 	if (stat(path.c_str(), &st) == -1)
 		throw ClientError(404);
@@ -134,7 +137,7 @@ void HttpResponse::_fetchGETResource(void) {
 		if (fd == -1)
 			throw ClientError(403);
 		try {
-			_checkAcceptedFormat(_request, path);
+			_checkAcceptedFormat(path);
 			if (_isFileAboveThreshold(path))
 				_generateChunkedGETResponseContent(path); //_isResponseSent en fcontion de la ou on en est
 			else
@@ -143,7 +146,7 @@ void HttpResponse::_fetchGETResource(void) {
 		catch (ClientError &e) {
 			throw e;
 		}
-		return
+		return ;
 	}
 }
 
@@ -156,19 +159,19 @@ bool HttpResponse::_isFileAboveThreshold(std::string &path)
 }
 
 int	HttpResponse::_fetchDirectoryRessource(std::string path) {
-	std::vector<std::string> index = _location_block.getIndex();
+	std::vector<std::string> index = _location_block->getIndex();
 
-	for (size_t i; i < index.size(); i++) {
+	for (size_t i = 0; i < index.size(); i++) {
 		std::string new_path = path + index[i];
 		int fd = open(new_path.c_str(), O_RDONLY);
 		if (fd > 0){
-			if (_checkAcceptedFormat(_request, new_path) == true)
+			if (_checkAcceptedFormat(new_path) == true)
 				return fd;
 			else
 				close(fd);
 		}
 	}
-	if (_location_block.getDirlisting() == true) {
+	if (_location_block->getDirlisting() == true) {
 		_generateDirlistingResponse(path);
 		return 0;
 	}
@@ -178,7 +181,7 @@ int	HttpResponse::_fetchDirectoryRessource(std::string path) {
 
 bool HttpResponse::_isPathWithinRoot(std::string path)
 {
-		std::string root = this->_location_block->_root;
+		std::string root = _location_block->getRoot();
 		if (path.size() < root.size())
 			return (false);
 		for(size_t i = 0; i < root.size(); ++i)
@@ -206,46 +209,50 @@ void HttpResponse::_generateDirlistingResponse(std::string path)
 	}
 	closedir(dp);
 
-	std::string reponseBody = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Directory listing</title><style>body {font-family: 'Arial', sans-serif;background: linear-gradient(90deg, #8360c3, #faae5a);color: #fff;margin: 0;padding: 0;}h1 {text-align: center;color: #5d5fef;margin-top: 50px;}.container {max-width: 800px;margin: 20px auto;padding: 20px;box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);border-radius: 8px;}ul {list-style-type: none;padding: 0;}ul li {padding: 10px;border-bottom: 1px solid #ddd;}ul li a {text-decoration: none;color: #fff;}ul li:hover {background-color: #f0f0f5;}footer {text-align: center;margin-top: 20px;padding: 10px 0;background-color: #5d5fef;color: white;}</style></head><body><h1>Liste des fichiers</h1><div class=\"container\"><ul>";
+	std::string responseBody = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Directory listing</title><style>body {font-family: 'Arial', sans-serif;background: linear-gradient(90deg, #8360c3, #faae5a);color: #fff;margin: 0;padding: 0;}h1 {text-align: center;color: #5d5fef;margin-top: 50px;}.container {max-width: 800px;margin: 20px auto;padding: 20px;box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);border-radius: 8px;}ul {list-style-type: none;padding: 0;}ul li {padding: 10px;border-bottom: 1px solid #ddd;}ul li a {text-decoration: none;color: #fff;}ul li:hover {background-color: #f0f0f5;}footer {text-align: center;margin-top: 20px;padding: 10px 0;background-color: #5d5fef;color: white;}</style></head><body><h1>Liste des fichiers</h1><div class=\"container\"><ul>";
 	for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); ++it)
 	{
-		reponseBody += "<li><a href=\"";
-		reponseBody += *it;
-		reponseBody += "\">";
-		reponseBody += *it;
-		reponseBody += "</a></li>";
+		responseBody += "<li><a href=\"";
+		responseBody += *it;
+		responseBody += "\">";
+		responseBody += *it;
+		responseBody += "</a></li>";
 	}
-	reponseBody +="</ul></div><footer><p>Brought to you by JB, EB & HV</p></footer></body></html>";
+	responseBody +="</ul></div><footer><p>Brought to you by JB, EB & HV</p></footer></body></html>";
 	
 	std::ostringstream oss2;
-	oss2 << reponseBody.size();
+	oss2 << responseBody.size();
     std::string sizeStr = oss2.str();
 
-	this->_reponseContent = "HTTP/1.1 200 OK\r\n";
-	this->_reponseContent += "Content-Type: text/html\r\n";
-	this->_reponseContent += "Content-Length: " + sizeStr + "\r\n";
-	this->_reponseContent += "\r\n";
-	this->_reponseContent += reponseBody;
+	this->_responseContent = "HTTP/1.1 200 OK\r\n";
+	this->_responseContent += "Content-Type: text/html\r\n";
+	this->_responseContent += "Content-Length: " + sizeStr + "\r\n";
+	this->_responseContent += "\r\n";
+	this->_responseContent += responseBody;
 }
 
 bool HttpResponse::_checkAcceptedFormat(std::string path) {
 	std::vector<std::string> accepted_formats = _request.getAccept();
 	
-	if (!accepted_formats)
+	if (accepted_formats.size() == 0)
 		return true;
-	if (accepted_formats.find("*/*") != accepted_formats.end())
+	
+	std::vector<std::string>::iterator beg = accepted_formats.begin();
+	std::vector<std::string>::iterator end = accepted_formats.end(); 
+	if (std::find(beg, end, "*/*") != end)
 		return true;
 	size_t pos = path.find_last_of('.');
 	if (pos == std::string::npos)
 		return false; // TBC HERE => i refuse any file without an extension because there is no way to know if it s binary or text
 	std::string extension = path.substr(pos);
-	if (_mimeMap[extension]) {
+	if (_mimeMap[extension] != "") {
 		std::string mime_type = _mimeMap[extension];
-		if (accepted_formats.find(mime_type) != accepted_formats.end())
+		if (std::find(beg, end, mime_type) != end)
 			return true;
-		if ((size_t pos = mime_type.find("/")) != std::string::npos) {
+		//size_t pos = std::find(mime_type.begin(), mime_type.end(), "/");
+		if (size_t pos = mime_type.find("/") != std::string::npos) {
 			mime_type = mime_type.substr(pos) + "/*";
-			if (accepted_formats.find(mime_type) != accepted_formats.end())
+			if (std::find(beg, end, mime_type) != end)
 				return true;
 		}
 	}
@@ -273,35 +280,39 @@ void HttpResponse::_generateDELResponse(void)
 	// TODO: Review if the file to delete exists, if not error 404
 	// TODO: Review if the file can be deleted, if not error 403
 
-	this->_reponseContent = "HTTP/1.1 204 No Content\r\n";
+	this->_responseContent = "HTTP/1.1 204 No Content\r\n";
 }
 
 //Assuming POST is only to upload files
 void HttpResponse::_generatePOSTResponse(void)
 {
 	std::ostringstream oss;
-	oss << /*TODO: Get the file size*/;
+	/*oss << TODO: Get the file size;*/
     std::string sizeStr = oss.str();
 	
-	std::string reponseBody = "{\n";
-	reponseBody += "\"message\": \"File uploaded successfully.\",\n";
-	reponseBody += "\"filename\": \"" + /*Path file*/ + "\",\n";
-	reponseBody += "\"uploadedAt\": \""+ displayTimestampResponseFormat()+ "\",\n";
-	reponseBody += "\"size\": " + sizeStr + "\n";
-	reponseBody += "}\n";
+	std::string responseBody = "{\n";
+	responseBody += "\"message\": \"File uploaded successfully.\",\n";
+	responseBody += "\"filename\": \"";
+	/*responseBody += Path file;*/ 
+	responseBody += "\",\n";
+	responseBody += "\"uploadedAt\": \"";
+	responseBody += displayTimestampResponseFormat();
+	responseBody += "\",\n";
+	responseBody += "\"size\": " + sizeStr + "\n";
+	responseBody += "}\n";
 
 	std::ostringstream oss2;
-	oss2 << reponseBody.size();
-    std::string sizeStr = oss2.str();
+	oss2 << responseBody.size();
+    std::string sizeStr2 = oss2.str();
 
-	this->_reponseContent = "HTTP/1.1 201 Created\r\n";
-	this->_reponseContent += "Content-Type: application/json\r\n";
-	this->_reponseContent += "Content-Length: " + sizeStr + "\r\n";
-	this->_reponseContent += "\r\n";
-	this->_reponseContent += reponseBody
+	this->_responseContent = "HTTP/1.1 201 Created\r\n";
+	this->_responseContent += "Content-Type: application/json\r\n";
+	this->_responseContent += "Content-Length: " + sizeStr2 + "\r\n";
+	this->_responseContent += "\r\n";
+	this->_responseContent += responseBody
 }
 
-void HttpResponse::_generateErrorResponse(int errorCode, char *errorMessage) {
+void HttpResponse::_generateErrorResponse(int errorCode, const char *errorMessage) {
 	std::stringstream ss;
 	
 	ss << "HTTP/1.1 " << errorCode << " " << errorMessage << "\r\n";
@@ -362,9 +373,9 @@ std::stringstream	HttpResponse::_displayTimeStamp(void) {
 
 std::string HttpResponse::getResponseContent(void)
 {
-	if (this->_reponseContent.empty())
+	if (this->_responseContent.empty())
 		this->_generateResponseContent();
-	return (this->_reponseContent);
+	return (this->_responseContent);
 }
 
 void	HttpResponse::_generateMimeMap(void) {
