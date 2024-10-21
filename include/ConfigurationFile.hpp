@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigurationFile.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:55:36 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/17 18:25:02 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/16 15:13:03 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,9 @@ class ConfigurationFile
 		unsigned long 									_body_size;
 		std::vector<ServerBlock> 						_serverBlocks;
 
-		void parseUser(std::vector<std::string> args);				//get user
-		void parseErrorLog(std::vector<std::string> args);			//get error_log
-		void parseBodySize(std::vector<std::string> args);			//get body_size
+		void parseUser(std::vector<std::string> &args);				//get user
+		void parseErrorLog(std::vector<std::string> &args);			//get error_log
+		void parseBodySize(std::vector<std::string> &args);			//get body_size
 		void parseServerBlock(std::istringstream &iss);								//parse server blocks inside config file
 
 	public:
