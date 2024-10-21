@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cuteness_ <cuteness_@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 15:48:58 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/21 12:03:55 by cuteness_        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,12 @@
 # include <netinet/in.h>
 # include <sys/epoll.h>
 # include <fcntl.h>
+# include <unistd.h>
+# include <arpa/inet.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <sys/wait.h>
+# include <cstring>
 
 # include "Server.hpp"
 # include "Socket.hpp"
@@ -46,9 +52,11 @@
 #define CLIENT_TIMEOUT_LIMIT_SEC 10
 #define REQUEST_TIMEOUT_LIMIT_SEC 10
 #define MAX_REQUEST_SIZE 5120
+#define	MAX_URI_SIZE 65536
 
 void	displayTimestamp(void);
-void	print(int i, std::string message);
+void	print(int i, std::string message, int fd = -2);
 std::vector<std::string> tokenize(std::string s, char delimiter);
+void	modifyEpollCTL(int EpollFD, int listendFD, int epollAction, bool isReadyToSendResponse = false);
 
 #endif

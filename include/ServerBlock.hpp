@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerBlock.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:07:40 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 12:11:38 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/17 18:25:16 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,11 @@ class ServerBlock
 		std::map<int, std::string> _error_pages;
 		std::vector<LocationBlock> _locationBlocks;
 
-		void parseListen(std::vector<std::string> args);  //get IP and Port -> listen
-		void parseServerName(std::vector<std::string> args); //get server name
-		void parseErrorPages(std::vector<std::string> args); //get error pages
-		void parseLocationBlock(std::vector<std::string> block, int i); //get location blocks in the server block
-		void parseServer(std::vector<std::string> block)
+		void parseListen(std::vector<std::string> &args);  //get IP and Port -> listen
+		void parseServerName(std::vector<std::string> &args); //get server name
+		void parseErrorPages(std::vector<std::string> &args); //get error pages
+		size_t parseLocationBlock(std::vector<std::string> block, size_t i); //get location blocks in the server block
+		void parseServer(std::vector<std::string> block);
 
 	public:
 		ServerBlock(std::vector<std::string> block);

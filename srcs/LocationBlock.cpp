@@ -29,17 +29,17 @@ LocationBlock::~LocationBlock(void) {}
 
 // Main Parsing Functions for the LocationBlock class
 
-typedef void (*parseFunction)(const std::vector<std::string> &);
+typedef void (LocationBlock::*parseFunction)(std::vector<std::string> &);
 
 void LocationBlock::parseLocationBlock(std::vector<std::string> block) {
 	std::map<std::string, parseFunction> parseFunctions;
-	parseFunctions["root"] = &parseRoot;
-	parseFunctions["index"] = &parseIndex;
-	parseFunctions["dirlisting"] = &parseDirlisting;
-	parseFunctions["methods"] = &parseMethods;
-	parseFunctions["redirect"] = &parseRedirect;
-	parseFunctions["cgi_extension"] = &parseCgiExtension;
-	parseFunctions["upload_path"] = &parseUploadPath;
+	parseFunctions["root"] = &LocationBlock::parseRoot;
+	parseFunctions["index"] = &LocationBlock::parseIndex;
+	parseFunctions["dirlisting"] = &LocationBlock::parseDirlisting;
+	parseFunctions["methods"] = &LocationBlock::parseMethods;
+	parseFunctions["redirect"] = &LocationBlock::parseRedirect;
+	parseFunctions["cgi_extension"] = &LocationBlock::parseCgiExtension;
+	parseFunctions["upload_path"] = &LocationBlock::parseUploadPath;
 
 	parseLocation(tokenize(block[0], ' '));
 	for (size_t i = 1; i < block.size(); i++) {
@@ -50,7 +50,7 @@ void LocationBlock::parseLocationBlock(std::vector<std::string> block) {
 			continue;
 		if (parseFunctions.find(tokens[0]) != parseFunctions.end()) {
 			std::vector<std::string> args(tokens.begin() + 1, tokens.end());
-			parseFunctions[tokens[0]](args);
+			(this->*parseFunctions[tokens[0]])(args);
 		}
 		else {
 			std::string error =  "Error: invalid directive : " + tokens[0];
@@ -65,7 +65,7 @@ void LocationBlock::parseLocation(std::vector<std::string> args) {
 	this->_location = args[1];
 }
 
-void LocationBlock::parseRoot(std::vector<std::string> args) {
+void LocationBlock::parseRoot(std::vector<std::string> &args) {
 	if (args.size() != 1)
 		throw std::runtime_error("Error: invalid root directive");
 	if (args[0].find(";") != args[0].size() - 1)
@@ -73,16 +73,16 @@ void LocationBlock::parseRoot(std::vector<std::string> args) {
 	this->_root = args[0].substr(0, args[0].size() - 2);
 }
 
-void LocationBlock::parseIndex(std::vector<std::string> args) {
+void LocationBlock::parseIndex(std::vector<std::string> &args) {
 	std::string line;
-	for (int i = 0; i < args.size(); i++)
+	for (size_t i = 0; i < args.size(); i++)
 		line += args[i] + " ";
-	if (line.find(";") != line.size() - 2 || args.size() != 2)
+	if (line.find(";") != line.size() - 2)
 		throw std::runtime_error("Error: invalid index directive");
 	this->_index = tokenize(line.substr(0, line.size() - 2), ' ');
 }
 
-void LocationBlock::parseDirlisting(std::vector<std::string> args) {
+void LocationBlock::parseDirlisting(std::vector<std::string> &args) {
 	if (args.size() != 1)
 		throw std::runtime_error("Error: invalid dirlisting directive");
 	if (args[0].find(";") != args[0].size() - 1)
@@ -96,9 +96,9 @@ void LocationBlock::parseDirlisting(std::vector<std::string> args) {
 		throw std::runtime_error("Error: invalid dirlisting directive");
 }
 
-void LocationBlock::parseMethods(std::vector<std::string> args) {
+void LocationBlock::parseMethods(std::vector<std::string> &args) {
 	std::string line;
-	for (int i = 0; i < args.size(); i++)
+	for (size_t i = 0; i < args.size(); i++)
 		line += args[i] + " ";
 	if (line.find(";") != line.size() - 2)
 		throw std::runtime_error("Error: invalid methods directive");
@@ -108,7 +108,7 @@ void LocationBlock::parseMethods(std::vector<std::string> args) {
 			throw std::runtime_error("Error: invalid methods directive");
 }
 
-void LocationBlock::parseRedirect(std::vector<std::string> args) {
+void LocationBlock::parseRedirect(std::vector<std::string> &args) {
 	if (args.size() != 2)
 		throw std::runtime_error("Error: invalid redirect directive");
 	if (args[1].find(";") != args[1].size() - 1)
@@ -116,16 +116,16 @@ void LocationBlock::parseRedirect(std::vector<std::string> args) {
 	this->_redirect = std::make_pair(std::atoi(args[0].c_str()), args[1].substr(0, args[1].size() - 1));
 }
 
-void LocationBlock::parseCgiExtension(std::vector<std::string> args) {
+void LocationBlock::parseCgiExtension(std::vector<std::string> &args) {
 	std::string line;
-	for (int i = 0; i < args.size(); i++)
+	for (size_t i = 0; i < args.size(); i++)
 		line += args[i] + " ";
 	if (line.find(";") != line.size() - 2 || args.size() != 2)
 		throw std::runtime_error("Error: invalid cgi_extension directive");
 	this->cgi_extension[args[0]] = args[1].substr(0, args[1].size() - 1);
 }
 
-void LocationBlock::parseUploadPath(std::vector<std::strings> args) {
+void LocationBlock::parseUploadPath(std::vector<std::string> &args) {
 	if (args.size() != 1)
 		throw std::runtime_error("Error: invalid upload_path directive");
 	if (args[0].find(";") != args[0].size() - 1)

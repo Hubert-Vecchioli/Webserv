@@ -39,7 +39,7 @@ ConfigurationFile::~ConfigurationFile(void) {}
 
 // Main Parsing Functions for the ConfigurationFile class
 
-typedef void (*parseFunction)(const std::vector<std:string> &);
+typedef void (ConfigurationFile::*parseFunction)(std::vector<std::string> &);
 
 void ConfigurationFile::read(void) {
 	if (this->_filename.empty())
@@ -66,9 +66,9 @@ void ConfigurationFile::read(std::string filename) {
 
 void ConfigurationFile::parseFile(void) {
 	std::map<std::string, parseFunction> parseFunctions;
-	parseFunctions["user"] = &parseUser;
-	parseFunctions["error_log"] = &parseErrorLog;
-	parseFunctions["body_size"] = &parseBodySize;
+	parseFunctions["user"] = &ConfigurationFile::parseUser;
+	parseFunctions["error_log"] = &ConfigurationFile::parseErrorLog;
+	parseFunctions["body_size"] = &ConfigurationFile::parseBodySize;
 
 	std::istringstream iss(this->_content);
 	std::string line;
@@ -85,7 +85,7 @@ void ConfigurationFile::parseFile(void) {
 			parseServerBlock(iss);
 		else if (parseFunctions.find(tokens[0]) != parseFunctions.end()) {
 			std::vector<std::string> args(tokens.begin() + 1, tokens.end());
-			parseFunctions[tokens[0]](args);
+			(this->*parseFunctions[tokens[0]])(args);
 		}
 		else {
 			std::string error =  "Error: invalid directive : " + tokens[0];
@@ -96,19 +96,19 @@ void ConfigurationFile::parseFile(void) {
 		throw std::runtime_error("Error: no server block found");
 }
 
-void ConfigurationFile::parseUser(std::vector<std::string> args) {
+void ConfigurationFile::parseUser(std::vector<std::string> &args) {
 	if (args.size() != 1)
 		throw std::runtime_error("Error: invalid user directive");
 	this->_user = args[0].substr(0, args[0].find(";"));
 }
 
-void ConfigurationFile::parseErrorLog(std::vector<std::string> args) {
+void ConfigurationFile::parseErrorLog(std::vector<std::string> &args) {
 	if (args.size() != 1)
 		throw std::runtime_error("Error: invalid error_log directive");
 	this->_error_log = args[0].substr(0, args[0].find(";"));
 }
 
-void ConfigurationFile::parseBodySize(std::vector<std::string> args) {
+void ConfigurationFile::parseBodySize(std::vector<std::string> &args) {
 	if (args.size() != 2)
 		throw std::runtime_error("Error: invalid body_size directive");
 	unsigned long multiplier = 1;
@@ -131,12 +131,12 @@ void ConfigurationFile::parseServerBlock(std::istringstream &iss) {
 
 	while (std::getline(iss, line)) {
 		for (size_t i = 0; i < line.size(); i++) {
-			for (size_t j = 0; j < line.size(); j++) {
-				if (line[i][j] == '{')
-					openBrackets++;
-				else if (line[i][j] == '}')
-					openBrackets--;
-			}
+			//for (size_t j = 0; j < line.size(); j++) {
+			if (line[i]/*[j]*/ == '{')
+				openBrackets++;
+			else if (line[i]/*[j]*/ == '}')
+				openBrackets--;
+			//}
 		}
 		blockLines.push_back(line);
 		if (openBrackets == 0) {

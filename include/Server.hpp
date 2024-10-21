@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/12 18:22:54 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/18 11:43:54 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ class HttpRequest;
 class Server
 {
 	private:
-		static Server &					_uniqueInstance;
+		static Server &				_uniqueInstance;
 		ConfigurationFile*			_configurationFile;
 		bool 						_isServerGreenlighted;
 		int							_serverFD;
@@ -35,12 +35,13 @@ class Server
 		Server(Server const & rhs);
 		Server &operator=(Server const & rhs);
 
-		void _disconnectClient(int listenedFD);
 		void _triageEpollEvents(epoll_event & epollEvents);
 		void _reviewClientsHaveNoTimeout(void);
 		void _receiveRequest(int fd);
 		void _sendRequest(int fd);
 		void _reviewRequestsCompleted(void);
+		void _addNewClient(int listenedFD);
+		void _disconnectClient(int listenedFD);
 
 	public:
 		Server(void);
@@ -49,7 +50,8 @@ class Server
 		void startServer(ConfigurationFile & configurationFile);
 		void runServer(void);
 		void stopServer(void);
-		static const Server & getInstance(void) {return _uniqueInstance;};
+		static Server & getInstance(void) {return _uniqueInstance;};
+		//ConfigurationFile &getConfigurationFile() {return _configurationFile;};
 		
 		class FailureInitiateEpollInstanceException : public std::exception
 		{

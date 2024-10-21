@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/15 16:25:47 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/18 11:42:01 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,10 +141,10 @@ std::string HttpRequest::getValue(std::string request, std::string key_with_sep)
     return value;
 }
 
-HttpRequest* HttpRequest::findInstanceWithFD(std::vector<HttpRequest>& vector, int fd) {
-    for (std::vector<HttpRequest>::iterator it = vector.begin(); it != vector.end(); ++it) {
-        if (it->_client->getFD() == fd) {
-            return &(*it);
+HttpRequest* HttpRequest::findInstanceWithFD(std::vector<HttpRequest*>& vector, int fd) {
+    for (std::vector<HttpRequest*>::iterator it = vector.begin(); it != vector.end(); ++it) {
+        if ((*it)->_client->getFD() == fd) {
+            return (*it);
         }
     }
     return (0);
@@ -179,8 +179,34 @@ void HttpRequest::displayRequestLine(std::ostream &o) {
     //     o << _queryString << std::endl; // DEBUG
 }
 
-void HttpRequest::displayRequestBody(std::ostream & o) {
-    o << _content_body << std::endl;
+std::string HttpRequest::getValue(std::string request, std::string key_with_sep) {
+    std::string value;
+    
+    size_t pos_key = request.find(key_with_sep);
+    if (pos_key != std::string::npos) {
+        size_t endline = request.find('\n', pos_key);
+            if (endline != std::string::npos)
+                value = request.substr(pos_key + key_with_sep.size(), endline - pos_key - key_with_sep.size());
+            else 
+                value = request.substr(pos_key + key_with_sep.size());
+    }
+    else
+        value = "";
+    return value;
+}
+
+void HttpRequest::parseRequestHeader(char *request) {
+        std::string str_request = request;
+
+        _host = getValue(str_request, "Host: ");
+        _accept = getValue(str_request, "Accept: ");
+        if (getValue(str_request, "Connection: ") == "keep-alive")
+            _connection = KEEP_ALIVE;
+        else
+            _connection = CLOSE;
+        _content_type = getValue(str_request, "Content-Type: ");
+        std::string len = getValue(str_request, "Content-Length: ");
+        _content_len = atol(len.c_str());
 }
 
 void HttpRequest::displayRequestHeader(std::ostream & o) {
