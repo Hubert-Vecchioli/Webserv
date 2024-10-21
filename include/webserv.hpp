@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 16:20:55 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/21 18:05:02 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 # include <sys/wait.h>
 # include <dirent.h>
 # include <cstring>
+# include <algorithm>
 
 # include "Server.hpp"
 # include "Socket.hpp"

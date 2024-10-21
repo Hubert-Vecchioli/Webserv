@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/18 13:37:48 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/21 17:39:48 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,8 +185,10 @@ void Server::_receiveRequest(int fd)
 	if(sizeHTTPRequest < 0)
 		throw FailureToReceiveData();
 	rawHTTPRequest[sizeHTTPRequest] = 0;
-	HttpResponse* response = new HttpResponse();
-	this->_requests.push_back(new HttpRequest(clientSendingARequest, response, rawHTTPRequest));
+	HttpRequest *request = new HttpRequest(clientSendingARequest, rawHTTPRequest);
+	HttpResponse *response = new HttpResponse(*this, *request);
+	request->setResponse(response);
+	this->_requests.push_back(request);
 	print(1, "[Info] - Request successfully received from Client FD : ", fd);
 }
 
