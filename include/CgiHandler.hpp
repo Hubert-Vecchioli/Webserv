@@ -26,8 +26,6 @@ class CgiHandler
 		void execParent(int fd[2]);
 		char **convertEnv();
 		char **convertArgs(std::string cgi_fullpath, std::string exec_cgi);
-		
-
 
 };
 
