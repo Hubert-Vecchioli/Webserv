@@ -104,7 +104,7 @@ char **CgiHandler::convertArgs(std::string cgi_fullpath, std::string exec_cgi) {
 	char **argv = new char*[3];
 	argv[0] = strdup(exec_cgi.c_str());
 	argv[1] = strdup(cgi_fullpath.c_str());
-	argv[2] = nullptr;
+	argv[2] = NULL;
 	return argv;
 }
 
