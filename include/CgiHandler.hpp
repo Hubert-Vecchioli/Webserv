@@ -12,18 +12,20 @@ class CgiHandler
 		CgiHandler(CgiHandler const & rhs);
 		CgiHandler &operator=(CgiHandler const & rhs);
 		~CgiHandler(void);
+
+		int getStatus(void) const {return _status;}
+		std::string getOutput(void) const {return _output;}
 	
 	private:
 		std::map<std::string, std::string> _env;
 		int _status;
 		std::string _output;
 
-		void executeCgi(HttpResponse const &response);
+		char **convertEnv(void);
+		void timeout(int pid);
 		void execChild(char **argv, char **envp, int fd[2]);
-		void execParent(pid_t pid);
-		void timeout(pid_t pid);
-		char **convertEnv();
-		
+		void execParent(pid_t pid, int fd[2]);
+		void executeCgi(HttpResponse const &response);
 
 
 };
