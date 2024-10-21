@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: cuteness_ <cuteness_@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/17 18:23:56 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/21 14:10:03 by cuteness_        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,14 @@ void HttpResponse::_generateResponseContent(void)
 	
 	// if(/*_request is CGI*/)
 	// 	// trigger the CGI
+	
+	/*
+	CgiHandler cgi(this);
+	if (cgi.getStatus() != 200)
+		gen the error response
+	std::string out = cgi.getOutput();
+	*/
+
 	//will need to add the try & catch
 	switch(_request.getMethod())
 	{

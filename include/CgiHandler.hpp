@@ -12,6 +12,9 @@ class CgiHandler
 		CgiHandler(CgiHandler const & rhs);
 		CgiHandler &operator=(CgiHandler const & rhs);
 		~CgiHandler(void);
+
+		int getStatus(void) const {return _status;}
+		std::string getOutput(void) const {return _output;}
 	
 	private:
 		std::map<std::string, std::string> _env;
