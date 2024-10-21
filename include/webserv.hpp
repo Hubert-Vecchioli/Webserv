@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cuteness_ <cuteness_@student.42.fr>        +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 15:22:06 by cuteness_        ###   ########.fr       */
+/*   Updated: 2024/10/21 16:20:55 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,9 +58,7 @@
 
 void	displayTimestamp(void);
 void	print(int i, std::string message, int fd = -2);
-void	print(int i, std::string message, int fd = -2);
 std::vector<std::string> tokenize(std::string s, char delimiter);
-void	modifyEpollCTL(int EpollFD, int listendFD, int epollAction, bool isReadyToSendResponse = false);
 void	modifyEpollCTL(int EpollFD, int listendFD, int epollAction, bool isReadyToSendResponse = false);
 
 #endif
