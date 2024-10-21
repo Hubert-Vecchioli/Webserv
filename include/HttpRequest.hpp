@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/18 16:02:17 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/21 12:30:32 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ class HttpRequest
 		void displayRequestBody(std::ostream & o);
 
 		HttpResponse* getResponse(void) {return _response;};
-		static HttpRequest* findInstanceWithFD(std::vector<HttpRequest>& vector, int fd);
+		static HttpRequest* findInstanceWithFD(std::vector<HttpRequest*>& vector, int fd);
 
 		t_method getMethod() {return _method;};
 		bool getHTTP() {return _http1;};

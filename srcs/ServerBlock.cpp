@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   ServerBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:08:49 by hvecchio          #+#    #+#             */
 /*   Updated: 2024/10/17 15:50:50 by ebesnoin         ###   ########.fr       */
@@ -37,13 +37,13 @@ ServerBlock::~ServerBlock(void) {}
 
 // Main Parsing Functions for the ServerBlock class
 
-typedef void (*parseFunction)(const std::vector<std::string> &);
+typedef void (ServerBlock::*parseFunction)(std::vector<std::string> &);
 
 void ServerBlock::parseServer(std::vector<std::string> block) {
 	std::map<std::string, parseFunction> parseFunctions;
-	parseFunctions["listen"] = &parseListen;
-	parseFunctions["server_name"] = &parseServerName;
-	parseFunctions["error_page"] = &parseErrorPages;
+	parseFunctions["listen"] = &ServerBlock::parseListen;
+	parseFunctions["server_name"] = &ServerBlock::parseServerName;
+	parseFunctions["error_page"] = &ServerBlock::parseErrorPages;
 
 	for (size_t i = 0; i < block.size(); i++) {
 		std::vector<std::string> tokens = tokenize(block[i], ' ');
@@ -55,7 +55,7 @@ void ServerBlock::parseServer(std::vector<std::string> block) {
 			i = parseLocationBlock(block, i);
 		else if (parseFunctions.find(tokens[0]) != parseFunctions.end()) {
 			std::vector<std::string> args(tokens.begin() + 1, tokens.end());
-			parseFunctions[tokens[0]](args);
+			(this->*parseFunctions[tokens[0]])(args);
 		}
 		else {
 			std::string error =  "Error: invalid directive : " + tokens[0];
@@ -70,9 +70,9 @@ void ServerBlock::parseServer(std::vector<std::string> block) {
 		throw std::runtime_error("Error: no location block found");
 }
 
-void ServerBlock::parseListen (std::vector<std::string> args) {
+void ServerBlock::parseListen (std::vector<std::string> &args) {
 	std::string line;
-	for (int i = 0; i < args.size(); i++)
+	for (size_t i = 0; i < args.size(); i++)
 		line += args[i] + " ";
 	if (line.find(";") != line.size() - 2)
 		throw std::runtime_error("Error: invalid listen directive");
@@ -82,9 +82,9 @@ void ServerBlock::parseListen (std::vector<std::string> args) {
 		throw std::runtime_error("Error: invalid listen directive");
 }
 
-void ServerBlock::parseServerName(std::vector<std::string> args) {
+void ServerBlock::parseServerName(std::vector<std::string> &args) {
 	std::string line;
-	for (int i = 0; i < args.size(); i++)
+	for (size_t i = 0; i < args.size(); i++)
 		line += args[i] + " ";
 	if (line.find(";") != line.size() - 2) {
 		throw std::runtime_error("Error: invalid server name directive");
@@ -93,9 +93,9 @@ void ServerBlock::parseServerName(std::vector<std::string> args) {
 	}
 }
 
-void ServerBlock::parseErrorPages(std::vector<std::string> args) {
+void ServerBlock::parseErrorPages(std::vector<std::string> &args) {
 	std::string line;
-	for (int i = 0; i < args.size(); i++)
+	for (size_t i = 0; i < args.size(); i++)
 		line += args[i] + " ";
 	if (line.find(";") != line.size() - 2)
 		throw std::runtime_error("Error: invalid error pages directive");
@@ -103,7 +103,7 @@ void ServerBlock::parseErrorPages(std::vector<std::string> args) {
 		this->_error_pages[std::atoi(args[i].c_str())] = args[args.size() - 1];
 }
 
-void ServerBlock::parseLocationBlock(std::vector<std::string> block, int i) {
+size_t ServerBlock::parseLocationBlock(std::vector<std::string> block, size_t i) {
 	std::vector<std::string> lBlock;
 	size_t openBrackets = 0;
 	size_t start = i;
