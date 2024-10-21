@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 10:50:07 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/21 16:28:50 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,9 @@ class HttpResponse
 		bool getResponseStatus(void) const {return _isResponseSent;};
 		std::time_t getLastActionTimeStamp(void) const {return _lastActionTimeStamp;};
 		std::string getResponseContent(void);
+		HttpRequest & getRequest() const {return _request;};
+		ServerBlock & getServerBlock() const {return *_server_block;};
+		LocationBlock & getLocationBlock() const {return *_location_block;};
 
 		class ServerError : public std::exception {
 			private:

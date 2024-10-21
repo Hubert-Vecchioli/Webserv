@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cuteness_ <cuteness_@student.42.fr>        +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 15:21:18 by cuteness_        ###   ########.fr       */
+/*   Updated: 2024/10/21 16:27:10 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ class HttpRequest
 		std::string getRequestURI() {return _requestURI;};
 		std::string getHost() {return _host;};
 		std::vector<std::string> getAccept() {return _accept;};
+		size_t getContentLength() {return _content_len;};
+		std::string getContentType() {return _content_type;};
 };
 
 #endif
