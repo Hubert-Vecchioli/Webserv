@@ -8,7 +8,7 @@ class HttpResponse;
 class CgiHandler
 {
 	public:
-		CgiHandler(HtppResponse &response);
+		CgiHandler(HttpResponse const &response);
 		CgiHandler(CgiHandler const & rhs);
 		CgiHandler &operator=(CgiHandler const & rhs);
 		~CgiHandler(void);
