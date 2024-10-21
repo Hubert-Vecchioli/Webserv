@@ -16,11 +16,13 @@
 			</nav>
 		</header>
 		<main>
-			<h1>Send us a picture of a banana.</h1>
-			<p>(pineapples tolerated)</p>
-			<form class="styled-form" method="POST" action="/upload" enctype="multipart/form-data">
-				<input type="file" name="file" placeholder="Choose de file" required>
-				<input type="submit" value="Upload">
+			<h1>Contact us, if you dare.</h1>
+			<form class="styled-form" method="get" action="">
+				<input type="text" name="name" placeholder="name" autofocus>
+				<input type="text" name="lastname" placeholder="lastname">
+				<input type="email" name="email" placeholder="name@gmail.com" required>
+				<textarea name="message" id="message" placeholder="message" required></textarea>
+				<button type="submit">Submit</button>
 			</form>
 		</main>
 	</body>
