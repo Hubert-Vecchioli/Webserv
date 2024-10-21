@@ -1,9 +1,9 @@
 #include "CgiHandler.hpp"
 
-CgiHandler::CgiHandler(HttpRequest const &request, ) {
+CgiHandler::CgiHandler(HttpResponse const &response) {
 	_env["AUTH_TYPE"] = "";
-	_env["CONTENT_LENGTH"] = std::to_string(request.getContentLen());
-	_env["CONTENT_TYPE"] = request.getContentType();
+	_env["CONTENT_LENGTH"] = std::to_string(response.getRequest.getContentLength);
+	_env["CONTENT_TYPE"] = response.getRequest.getContentType();
 	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	_env["PATH_INFO"] = "";
 	_env["PATH_TRANSLATED"] = "";

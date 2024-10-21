@@ -3,10 +3,12 @@
 
 #include "webserv.hpp"
 
+class HttpResponse;
+
 class CgiHandler
 {
 	public:
-		CgiHandler(HttpRequest const &request);
+		CgiHandler(response.getRequest.getContentLength);
 		CgiHandler(CgiHandler const & rhs);
 		CgiHandler &operator=(CgiHandler const & rhs);
 		~CgiHandler(void);
@@ -23,6 +25,6 @@ class CgiHandler
                        	    //"SERVER_PORT" | "SERVER_PROTOCOL" |
                        	    //"SERVER_SOFTWARE"
 
-}
+};
 
 #endif //CGIHANDLER_HPP
