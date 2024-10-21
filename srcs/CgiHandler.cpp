@@ -1,5 +1,7 @@
 #include "CgiHandler.hpp"
 
+pid_t pid = -1;
+
 CgiHandler::CgiHandler(HttpResponse const &response) {
 	std::string uri = response.getRequest().getRequestURI();
 	std::string pathinfo = uri.substr(uri.find('.', 8));
@@ -50,35 +52,38 @@ void CgiHandler::executeCgi(HttpResponse const &response) {
 		throw std::runtime_error("Unrecognized CGI extension");
 		return;
 	}
-	char **argv = {exec_cgi.c_str(), cgi_fullpath.c_str(), NULL};
-	char **envp = convertEnv();
 	int fd[2];
-
 	if (pipe(fd) == -1) {
 		_status = 500;
 		throw std::runtime_error("Pipe failed");
 	}
-	pid_t pid = fork();
+	char **argv = convertArgs(cgi_fullpath, exec_cgi);
+	char **envp = convertEnv();
+	pid = fork();
 	if (pid < 0) {
 		_status = 500;
+		delete[] envp;
+		delete[] argv;
 		throw std::runtime_error("Fork failed");
 	}
-
 	else if (pid == 0)
 		execChild(argv, envp, fd);
 	else
 		try {
-			execParent(pid, fd);
+			execParent(fd);
 		}
 		catch (std::exception &e) {
 			delete[] envp;
+			delete[] argv;
 			throw e;
 		}
 	_status = 200;
 	delete[] envp;
+	delete[] argv;
 }
 
-void CgiHandler::timeout(pid_t pid) {
+static void timeoutHandler(int sig) {
+	(void)sig;
 	if (pid > 0)
 		kill(pid, SIGKILL);
 }
@@ -95,6 +100,14 @@ char **CgiHandler::convertEnv() {
 	return env;
 }
 
+char **CgiHandler::convertArgs(std::string cgi_fullpath, std::string exec_cgi) {
+	char **argv = new char*[3];
+	argv[0] = strdup(exec_cgi.c_str());
+	argv[1] = strdup(cgi_fullpath.c_str());
+	argv[2] = NULL;
+	return argv;
+}
+
 void CgiHandler::execChild(char **argv, char **envp, int fd[2]) {
 	close(fd[0]);
 	dup2(fd[1], STDOUT_FILENO);
@@ -103,9 +116,9 @@ void CgiHandler::execChild(char **argv, char **envp, int fd[2]) {
 	exit(1);
 }
 
-void CgiHandler::execParent(pid_t pid, int fd[2]) {
+void CgiHandler::execParent(int fd[2]) {
 	close(fd[1]);
-	signal(SIGALRM, timeout(pid));
+	signal(SIGALRM, timeoutHandler);
 	alarm(5);
 
 	int status;
@@ -128,7 +141,7 @@ void CgiHandler::execParent(pid_t pid, int fd[2]) {
 		throw std::runtime_error("CGI Timeout");
 	}
 	
-	size_t i = 0;
+	int i = 0;
 	const int bufferSize = 1024;
 	char buffer[bufferSize];
 	while ((i = read(fd[0], buffer, bufferSize - 1)) > 0) {

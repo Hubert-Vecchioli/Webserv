@@ -24,8 +24,10 @@ class CgiHandler
 		char **convertEnv(void);
 		void timeout(pid_t pid);
 		void execChild(char **argv, char **envp, int fd[2]);
-		void execParent(pid_t pid, int fd[2]);
-		void executeCgi(HttpResponse const &response);
+		void execParent(int fd[2]);
+		char **convertEnv();
+		char **convertArgs(std::string cgi_fullpath, std::string exec_cgi);
+		
 
 
 };
