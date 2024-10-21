@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:53:51 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/12 18:32:06 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/18 11:41:47 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,10 +50,10 @@ void Client::updateLastActionTimeStamp(void)
 	this->_lastActionTimeStamp = time(0);
 }
 
-Client* Client::findInstanceWithFD(std::vector<Client>& vector, int fd) {
-    for (std::vector<Client>::iterator it = vector.begin(); it != vector.end(); ++it) {
-        if (it->_fd == fd) {
-            return &(*it);
+Client* Client::findInstanceWithFD(std::vector<Client*>& vector, int fd) {
+    for (std::vector<Client *>::const_iterator it = vector.begin(); it != vector.end(); ++it) {
+        if ((*it)->_fd == fd) {
+            return (*it);
         }
     }
     return (0);

@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   LocationBlock.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:07:40 by hvecchio          #+#    #+#             */
 /*   Updated: 2024/10/17 16:02:07 by ebesnoin         ###   ########.fr       */
@@ -30,13 +30,13 @@ class LocationBlock
 
 		void parseLocationBlock(std::vector<std::string> block);
 		void parseLocation(std::vector<std::string> args);
-		void parseRoot(std::vector<std::string> args);
-		void parseIndex(std::vector<std::string> args);
-		void parseDirlisting(std::vector<std::string> args);
-		void parseMethods(std::vector<std::string> args);
-		void parseRedirect(std::vector<std::string> args);
-		void parseCgiExtension(std::vector<std::string> args);
-		void parseUploadPath(std::vector<std::string> args);
+		void parseRoot(std::vector<std::string> &args);
+		void parseIndex(std::vector<std::string> &args);
+		void parseDirlisting(std::vector<std::string> &args);
+		void parseMethods(std::vector<std::string> &args);
+		void parseRedirect(std::vector<std::string> &args);
+		void parseCgiExtension(std::vector<std::string> &args);
+		void parseUploadPath(std::vector<std::string> &args);
 		
 	public:
 		LocationBlock(std::vector<std::string> block);
