@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 10:48:20 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/21 12:26:46 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,7 +155,7 @@ int	HttpResponse::_fetchDirectoryRessource(std::string path) {
 		int fd = open(new_path.c_str(), O_RDONLY);
 		if (fd > 0){
 			if (_checkAcceptedFormat(_request, new_path) == true)
-				return int;
+				return fd;
 			else
 				close(fd);
 		}
