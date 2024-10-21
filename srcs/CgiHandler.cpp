@@ -6,7 +6,7 @@ CgiHandler::CgiHandler(HttpResponse const &response) {
 	std::string uri = response.getRequest().getRequestURI();
 	std::string pathinfo = uri.substr(uri.find('.', 8));
 	pathinfo = pathinfo.substr(0, pathinfo.find_last_of('/') + 1);
-	_env["CONTENT_LENGTH"] = std::to_string(response.getRequest().getContentLength());
+	_env["CONTENT_LENGTH"] = ft_toString(response.getRequest().getContentLength());
 	_env["CONTENT_TYPE"] = response.getRequest().getContentType();
 	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	_env["PATH_INFO"] = pathinfo;
@@ -16,7 +16,7 @@ CgiHandler::CgiHandler(HttpResponse const &response) {
 	_env["REQUEST_METHOD"] = response.getRequest().getMethod();
 	_env["SCRIPT_NAME"] = uri.substr(uri.find_last_of('/') + 1);
 	_env["SERVER_NAME"] = uri.substr(8, uri.find('.', 8) - 8);
-	_env["SERVER_PORT"] = std::to_string(response.getServerBlock().getIPandPort()->second);
+	_env["SERVER_PORT"] = ft_toString(response.getServerBlock().getIPandPort().second);
 	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	_env["SERVER_SOFTWARE"] = "webserv";
 	//_env["REMOTE_HOST"] = nullptr; // client domain name if available
