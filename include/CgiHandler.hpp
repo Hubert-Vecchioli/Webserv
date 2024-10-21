@@ -23,7 +23,7 @@ class CgiHandler
 
 		void executeCgi(HttpResponse const &response);
 		void execChild(char **argv, char **envp, int fd[2]);
-		void execParent(pid_t pid);
+		void execParent(pid_t pid, int fd[2]);
 		void timeout(pid_t pid);
 		char **convertEnv();
 		
