@@ -12,6 +12,7 @@ CFLAGS 			= -Wall -Werror -Wextra -Wshadow -Wno-shadow -std=c++98
 
 INCS = ./include
 PATHS = main.cpp \
+		CgiHandler.cpp \
 		ConfigurationFile.cpp \
 		LocationBlock.cpp \
 		ServerBlock.cpp \
