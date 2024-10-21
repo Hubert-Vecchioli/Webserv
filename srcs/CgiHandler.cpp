@@ -65,7 +65,14 @@ void CgiHandler::executeCgi(HttpResponse const &response) {
 	else if (pid == 0)
 		execChild(argv, envp, fd);
 	else
-		execParent(pid);
+		try {
+			execParent(pid);
+		}
+		catch (std::exception &e) {
+			delete[] envp;
+			throw e;
+		}
+	_status = 200;
 	delete[] envp;
 }
 
