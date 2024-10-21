@@ -8,22 +8,23 @@ class HttpResponse;
 class CgiHandler
 {
 	public:
-		CgiHandler(response.getRequest.getContentLength);
+		CgiHandler(HtppResponse &response);
 		CgiHandler(CgiHandler const & rhs);
 		CgiHandler &operator=(CgiHandler const & rhs);
 		~CgiHandler(void);
 	
 	private:
 		std::map<std::string, std::string> _env;
-							//"AUTH_TYPE" | "CONTENT_LENGTH" |
-                        	//"CONTENT_TYPE" | "GATEWAY_INTERFACE" |
-                        	//"PATH_INFO" | "PATH_TRANSLATED" |
-                       	    //"QUERY_STRING" | "REMOTE_ADDR" |
-                       	    //"REMOTE_HOST" | "REMOTE_IDENT" |
-                       	    //"REMOTE_USER" | "REQUEST_METHOD" |
-                       	    //"SCRIPT_NAME" | "SERVER_NAME" |
-                       	    //"SERVER_PORT" | "SERVER_PROTOCOL" |
-                       	    //"SERVER_SOFTWARE"
+		int _status;
+		std::string _output;
+
+		void executeCgi(HttpResponse const &response);
+		void execChild(char **argv, char **envp, int fd[2]);
+		void execParent(pid_t pid);
+		void timeout(pid_t pid);
+		char **convertEnv();
+		
+
 
 };
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cuteness_ <cuteness_@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/18 11:50:21 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/21 12:03:55 by cuteness_        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@
 # include <arpa/inet.h>
 # include <sys/types.h>
 # include <sys/stat.h>
+# include <sys/wait.h>
+# include <cstring>
 
 # include "Server.hpp"
 # include "Socket.hpp"
