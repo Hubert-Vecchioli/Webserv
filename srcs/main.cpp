@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:23:30 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/09 01:24:58 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/22 15:43:17 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,10 @@
 
 int main(int ac, char **av)
 {
-	//Server server;
+	Server *server = 0;
 
-	//signal(SIGINT, ft_stop_server);
+	server->getInstance();
+	signal(SIGINT, ft_stop_server);
 	try
 	{
 		ConfigurationFile config = ConfigurationFile(ac, av);// load & parse a config file OR load default config - and its respective cout message
@@ -25,8 +26,8 @@ int main(int ac, char **av)
 		{
 			std::cout << iphost[i].first << " " << iphost[i].second << std::endl;
 		}
-		//server.startServer(config); //Should I add the config object as an argument of initiate?
-		//server.run();
+		server->startServer(config); //Should I add the config object as an argument of initiate?
+		server->runServer();
 	}
 	catch (std::exception & e)
 	{

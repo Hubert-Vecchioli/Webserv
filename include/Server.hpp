@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/22 15:11:56 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 15:44:50 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ class HttpRequest;
 class Server
 {
 	private:
-		static Server &				_uniqueInstance;
+		static Server				*_uniqueInstance;
 		ConfigurationFile*			_configurationFile;
 		bool 						_isServerGreenlighted;
 		int							_serverFD;
@@ -32,9 +32,9 @@ class Server
 		std::vector<Client*>		_clients;
 		std::vector<HttpRequest*>	_requests;
 
-		Server(void) : _configurationFile(nullptr), _isServerGreenlighted(false), _serverFD(-1) {}
-		Server(Server const & rhs) = delete;
-		Server &operator=(Server const & rhs) = delete;
+		Server(void) : _configurationFile(0), _isServerGreenlighted(false), _serverFD(-1) {}
+		Server(Server const & rhs);
+		Server &operator=(Server const & rhs);
 
 		void _triageEpollEvents(epoll_event & epollEvents);
 		void _reviewClientsHaveNoTimeout(void);
@@ -54,8 +54,7 @@ class Server
 		
 		void startServer(ConfigurationFile & configurationFile);
 		void runServer(void);
-		void stopServer(void);
-		static Server & getInstance(void) {return _uniqueInstance;};
+		static void stopServer(void);
 		//ConfigurationFile &getConfigurationFile() {return _configurationFile;};
 
 		ConfigurationFile &getConfigurationFile(void) {return *_configurationFile;};
