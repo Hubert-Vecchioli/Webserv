@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/22 11:33:30 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 11:51:22 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,30 +152,29 @@ void HttpResponse::_fetchGETResource(void) {
 
 void HttpResponse::_generateChunkedGETResponseContent(std::string path)
 {
-    print(1, "[Info] - Opening file to answer the request from Client FD : ", this->_request->getClient()->getFD());
+    print(1, "[Info] - Opening file to answer the request from Client FD : ", this->_request.getClient()->getFD());
     //Check si presence de l extension du fichier
 	//TODO HV: Factoriser la partie concernant l'extension
     size_t pos = path.find_last_of('.');
     if (pos == std::string::npos)
         throw ClientError(400);
     std::string extension = path.substr(pos);
-    this->_generateMimeMap();
-    if (!_mimeMap[extension])
+    if (_mimeMap[extension].empty())
         throw ClientError(400);
     
-    this->_reponseContent = "HTTP/1.1 200 OK\r\n";
-    this->_reponseContent += "Content-Type: " + _mimeMap[extension] + "\r\n";
-    this->_reponseContent += "Transfer-Encoding: chunked\r\n";
-    this->_reponseContent += "\r\n";
+    this->_responseContent = "HTTP/1.1 200 OK\r\n";
+    this->_responseContent += "Content-Type: " + _mimeMap[extension] + "\r\n";
+    this->_responseContent += "Transfer-Encoding: chunked\r\n";
+    this->_responseContent += "\r\n";
 
     int fileFd = open(path.c_str(), O_RDONLY);
     if (fileFd == -1)
     {
-        print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request->getClient()->getFD());
+        print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request.getClient()->getFD());
         struct stat stats;
         if (stat(path.c_str(), &stats) != 0)
             throw ClientError(404); 
-        if ((info.st_mode & S_IFDIR) != 0)
+        if ((stats.st_mode & S_IFDIR) != 0)
             throw ClientError(403);
         else
             throw ClientError(404);
@@ -188,7 +187,7 @@ void HttpResponse::_generateChunkedGETResponseContent(std::string path)
     else if (readSize == 0)
     {
         close(fileFd);
-        this->_reponseContent += "0\r\n\r\n";
+        this->_responseContent += "0\r\n\r\n";
 		// TODO HV: si timeout, est ce que je leak d'un fd non fermé??
         // ajouter que la reponse est done // TODO avoir un bool: response is ready!
     }
@@ -196,20 +195,19 @@ void HttpResponse::_generateChunkedGETResponseContent(std::string path)
     {
         std::stringstream readSizeHex;
         readSizeHex << std::hex << readSize;
-        this->_reponseContent += readSizeHex.str() + "\r\n" + buffer + "\r\n";
+        this->_responseContent += readSizeHex.str() + "\r\n" + buffer + "\r\n";
     }
 }
 
 void HttpResponse::_generateGETResponseContent(std::string path)
 {
-    print(1, "[Info] - Opening file to answer the request from Client FD : ", this->_request->getClient()->getFD());
+    print(1, "[Info] - Opening file to answer the request from Client FD : ", this->_request.getClient()->getFD());
     //Check si presence de l extension du fichier
     size_t pos = path.find_last_of('.');
     if (pos == std::string::npos)
         throw ClientError(400);
     std::string extension = path.substr(pos);
-    this->_generateMimeMap();
-    if (!_mimeMap[extension])
+    if (_mimeMap[extension].empty())
         throw ClientError(400);
     std::ifstream file(path.c_str());
     file.open(this->name_.c_str());
@@ -236,11 +234,11 @@ void HttpResponse::_generateGETResponseContent(std::string path)
     oss2 << fileContent.size();
     std::string sizeStr = oss2.str();
 
-    this->_reponseContent = "HTTP/1.1 200 OK\r\n";
-    this->_reponseContent += "Content-Type: " + _mimeMap[extension] + "\r\n";
-    this->_reponseContent += "Content-Length: " + sizeStr + "\r\n";
-    this->_reponseContent += "\r\n";
-    this->_reponseContent += fileContent;
+    this->_responseContent = "HTTP/1.1 200 OK\r\n";
+    this->_responseContent += "Content-Type: " + _mimeMap[extension] + "\r\n";
+    this->_responseContent += "Content-Length: " + sizeStr + "\r\n";
+    this->_responseContent += "\r\n";
+    this->_responseContent += fileContent;
 }
 
 bool HttpResponse::_isFileAboveThreshold(std::string &path)
@@ -338,7 +336,7 @@ bool HttpResponse::_checkAcceptedFormat(std::string path) {
 	if (pos == std::string::npos)
 		return false; // TBC HERE => i refuse any file without an extension because there is no way to know if it s binary or text
 	std::string extension = path.substr(pos);
-	if (_mimeMap[extension] != "") {
+	if (_mimeMap[extension].empty()) {
 		std::string mime_type = _mimeMap[extension];
 		if (std::find(beg, end, mime_type) != end)
 			return true;
@@ -414,7 +412,7 @@ void HttpResponse::_generateErrorResponse(int errorCode, const char *errorMessag
 	if (!_server_block)
 		return _generateGenericErrorResponse(errorCode, errorMessage);
 	std::string error_page = _server_block->getErrorPages()[errorCode];
-	if (error_page == "")
+	if (error_page.empty())
 		return _generateGenericErrorResponse(errorCode, errorMessage);
 	std::string path = _location_block->getRoot() + error_page;
 	struct stat stats;
