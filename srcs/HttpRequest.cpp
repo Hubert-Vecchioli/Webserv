@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 17:27:55 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 11:06:40 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,6 +124,26 @@ void HttpRequest::parseCookie(std::string request) {
 }
 
 // Helper functions
+
+std::string HttpRequest::getStringMethod() {
+    std::string method;
+    switch (_method)
+    {
+    case GET:
+        method = "GET";
+        break;
+    case POST:
+        method = "POST";
+        break;
+    case DELETE:
+        method = "DELETE";
+        break;
+    default:
+        method = "ERROR";
+        break;
+    }
+    return method;
+}
 
 std::string HttpRequest::getValue(std::string request, std::string key_with_sep) {
     std::string value;
