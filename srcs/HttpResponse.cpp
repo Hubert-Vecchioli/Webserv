@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/22 11:51:22 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 12:03:12 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,18 +167,18 @@ void HttpResponse::_generateChunkedGETResponseContent(std::string path)
     this->_responseContent += "Transfer-Encoding: chunked\r\n";
     this->_responseContent += "\r\n";
 
-    int fileFd = open(path.c_str(), O_RDONLY);
-    if (fileFd == -1)
-    {
-        print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request.getClient()->getFD());
-        struct stat stats;
-        if (stat(path.c_str(), &stats) != 0)
-            throw ClientError(404); 
-        if ((stats.st_mode & S_IFDIR) != 0)
-            throw ClientError(403);
-        else
-            throw ClientError(404);
-    }
+    // int fileFd = open(path.c_str(), O_RDONLY);
+    // if (fileFd == -1)
+    // {
+    //     print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request.getClient()->getFD());
+    //     struct stat stats;
+    //     if (stat(path.c_str(), &stats) != 0)
+    //         throw ClientError(404); 
+    //     if ((stats.st_mode & S_IFDIR) != 0)
+    //         throw ClientError(403);
+    //     else
+    //         throw ClientError(404);
+    // }
 	//TODO HV: A tester avec un tres long texte si ça passe
     char buffer[RESPONSE_BUFFER];
     ssize_t readSize = read(fileFd, buffer, RESPONSE_BUFFER);
@@ -210,25 +210,25 @@ void HttpResponse::_generateGETResponseContent(std::string path)
     if (_mimeMap[extension].empty())
         throw ClientError(400);
     std::ifstream file(path.c_str());
-    file.open(this->name_.c_str());
-    if (!file.is_open())
-    {
-        print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request->getClient()->getFD());
-        struct stat stats;
-        if (stat(path.c_str(), &stats) != 0)
-            throw ClientError(404); 
-        if ((info.st_mode & S_IFDIR) != 0)
-            throw ClientError(403);
-        else
-            throw ClientError(404);
-    }
+    // file.open(this->name_.c_str());
+    // if (!file.is_open())
+    // {
+    //     print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request->getClient()->getFD());
+    //     struct stat stats;
+    //     if (stat(path.c_str(), &stats) != 0)
+    //         throw ClientError(404); 
+    //     if ((info.st_mode & S_IFDIR) != 0)
+    //         throw ClientError(403);
+    //     else
+    //         throw ClientError(404);
+    // }
     std::ostringstream content;
     std::string line;
     while (std::getline(file, line))
     {
         content << line << "\n";
     }
-    file.close();
+    // file.close();
     std::string fileContent = content.str();
     std::ostringstream oss2;
     oss2 << fileContent.size();
@@ -312,7 +312,7 @@ void HttpResponse::_generateDirlistingResponse(std::string path)
 	responseBody +="</ul></div><footer><p>Brought to you by JB, EB & HV</p></footer></body></html>";
 	
 	std::ostringstream oss2;
-	oss2 << responseBody.size();
+	oss2 << responseBody.size();bool HttpResponse::_checkAcceptedFormat(std::string path)
     std::string sizeStr = oss2.str();
 
 	this->_responseContent = "HTTP/1.1 200 OK\r\n";
