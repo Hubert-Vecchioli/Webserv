@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/22 13:14:28 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/22 15:03:12 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,11 +212,11 @@ void HttpResponse::_generateGETResponseContent(std::string path)
     std::ifstream file(path.c_str());
     if (!file.is_open())
     {
-        print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request->getClient()->getFD());
+        print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request.getClient()->getFD());
         struct stat stats;
         if (stat(path.c_str(), &stats) != 0)
             throw ClientError(404); 
-        if ((info.st_mode & S_IFDIR) != 0)
+        if ((stats.st_mode & S_IFDIR) != 0)
             throw ClientError(403);
         else
             throw ClientError(404);
@@ -311,7 +311,7 @@ void HttpResponse::_generateDirlistingResponse(std::string path)
 	responseBody +="</ul></div><footer><p>Brought to you by JB, EB & HV</p></footer></body></html>";
 	
 	std::ostringstream oss2;
-	oss2 << responseBody.size();bool HttpResponse::_checkAcceptedFormat(std::string path)
+	oss2 << responseBody.size();
     std::string sizeStr = oss2.str();
 
 	this->_responseContent = "HTTP/1.1 200 OK\r\n";
