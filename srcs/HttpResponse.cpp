@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 19:00:53 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 11:23:58 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ void	HttpResponse::_fetchLocationBlock(void) {
 
 void HttpResponse::_checkAllowedMethod(void) {
 	std::vector<std::string> methods = _location_block->getMethods();
-	if (std::find(methods.begin(), methods.end(), _request.getMethod()) == methods.end())
+	if (std::find(methods.begin(), methods.end(), _request.getStringMethod()) == methods.end())
 		throw ClientError(405);
 }
 
@@ -309,7 +309,7 @@ void HttpResponse::_generatePOSTResponse(void)
 	this->_responseContent += "Content-Type: application/json\r\n";
 	this->_responseContent += "Content-Length: " + sizeStr2 + "\r\n";
 	this->_responseContent += "\r\n";
-	this->_responseContent += responseBody
+	this->_responseContent += responseBody;
 }
 
 void HttpResponse::_generateErrorResponse(int errorCode, const char *errorMessage) {
@@ -320,17 +320,18 @@ void HttpResponse::_generateErrorResponse(int errorCode, const char *errorMessag
 	ss << "Content-Type: text/html\r\n";
 	if (!_server_block)
 		return _generateGenericErrorResponse(errorCode, errorMessage);
-	std::string error_page = _server_block.getErrorPages()[errorCode];
-	if (!error_page)
+	std::string error_page = _server_block->getErrorPages()[errorCode];
+	if (error_page == "")
 		return _generateGenericErrorResponse(errorCode, errorMessage);
+	std::string path = _location_block->getRoot() + error_page;
 	struct stat stats;
-	if (stat(&stats) == -1)
+	if (stat(path.c_str(), &stats) == -1)
 		return _generateGenericErrorResponse(errorCode, errorMessage);
 	size_t size = stats.st_size;
 	ss << "Content-Size: " << size << "\r\n";
 	ss << "\r\n";
 	
-	std::ifstream file(error_page.c_str());
+	std::ifstream file(path.c_str());
 	if (!file.is_open())
 		return _generateGenericErrorResponse(errorCode, errorMessage);
 	std::string line;
@@ -340,7 +341,7 @@ void HttpResponse::_generateErrorResponse(int errorCode, const char *errorMessag
 	_responseContent = ss.str();		
 }
 
-void HttpResponse::_generateGenericErrorResponse(int errorCode, char *errorMessage) {
+void HttpResponse::_generateGenericErrorResponse(int errorCode, const char *errorMessage) {
 	std::stringstream ss;
 	std::stringstream body;
 
@@ -360,7 +361,7 @@ void HttpResponse::_generateGenericErrorResponse(int errorCode, char *errorMessa
 	_responseContent = ss.str();
 }
 
-std::stringstream	HttpResponse::_displayTimeStamp(void) {
+std::string	HttpResponse::_displayTimeStamp(void) {
 	std::stringstream ss;
 	struct tm *gmt = gmtime(&_lastActionTimeStamp);
 	char buffer[100];
@@ -368,8 +369,19 @@ std::stringstream	HttpResponse::_displayTimeStamp(void) {
 	strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", gmt);
 
 	ss << "Date: " << buffer;
-    return ss;
+    return ss.str();
 }
+
+
+void HttpResponse::_generateChunkedGETResponseContent(std::string &path) {
+	(void) path;
+	return;
+}
+void HttpResponse::_generateGETResponseContent(std::string &path) {
+	(void) path;
+	return ;
+}
+
 
 std::string HttpResponse::getResponseContent(void)
 {
@@ -417,19 +429,41 @@ void	HttpResponse::_generateMimeMap(void) {
 }
 
 const char *HttpResponse::ServerError::what() const throw() {
-	if (code < 500 || code > 505)
-		return "Unknown error\n";
+	if (_errorCode < 500 || _errorCode > 505)
+		return "Unknown server error of type 1\n";
 	else {
-		std::string errorMessage = _errorMap[_errorCode];
-		return errorMessage.c_str();
+		std::map<int, std::string>::const_iterator it = _errorMap.find(_errorCode);
+		if (it != _errorMap.end()) {
+			std::string errorMessage = it->second;
+			const char *error = errorMessage.c_str();
+			return error;
+		}
+		else
+			return "Unknown server error of type 2\n";
 	}
 }
 
 const char *HttpResponse::ClientError::what() const throw() {
-	if (code < 400 || (code > 415 && code != 429))
-		return "Unknown error\n";
+	if (_errorCode < 400 || (_errorCode > 415 && _errorCode != 429))
+		return "Unknown client error of type 1\n";
 	else {
-		std::string errorMessage = _errorCode[_errorCode];
-		return errorMessage.c_str();
+		std::map<int, std::string>::const_iterator it = _errorMap.find(_errorCode);
+		if (it != _errorMap.end()) {
+			std::string errorMessage = it->second;
+			const char *error = errorMessage.c_str();
+			return error;
+		}
+		else
+			return "Unkown client error of type 2\n";
 	}
+}
+
+HttpResponse & HttpResponse::operator=(HttpResponse const & rhs) {
+	if (this != &rhs) {
+		_isResponseSent = rhs._isResponseSent;
+		_responseContent = rhs._responseContent;
+		_lastActionTimeStamp = rhs._lastActionTimeStamp;
+		_mimeMap = rhs._mimeMap;
+	}
+	return *this;
 }
