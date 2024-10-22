@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 17:26:52 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 11:07:07 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ class HttpRequest
 		static HttpRequest* findInstanceWithFD(std::vector<HttpRequest*>& vector, int fd);
 
 		t_method getMethod() {return _method;};
+		std::string getStringMethod();
 		bool getHTTP() {return _http1;};
 		std::string getQueryString() {return _queryString;};
 		std::string getRequestURI() {return _requestURI;};

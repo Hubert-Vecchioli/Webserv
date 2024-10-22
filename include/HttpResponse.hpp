@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 18:08:49 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 11:21:00 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,9 @@ class HttpResponse
 		void 				_generatePOSTResponse(void);
 		void 				_generateDELResponse(void);
 		void				_generateErrorResponse(int errorCode, const char *errorMessage);
-		void				_generateGenericErrorResponse(int errorCode, char *errorMessage);
+		void				_generateGenericErrorResponse(int errorCode, const char *errorMessage);
 		void				_generateDirlistingResponse(std::string path);
-		std::stringstream	_displayTimeStamp(void);
+		std::string			_displayTimeStamp(void);
 		void				_fetchServerBlock(void);
 		void				_fetchLocationBlock(void);
 		void				_checkAllowedMethod(void);
@@ -54,9 +54,9 @@ class HttpResponse
 
 	public:
 		HttpResponse(Server &server, HttpRequest &request) : _server(server), _request(request) {_generateMimeMap();};
-		HttpResponse(HttpResponse const & rhs);
+		HttpResponse(HttpResponse const & rhs) : _server(rhs._server), _request(rhs._request) {if (this != &rhs) *this = rhs;};
 		HttpResponse &operator=(HttpResponse const & rhs);
-		~HttpResponse(void);
+		~HttpResponse(void) {};
 		
 		bool getResponseStatus(void) const {return _isResponseSent;};
 		std::time_t getLastActionTimeStamp(void) const {return _lastActionTimeStamp;};
