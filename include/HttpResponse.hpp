@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/22 11:21:00 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 11:39:00 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,8 @@ class HttpResponse
 		void				_fetchGETResource(void);
 		bool 				_isPathWithinRoot(std::string path);
 		bool 				_isFileAboveThreshold(std::string &path);
-		void				_generateChunkedGETResponseContent(std::string &path);
-		void				_generateGETResponseContent(std::string &path);
+		void				_generateChunkedGETResponseContent(std::string path);
+		void				_generateGETResponseContent(std::string path);
 
 	public:
 		HttpResponse(Server &server, HttpRequest &request) : _server(server), _request(request) {_generateMimeMap();};

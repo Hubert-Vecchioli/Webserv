@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/22 11:07:07 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 11:40:10 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ class HttpRequest
 		void displayRequestBody(std::ostream & o);
 
 		void setResponse(HttpResponse *response) {_response = response;};
+		Client *getClient() {return _client;};
 		HttpResponse* getResponse(void) {return _response;};
 		static HttpRequest* findInstanceWithFD(std::vector<HttpRequest*>& vector, int fd);
 
