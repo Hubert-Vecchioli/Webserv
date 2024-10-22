@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/22 11:34:19 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 15:41:43 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,5 +63,6 @@ std::string	displayTimestampResponseFormat(void);
 void	print(int i, std::string message, int fd = -2);
 std::vector<std::string> tokenize(std::string s, char delimiter);
 void	modifyEpollCTL(int EpollFD, int listendFD, int epollAction, bool isReadyToSendResponse = false);
+void ft_stop_server(int signum);
 
 #endif

@@ -6,16 +6,13 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/22 15:26:45 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 15:45:27 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-Server::Server(void) : _isServerGreenlighted(false), _serverFD(-1)
-{
-	this->_uniqueInstance = *this;
-}
+Server* Server::_uniqueInstance = 0;
 
 Server::~Server()
 {
@@ -39,27 +36,7 @@ Server::~Server()
 		delete (*it);
 		//this->_sockets.erase(it);
 	}
-}
-
-Server::Server(Server const & rhs)
-{
-	*this = rhs;
-	return ;
-}
-
-Server &Server::operator=(Server const & rhs)
-{
-	if (this != &rhs)
-	{
-		this->_uniqueInstance = rhs._uniqueInstance;
-		this->_configurationFile = rhs._configurationFile;
-		this->_isServerGreenlighted = rhs._isServerGreenlighted;
-		this->_serverFD = rhs._serverFD;
-		this->_sockets = rhs._sockets;
-		this->_clients = rhs._clients;
-		this->_requests = rhs._requests;
-	}
-	return (*this);
+	delete _uniqueInstance;
 }
 
 void Server::startServer(ConfigurationFile & configurationFile)
@@ -84,7 +61,8 @@ void Server::startServer(ConfigurationFile & configurationFile)
 
 void Server::stopServer(void)
 {
-	this->_isServerGreenlighted = false;
+	getInstance()._isServerGreenlighted = false;
+	//_isServerGreenlighted = false;
 }
 
 void Server::runServer(void)
