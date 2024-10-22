@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>About - WebSerVaBienOuBien Tester</title>
+		<title>Hello you - WebSerVaBienOuBien Tester</title>
 		<link href="style.css" rel="stylesheet">
 	</head>
 	<body>
@@ -12,15 +12,16 @@
 					<li><a href="index.html">Home</a></li>
 					<li><a href="about.html">About</a></li>
 					<li><a href="contact.html">Contact</a></li>
-					<li><a href="say_hello.html">Say Hello</a></li>
+					<li class="active"><a href="say_hello.html">Say Hello</a></li>
 				</ul>
 			</nav>
 		</header>
 		<main>
-			<div class="error-container">
-				<div class="error-code">404</div>
-				<div class="error-text">Page Not Found</div>
-			</div>
+			<h1>Hello... But what's your name?</h1>
+			<form class="styled-form" method="get" action="../cgi-bin/say_hello.py">
+				<input type="text" name="name" placeholder="name" autofocus>
+				<button type="submit">Submit</button>
+			</form>
 		</main>
 	</body>
 </html>
