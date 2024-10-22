@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 17:49:49 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 15:11:56 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,9 @@ class Server
 		std::vector<Client*>		_clients;
 		std::vector<HttpRequest*>	_requests;
 
-		Server(Server const & rhs);
-		Server &operator=(Server const & rhs);
+		Server(void) : _configurationFile(nullptr), _isServerGreenlighted(false), _serverFD(-1) {}
+		Server(Server const & rhs) = delete;
+		Server &operator=(Server const & rhs) = delete;
 
 		void _triageEpollEvents(epoll_event & epollEvents);
 		void _reviewClientsHaveNoTimeout(void);
@@ -44,7 +45,11 @@ class Server
 		void _disconnectClient(int listenedFD);
 
 	public:
-		Server(void);
+		static Server &getInstance() {
+			if (!_uniqueInstance)
+				_uniqueInstance = new Server();
+			return *_uniqueInstance;
+		}
 		~Server(void);
 		
 		void startServer(ConfigurationFile & configurationFile);
