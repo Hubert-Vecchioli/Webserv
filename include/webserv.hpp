@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 18:05:02 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 08:16:36 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@
 #define MAX_REQUEST_SIZE 5120
 #define	MAX_URI_SIZE 65536
 #define	FILE_CHUNK_THRESHOLD 163840 // randomly chose 5120 * 2^5
+#define RESPONSE_BUFFER 20480 // randomly chose 5120 * 2^2
 
 void	displayTimestamp(void);
 void	print(int i, std::string message, int fd = -2);
