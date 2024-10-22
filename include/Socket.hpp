@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:53:56 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/18 11:31:33 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/22 15:22:05 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ class Socket
 		Socket &operator=(Socket const & rhs);
 		~Socket(void);
 		
+		int getFD(void);
 		static Socket* findInstanceWithFD(std::vector<Socket*>& vector, int fd);
 
 

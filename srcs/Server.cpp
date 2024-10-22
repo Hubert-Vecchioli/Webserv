@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 17:39:48 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 15:20:07 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,24 @@ Server::~Server()
 {
 	if (this->_serverFD != -1)
 		close(_serverFD);
-	//close and delete all the clients & sockets & requests & responses
+	for(std::vector<HttpRequest*>::iterator it = this->_requests.begin(); it != this->_requests.begin(); ++it)
+	{
+		delete (*it)->getResponse();
+		delete *it;
+		//this->_requests.erase(it);
+	}
+	for (std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
+	{
+		close((*it)->getFD());
+		delete (*it);
+		//this->_clients.erase(it);
+	}
+	for (std::vector<Socket*>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); ++it)
+	{
+		close((*it)->getFD());
+		delete (*it);
+		//this->_sockets.erase(it);
+	}
 }
 
 Server::Server(Server const & rhs)
@@ -214,8 +231,6 @@ void Server::_disconnectClient(int listenedFD)
 	modifyEpollCTL(this->_serverFD, listenedFD, EPOLL_CTL_DEL);
 	if (clientToDisconnect)
 	{
-		
-		delete clientToDisconnect;
         for (std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
         {
             if (*it == clientToDisconnect)
@@ -224,6 +239,7 @@ void Server::_disconnectClient(int listenedFD)
                 break;
             }
         }
+		delete clientToDisconnect;
 	}
 	throw DisconnectedClientFDException();
 }
