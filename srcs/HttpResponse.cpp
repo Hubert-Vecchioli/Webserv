@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/22 11:23:58 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 11:33:30 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,99 @@ void HttpResponse::_fetchGETResource(void) {
 		}
 		return ;
 	}
+}
+
+void HttpResponse::_generateChunkedGETResponseContent(std::string path)
+{
+    print(1, "[Info] - Opening file to answer the request from Client FD : ", this->_request->getClient()->getFD());
+    //Check si presence de l extension du fichier
+	//TODO HV: Factoriser la partie concernant l'extension
+    size_t pos = path.find_last_of('.');
+    if (pos == std::string::npos)
+        throw ClientError(400);
+    std::string extension = path.substr(pos);
+    this->_generateMimeMap();
+    if (!_mimeMap[extension])
+        throw ClientError(400);
+    
+    this->_reponseContent = "HTTP/1.1 200 OK\r\n";
+    this->_reponseContent += "Content-Type: " + _mimeMap[extension] + "\r\n";
+    this->_reponseContent += "Transfer-Encoding: chunked\r\n";
+    this->_reponseContent += "\r\n";
+
+    int fileFd = open(path.c_str(), O_RDONLY);
+    if (fileFd == -1)
+    {
+        print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request->getClient()->getFD());
+        struct stat stats;
+        if (stat(path.c_str(), &stats) != 0)
+            throw ClientError(404); 
+        if ((info.st_mode & S_IFDIR) != 0)
+            throw ClientError(403);
+        else
+            throw ClientError(404);
+    }
+	//TODO HV: A tester avec un tres long texte si ça passe
+    char buffer[RESPONSE_BUFFER];
+    ssize_t readSize = read(fileFd, buffer, RESPONSE_BUFFER);
+    if (readSize == -1)
+        throw ClientError(403);
+    else if (readSize == 0)
+    {
+        close(fileFd);
+        this->_reponseContent += "0\r\n\r\n";
+		// TODO HV: si timeout, est ce que je leak d'un fd non fermé??
+        // ajouter que la reponse est done // TODO avoir un bool: response is ready!
+    }
+    else
+    {
+        std::stringstream readSizeHex;
+        readSizeHex << std::hex << readSize;
+        this->_reponseContent += readSizeHex.str() + "\r\n" + buffer + "\r\n";
+    }
+}
+
+void HttpResponse::_generateGETResponseContent(std::string path)
+{
+    print(1, "[Info] - Opening file to answer the request from Client FD : ", this->_request->getClient()->getFD());
+    //Check si presence de l extension du fichier
+    size_t pos = path.find_last_of('.');
+    if (pos == std::string::npos)
+        throw ClientError(400);
+    std::string extension = path.substr(pos);
+    this->_generateMimeMap();
+    if (!_mimeMap[extension])
+        throw ClientError(400);
+    std::ifstream file(path.c_str());
+    file.open(this->name_.c_str());
+    if (!file.is_open())
+    {
+        print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request->getClient()->getFD());
+        struct stat stats;
+        if (stat(path.c_str(), &stats) != 0)
+            throw ClientError(404); 
+        if ((info.st_mode & S_IFDIR) != 0)
+            throw ClientError(403);
+        else
+            throw ClientError(404);
+    }
+    std::ostringstream content;
+    std::string line;
+    while (std::getline(file, line))
+    {
+        content << line << "\n";
+    }
+    file.close();
+    std::string fileContent = content.str();
+    std::ostringstream oss2;
+    oss2 << fileContent.size();
+    std::string sizeStr = oss2.str();
+
+    this->_reponseContent = "HTTP/1.1 200 OK\r\n";
+    this->_reponseContent += "Content-Type: " + _mimeMap[extension] + "\r\n";
+    this->_reponseContent += "Content-Length: " + sizeStr + "\r\n";
+    this->_reponseContent += "\r\n";
+    this->_reponseContent += fileContent;
 }
 
 bool HttpResponse::_isFileAboveThreshold(std::string &path)
@@ -371,17 +464,6 @@ std::string	HttpResponse::_displayTimeStamp(void) {
 	ss << "Date: " << buffer;
     return ss.str();
 }
-
-
-void HttpResponse::_generateChunkedGETResponseContent(std::string &path) {
-	(void) path;
-	return;
-}
-void HttpResponse::_generateGETResponseContent(std::string &path) {
-	(void) path;
-	return ;
-}
-
 
 std::string HttpResponse::getResponseContent(void)
 {
