@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/21 19:00:53 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/22 12:03:12 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ void	HttpResponse::_fetchLocationBlock(void) {
 
 void HttpResponse::_checkAllowedMethod(void) {
 	std::vector<std::string> methods = _location_block->getMethods();
-	if (std::find(methods.begin(), methods.end(), _request.getMethod()) == methods.end())
+	if (std::find(methods.begin(), methods.end(), _request.getStringMethod()) == methods.end())
 		throw ClientError(405);
 }
 
@@ -148,6 +148,97 @@ void HttpResponse::_fetchGETResource(void) {
 		}
 		return ;
 	}
+}
+
+void HttpResponse::_generateChunkedGETResponseContent(std::string path)
+{
+    print(1, "[Info] - Opening file to answer the request from Client FD : ", this->_request.getClient()->getFD());
+    //Check si presence de l extension du fichier
+	//TODO HV: Factoriser la partie concernant l'extension
+    size_t pos = path.find_last_of('.');
+    if (pos == std::string::npos)
+        throw ClientError(400);
+    std::string extension = path.substr(pos);
+    if (_mimeMap[extension].empty())
+        throw ClientError(400);
+    
+    this->_responseContent = "HTTP/1.1 200 OK\r\n";
+    this->_responseContent += "Content-Type: " + _mimeMap[extension] + "\r\n";
+    this->_responseContent += "Transfer-Encoding: chunked\r\n";
+    this->_responseContent += "\r\n";
+
+    // int fileFd = open(path.c_str(), O_RDONLY);
+    // if (fileFd == -1)
+    // {
+    //     print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request.getClient()->getFD());
+    //     struct stat stats;
+    //     if (stat(path.c_str(), &stats) != 0)
+    //         throw ClientError(404); 
+    //     if ((stats.st_mode & S_IFDIR) != 0)
+    //         throw ClientError(403);
+    //     else
+    //         throw ClientError(404);
+    // }
+	//TODO HV: A tester avec un tres long texte si ça passe
+    char buffer[RESPONSE_BUFFER];
+    ssize_t readSize = read(fileFd, buffer, RESPONSE_BUFFER);
+    if (readSize == -1)
+        throw ClientError(403);
+    else if (readSize == 0)
+    {
+        close(fileFd);
+        this->_responseContent += "0\r\n\r\n";
+		// TODO HV: si timeout, est ce que je leak d'un fd non fermé??
+        // ajouter que la reponse est done // TODO avoir un bool: response is ready!
+    }
+    else
+    {
+        std::stringstream readSizeHex;
+        readSizeHex << std::hex << readSize;
+        this->_responseContent += readSizeHex.str() + "\r\n" + buffer + "\r\n";
+    }
+}
+
+void HttpResponse::_generateGETResponseContent(std::string path)
+{
+    print(1, "[Info] - Opening file to answer the request from Client FD : ", this->_request.getClient()->getFD());
+    //Check si presence de l extension du fichier
+    size_t pos = path.find_last_of('.');
+    if (pos == std::string::npos)
+        throw ClientError(400);
+    std::string extension = path.substr(pos);
+    if (_mimeMap[extension].empty())
+        throw ClientError(400);
+    std::ifstream file(path.c_str());
+    // file.open(this->name_.c_str());
+    // if (!file.is_open())
+    // {
+    //     print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request->getClient()->getFD());
+    //     struct stat stats;
+    //     if (stat(path.c_str(), &stats) != 0)
+    //         throw ClientError(404); 
+    //     if ((info.st_mode & S_IFDIR) != 0)
+    //         throw ClientError(403);
+    //     else
+    //         throw ClientError(404);
+    // }
+    std::ostringstream content;
+    std::string line;
+    while (std::getline(file, line))
+    {
+        content << line << "\n";
+    }
+    // file.close();
+    std::string fileContent = content.str();
+    std::ostringstream oss2;
+    oss2 << fileContent.size();
+    std::string sizeStr = oss2.str();
+
+    this->_responseContent = "HTTP/1.1 200 OK\r\n";
+    this->_responseContent += "Content-Type: " + _mimeMap[extension] + "\r\n";
+    this->_responseContent += "Content-Length: " + sizeStr + "\r\n";
+    this->_responseContent += "\r\n";
+    this->_responseContent += fileContent;
 }
 
 bool HttpResponse::_isFileAboveThreshold(std::string &path)
@@ -221,7 +312,7 @@ void HttpResponse::_generateDirlistingResponse(std::string path)
 	responseBody +="</ul></div><footer><p>Brought to you by JB, EB & HV</p></footer></body></html>";
 	
 	std::ostringstream oss2;
-	oss2 << responseBody.size();
+	oss2 << responseBody.size();bool HttpResponse::_checkAcceptedFormat(std::string path)
     std::string sizeStr = oss2.str();
 
 	this->_responseContent = "HTTP/1.1 200 OK\r\n";
@@ -245,7 +336,7 @@ bool HttpResponse::_checkAcceptedFormat(std::string path) {
 	if (pos == std::string::npos)
 		return false; // TBC HERE => i refuse any file without an extension because there is no way to know if it s binary or text
 	std::string extension = path.substr(pos);
-	if (_mimeMap[extension] != "") {
+	if (_mimeMap[extension].empty()) {
 		std::string mime_type = _mimeMap[extension];
 		if (std::find(beg, end, mime_type) != end)
 			return true;
@@ -309,7 +400,7 @@ void HttpResponse::_generatePOSTResponse(void)
 	this->_responseContent += "Content-Type: application/json\r\n";
 	this->_responseContent += "Content-Length: " + sizeStr2 + "\r\n";
 	this->_responseContent += "\r\n";
-	this->_responseContent += responseBody
+	this->_responseContent += responseBody;
 }
 
 void HttpResponse::_generateErrorResponse(int errorCode, const char *errorMessage) {
@@ -320,17 +411,18 @@ void HttpResponse::_generateErrorResponse(int errorCode, const char *errorMessag
 	ss << "Content-Type: text/html\r\n";
 	if (!_server_block)
 		return _generateGenericErrorResponse(errorCode, errorMessage);
-	std::string error_page = _server_block.getErrorPages()[errorCode];
-	if (!error_page)
+	std::string error_page = _server_block->getErrorPages()[errorCode];
+	if (error_page.empty())
 		return _generateGenericErrorResponse(errorCode, errorMessage);
+	std::string path = _location_block->getRoot() + error_page;
 	struct stat stats;
-	if (stat(&stats) == -1)
+	if (stat(path.c_str(), &stats) == -1)
 		return _generateGenericErrorResponse(errorCode, errorMessage);
 	size_t size = stats.st_size;
 	ss << "Content-Size: " << size << "\r\n";
 	ss << "\r\n";
 	
-	std::ifstream file(error_page.c_str());
+	std::ifstream file(path.c_str());
 	if (!file.is_open())
 		return _generateGenericErrorResponse(errorCode, errorMessage);
 	std::string line;
@@ -340,7 +432,7 @@ void HttpResponse::_generateErrorResponse(int errorCode, const char *errorMessag
 	_responseContent = ss.str();		
 }
 
-void HttpResponse::_generateGenericErrorResponse(int errorCode, char *errorMessage) {
+void HttpResponse::_generateGenericErrorResponse(int errorCode, const char *errorMessage) {
 	std::stringstream ss;
 	std::stringstream body;
 
@@ -360,7 +452,7 @@ void HttpResponse::_generateGenericErrorResponse(int errorCode, char *errorMessa
 	_responseContent = ss.str();
 }
 
-std::stringstream	HttpResponse::_displayTimeStamp(void) {
+std::string	HttpResponse::_displayTimeStamp(void) {
 	std::stringstream ss;
 	struct tm *gmt = gmtime(&_lastActionTimeStamp);
 	char buffer[100];
@@ -368,7 +460,7 @@ std::stringstream	HttpResponse::_displayTimeStamp(void) {
 	strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", gmt);
 
 	ss << "Date: " << buffer;
-    return ss;
+    return ss.str();
 }
 
 std::string HttpResponse::getResponseContent(void)
@@ -417,19 +509,41 @@ void	HttpResponse::_generateMimeMap(void) {
 }
 
 const char *HttpResponse::ServerError::what() const throw() {
-	if (code < 500 || code > 505)
-		return "Unknown error\n";
+	if (_errorCode < 500 || _errorCode > 505)
+		return "Unknown server error of type 1\n";
 	else {
-		std::string errorMessage = _errorMap[_errorCode];
-		return errorMessage.c_str();
+		std::map<int, std::string>::const_iterator it = _errorMap.find(_errorCode);
+		if (it != _errorMap.end()) {
+			std::string errorMessage = it->second;
+			const char *error = errorMessage.c_str();
+			return error;
+		}
+		else
+			return "Unknown server error of type 2\n";
 	}
 }
 
 const char *HttpResponse::ClientError::what() const throw() {
-	if (code < 400 || (code > 415 && code != 429))
-		return "Unknown error\n";
+	if (_errorCode < 400 || (_errorCode > 415 && _errorCode != 429))
+		return "Unknown client error of type 1\n";
 	else {
-		std::string errorMessage = _errorCode[_errorCode];
-		return errorMessage.c_str();
+		std::map<int, std::string>::const_iterator it = _errorMap.find(_errorCode);
+		if (it != _errorMap.end()) {
+			std::string errorMessage = it->second;
+			const char *error = errorMessage.c_str();
+			return error;
+		}
+		else
+			return "Unkown client error of type 2\n";
 	}
+}
+
+HttpResponse & HttpResponse::operator=(HttpResponse const & rhs) {
+	if (this != &rhs) {
+		_isResponseSent = rhs._isResponseSent;
+		_responseContent = rhs._responseContent;
+		_lastActionTimeStamp = rhs._lastActionTimeStamp;
+		_mimeMap = rhs._mimeMap;
+	}
+	return *this;
 }
