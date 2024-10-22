@@ -49,7 +49,7 @@ void ConfigurationFile::read(void) {
 		throw std::runtime_error("Error: could not open file");
 	std::string line;
 	while (std::getline(file, line))
-		 this->_content.append(line);
+		 this->_content.append(line + " ");
 	file.close();
 }
 
@@ -60,7 +60,7 @@ void ConfigurationFile::read(std::string filename) {
 		throw std::runtime_error("Error: could not open file");
 	std::string line;
 	while (std::getline(file, line))
-		 this->_content.append(line);
+		 this->_content.append(line + " ");
 	file.close();
 }
 
