@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:53:54 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/18 11:42:19 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/22 15:22:23 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,11 @@ Socket* Socket::findInstanceWithFD(std::vector<Socket*>& vector, int fd) {
         }
     }
     return (NULL);
+}
+
+int Socket::getFD(void)
+{
+	return (this->_fd);
 }
 
 
