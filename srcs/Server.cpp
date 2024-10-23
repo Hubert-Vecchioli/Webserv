@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/22 15:45:27 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/23 14:05:49 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,14 @@ Server::~Server()
 	delete _uniqueInstance;
 }
 
-void Server::startServer(ConfigurationFile & configurationFile)
+void Server::startServer(ConfigurationFile * configurationFile)
 {
-	this->_configurationFile = &configurationFile;
+	this->_configurationFile = configurationFile;
 	print(1, "[Info] - Initialising the webserv");
 	this->_serverFD = epoll_create(MAX_EVENTS);
     if (this->_serverFD == -1)
 		throw FailureInitiateEpollInstanceException();
-	const std::vector<std::pair <std::string, int> > &parsed_config = configurationFile.getserverIPandPorts();
+	const std::vector<std::pair <std::string, int> > &parsed_config = this->_configurationFile->getserverIPandPorts();
 	for (std::vector<std::pair <std::string, int> >::const_iterator it = parsed_config.begin(); it != parsed_config.end(); ++it)
 	{
 		int blocServersFD = socket(AF_INET, SOCK_STREAM, 0);
@@ -61,7 +61,7 @@ void Server::startServer(ConfigurationFile & configurationFile)
 
 void Server::stopServer(void)
 {
-	getInstance()._isServerGreenlighted = false;
+	Server::getInstance()._isServerGreenlighted = false;
 	//_isServerGreenlighted = false;
 }
 
@@ -75,7 +75,11 @@ void Server::runServer(void)
 		{
 			int epollWaitResult = epoll_wait(this->_serverFD, epollEvents, MAX_EVENTS, EPOLL_MAX_WAIT_TIME_MS);
 			if (epollWaitResult == -1)
+			{
+				if (this->_isServerGreenlighted == false)
+					break;
 				throw FailureEpollWaitException();
+			}
 			for (int eventId = 0; eventId < epollWaitResult; ++eventId)
 				this->_triageEpollEvents(epollEvents[eventId]);
 			this->_reviewClientsHaveNoTimeout();
@@ -111,7 +115,8 @@ void Server::_reviewRequestsCompleted(void)
 //the function below has an ugly use of exceptions, stucture to be reviewed
 void Server::_reviewClientsHaveNoTimeout(void)
 {
-	for(std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.begin(); ++it)
+	std::cout<< this->_clients.size() << std::endl;
+	for(std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
 	{
 		if (std::time(0) - (*it)->getLastActionTimeStamp() > CLIENT_TIMEOUT_LIMIT_SEC)
 		{
@@ -244,7 +249,7 @@ const char* Server::FailureEpollWaitException::what() const throw()
 
 const char* Server::DisconnectedClientFDException::what() const throw()
 {
-	return ("[Error] - Client FD disconnected, associated clients are erased");
+	return ("[Error] - Client FD disconnected, associated client was erased");
 }
 
 const char* Server::AcceptFailureException::what() const throw()

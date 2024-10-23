@@ -10,7 +10,7 @@ server {
     error_page 404 error404.html;
 
     location /photos {
-    root /var/www/; 
+    root ./web; 
     index index.html;
     dirlisting on;
     methods GET;
