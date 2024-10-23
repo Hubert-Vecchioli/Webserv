@@ -6,10 +6,10 @@ body {
 }
 
 main {
-    justify-content: center;
+	justify-content: center;
 	width: 50%;
-	margin: 20px auto;
 	padding: 20px;
+	margin: 20px auto;
 	display: flex;
 	flex-direction: column;
 }
@@ -37,6 +37,15 @@ li {
 
 h1 {
 	color: #55228f;
+    margin-bottom: 20px;
+	/* text-align: center; */
+	width: 100%;
+}
+
+p {
+    margin-bottom: 20px;
+	/* text-align: center; */
+	width: 100%;
 }
 
 strong {
@@ -129,15 +138,97 @@ input::placeholder, textarea::placeholder {
 .styled-form button:hover {
     background-color: #ffffff10;
 }
+
 .error-container {
     text-align: center;
 }
+
 .error-code {
     font-size: 10em;
     font-weight: bold;
     color: #55228f;
 }
+
 .error-text {
     font-size: 1em;
     color: #ffffff;
+}
+
+.container {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr); /* 2 columns */
+	gap: 20px;
+	width: 60%; /* Smaller width to fit your design */
+	max-width: 800px; /* Maximum width for the container */
+	margin: 20px auto; /* Center the grid on the page */
+}
+
+.page-box {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	width: 100%;
+	padding: 10px;
+    box-sizing: border-box;
+	border: 2px solid #55228f70; /* Dark purple border */
+	border-radius: 10px;
+	background-color: transparent;
+	transition: background-color 0.3s, box-shadow 0.3s;
+	text-align: center;
+    word-wrap: break-word;
+	/* min-height: 150px; Reduced height */
+}
+
+.page-content {
+	flex: 1; /* Allows the content to take up remaining space */
+	display: flex;
+	flex-direction: column;
+	justify-content: center; /* Center the paragraph text vertically */
+	align-items: center; /* Center the paragraph text horizontally */
+	width: 100%; /* Full width of the box */
+}
+
+.page-box h2 {
+	text-decoration: none;
+	color: #55228f; /* Dark purple text */
+	font-size: 18px; /* Slightly smaller font */
+    margin: 0;
+}
+
+.page-box p {
+	/* margin-top: 10px; */
+	color: white; /* White text for better contrast with background */
+	font-size: 14px; /* Slightly smaller font */
+}
+
+.page-box:hover {
+	background-color: rgba(255, 255, 255, 0.1); /* Very transparent white */
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow effect */
+}
+
+.page-box:hover h2 {
+	color: #faae5a; /* Color change on hover */
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 800px) {
+	.container {
+		width: 90%; /* Increase container width to fit screen */
+		grid-template-columns: 1fr; /* Change to 1 column layout */
+	}
+}
+
+@media screen and (max-width: 500px) {
+	.page-box {
+		height: auto; /* Allow height to be flexible */
+	}
+	
+	.page-box h2 {
+		font-size: 16px; /* Adjust font size for smaller screens */
+	}
+
+	.page-box p {
+		font-size: 12px; /* Adjust font size for smaller screens */
+	}
 }
