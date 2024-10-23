@@ -1,8 +1,0 @@
-https://www.digitalocean.com/community/tutorials/understanding-nginx-server-and-location-block-selection-algorithms
-https://whimsical.com/webserv-DhJ7C9MTqCUFtTDJRWyH1b
-
-
-
-// TODO by Emma
-- Error_page parsing (working on it)
-- Location Block Parsing

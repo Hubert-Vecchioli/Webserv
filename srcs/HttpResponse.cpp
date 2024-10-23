@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/22 15:03:12 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/23 16:12:34 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,12 @@ void HttpResponse::_generateResponseContent(void)
 	try {
 		_fetchServerBlock();
 		_fetchLocationBlock();
+			std::cout<< "ROROORORORO" << std::endl;
 		_checkAllowedMethod();
 	}
 	catch (HttpResponse::ClientError & e) {
 		return _generateErrorResponse(e.getErrorCode(), e.what());
 	}
-	
 	// if(/*_request is CGI*/)
 	// 	// trigger the CGI
 	
@@ -47,7 +47,7 @@ void HttpResponse::_generateResponseContent(void)
 	switch(_request.getMethod())
 	{
 		case GET:
-			this->_generateGETResponse();
+			this->_fetchGETResource();
 			break;
 		case POST:
 			this->_generatePOSTResponse();
@@ -69,6 +69,7 @@ void	HttpResponse::_fetchServerBlock(void) {
 	for (size_t i = 0; i < server_blocks.size(); i++) {
 		std::vector<std::string> server_names = server_blocks[i].getServerName();
 		for (size_t j = 0; j < server_names.size(); j++) {
+			server_names[j] += "\r";
 			if (host == server_names[j]) {
 				_server_block = &server_blocks[i];
 				return ;
@@ -89,6 +90,8 @@ void	HttpResponse::_fetchLocationBlock(void) {
 	
 	while (uri.size() > 0) {
 		for (size_t i = 0; i < location_blocks.size(); i++) {
+			std::cout<< location_blocks[i].getLocation() << std::endl;
+			std::cout<< uri << std::endl;
 			if (location_blocks[i].getLocation() == uri) {
 				_location_block = &location_blocks[i];
 				return ;
@@ -96,7 +99,7 @@ void	HttpResponse::_fetchLocationBlock(void) {
 		}
 		size_t pos = uri.find_last_of('/');
 		if (pos != std::string::npos && pos != 0)
-			uri = uri.substr(pos);
+			uri = uri.substr(pos + 1);
 		else if (pos == 0 && uri.size() > 1)
 			uri = "/";
 		else
