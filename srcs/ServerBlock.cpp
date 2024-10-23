@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:08:49 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/17 15:50:50 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/23 13:12:35 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,11 +86,10 @@ void ServerBlock::parseServerName(std::vector<std::string> &args) {
 	std::string line;
 	for (size_t i = 0; i < args.size(); i++)
 		line += args[i] + " ";
-	if (line.find(";") != line.size() - 2) {
+	if (line.find(";") != line.size() - 2)
 		throw std::runtime_error("Error: invalid server name directive");
 	args[args.size() -1] = args[args.size() - 1].substr(0, args[args.size() - 1].find(";"));
-		this->_server_name =  args;
-	}
+	this->_server_name =  args;
 }
 
 void ServerBlock::parseErrorPages(std::vector<std::string> &args) {
@@ -108,16 +107,18 @@ size_t ServerBlock::parseLocationBlock(std::vector<std::string> block, size_t i)
 	size_t openBrackets = 0;
 	size_t start = i;
 	while (openBrackets != 0 || start == i) {
-		i++;
 		if (i >= block.size())
 			throw std::runtime_error("Error: invalid location block");
-		lBlock.push_back(block[i]);
 		for (size_t j = 0; j < block[i].size(); j++) {
 			if (block[i][j] == '{')
 				openBrackets++;
 			else if (block[i][j] == '}')
 				openBrackets--;
 		}
+		if (openBrackets == 0)
+			break;
+		lBlock.push_back(block[i]);
+		i++;
 	}
 	LocationBlock location(lBlock);
 	this->_locationBlocks.push_back(location);

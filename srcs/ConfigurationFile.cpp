@@ -60,7 +60,7 @@ void ConfigurationFile::read(std::string filename) {
 		throw std::runtime_error("Error: could not open file");
 	std::string line;
 	while (std::getline(file, line))
-		 this->_content.append(line + " ");
+		 this->_content.append(line + "\n" + " ");
 	file.close();
 }
 
@@ -114,8 +114,7 @@ void ConfigurationFile::parseBodySize(std::vector<std::string> &args) {
 	if (args.size() != 2)
 		throw std::runtime_error("Error: invalid body_size directive");
 	unsigned long multiplier = 1;
-	std::string size = args[1].substr(0, args[0].find(";"));
-	size.erase(std::remove(size.begin(), size.end(), ';'), size.end());
+	std::string size = args[1].substr(0, args[1].find(";"));
 	if (size == "KB")
 		multiplier = 1024;
 	else if (size == "MB")
@@ -141,12 +140,12 @@ void ConfigurationFile::parseServerBlock(std::istringstream &iss) {
 				openBrackets--;
 			//}
 		}
-		blockLines.push_back(line);
 		if (openBrackets == 0) {
 			ServerBlock block(blockLines);
 			this->_serverBlocks.push_back(block);
 			return ;
 		}
+		blockLines.push_back(line);
 	}
 }
 
