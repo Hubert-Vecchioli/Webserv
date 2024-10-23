@@ -40,7 +40,7 @@ void LocationBlock::parseLocationBlock(std::vector<std::string> block) {
 	parseFunctions["redirect"] = &LocationBlock::parseRedirect;
 	parseFunctions["cgi_extension"] = &LocationBlock::parseCgiExtension;
 	parseFunctions["upload_path"] = &LocationBlock::parseUploadPath;
-
+	//std::cout<< block[0] << std::endl; POUR DEBUG
 	parseLocation(tokenize(block[0], ' '));
 	for (size_t i = 1; i < block.size(); i++) {
 		std::vector<std::string> tokens = tokenize(block[i], ' ');
@@ -60,6 +60,8 @@ void LocationBlock::parseLocationBlock(std::vector<std::string> block) {
 }
 
 void LocationBlock::parseLocation(std::vector<std::string> args) {
+	// std::cout<< args[0] << std::endl; POUR DEBUG
+	// std::cout<< args[1] << std::endl; POUR DEBUG
 	if (args.size() != 3)
 		throw std::runtime_error("Error: invalid location directive");
 	this->_location = args[1];

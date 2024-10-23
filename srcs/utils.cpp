@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 13:14:32 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/18 11:50:10 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/23 11:30:52 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,15 @@ void	displayTimestamp(void)
     std::tm *date = localtime(&now);
 	std::cout << "[";
 	std::cout << std::setfill('0') << 1900 + date->tm_year;
-	std::cout << " - ";
+	std::cout << "-";
 	std::cout << std::setfill('0') << std::setw(2) << 1 + date->tm_mon;
-	std::cout << " - ";
+	std::cout << "-";
 	std::cout << std::setfill('0') << std::setw(2) << date->tm_mday;
 	std::cout << " ";
 	std::cout << std::setfill('0') << std::setw(2) << date->tm_hour;
-	std::cout << " : ";
+	std::cout << ":";
 	std::cout << std::setfill('0') << std::setw(2) << date->tm_min;
-	std::cout << " : ";
+	std::cout << ":";
 	std::cout << std::setfill('0') << std::setw(2) << date->tm_sec;
 	std::cout << "] ";
 }

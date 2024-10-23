@@ -49,7 +49,7 @@ void ConfigurationFile::read(void) {
 		throw std::runtime_error("Error: could not open file");
 	std::string line;
 	while (std::getline(file, line))
-		 this->_content.append(line + " ");
+		 this->_content.append(line + "\n" + " ");
 	file.close();
 }
 
@@ -82,7 +82,9 @@ void ConfigurationFile::parseFile(void) {
 		if (tokens[0][0] == '#')
 			continue;
 		if (tokens[0] == "server" && tokens.size() > 1 && tokens[1] == "{")
+		{
 			parseServerBlock(iss);
+		}
 		else if (parseFunctions.find(tokens[0]) != parseFunctions.end()) {
 			std::vector<std::string> args(tokens.begin() + 1, tokens.end());
 			(this->*parseFunctions[tokens[0]])(args);
@@ -113,6 +115,7 @@ void ConfigurationFile::parseBodySize(std::vector<std::string> &args) {
 		throw std::runtime_error("Error: invalid body_size directive");
 	unsigned long multiplier = 1;
 	std::string size = args[1].substr(0, args[0].find(";"));
+	size.erase(std::remove(size.begin(), size.end(), ';'), size.end());
 	if (size == "KB")
 		multiplier = 1024;
 	else if (size == "MB")
