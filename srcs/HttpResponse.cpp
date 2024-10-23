@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/23 16:12:34 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/23 17:55:54 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ void HttpResponse::_generateResponseContent(void)
 	try {
 		_fetchServerBlock();
 		_fetchLocationBlock();
-			std::cout<< "ROROORORORO" << std::endl;
 		_checkAllowedMethod();
 	}
 	catch (HttpResponse::ClientError & e) {
@@ -63,18 +62,16 @@ void HttpResponse::_generateResponseContent(void)
 
 void	HttpResponse::_fetchServerBlock(void) {
 	std::string host = _request.getHost();
-	std::vector<ServerBlock> server_blocks = _server.getConfigurationFile().getServerBlocks();
+	std::vector<ServerBlock*> server_blocks = _server.getConfigurationFile().getServerBlocksPointers();
 	_server_block = 0;
 
 	for (size_t i = 0; i < server_blocks.size(); i++) {
-		std::vector<std::string> server_names = server_blocks[i].getServerName();
-		for (size_t j = 0; j < server_names.size(); j++) {
-			server_names[j] += "\r";
-			if (host == server_names[j]) {
-				_server_block = &server_blocks[i];
+		std::vector<std::string> server_names = server_blocks[i]->getServerName();
+			server_names[i] += "\r";
+			if (host == server_names[i]) {
+				_server_block = server_blocks[i];
 				return ;
 			}
-		}
 	}
 	if (!_server_block)
 		throw ClientError(400);
@@ -87,12 +84,11 @@ void	HttpResponse::_fetchLocationBlock(void) {
 		throw ClientError(414);
 
 	std::vector<LocationBlock> location_blocks = _server_block->getLocationBlocks();
-	
+	// std::cout<< (this->_server_block->getServerName())[0] << std::endl;
+	// std::cout<< "TTTTTTTT" << std::endl;
 	while (uri.size() > 0) {
-		for (size_t i = 0; i < location_blocks.size(); i++) {
-			std::cout<< location_blocks[i].getLocation() << std::endl;
-			std::cout<< uri << std::endl;
-			if (location_blocks[i].getLocation() == uri) {
+		for (size_t i = 0; i < location_blocks.size(); ++i) {
+			if ((location_blocks[i].getLocation()) == uri) {
 				_location_block = &location_blocks[i];
 				return ;
 			}

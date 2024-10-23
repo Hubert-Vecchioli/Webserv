@@ -167,6 +167,16 @@ std::vector<ServerBlock> ConfigurationFile::getServerBlocks(void) const {
 	return this->_serverBlocks;
 }
 
+std::vector<ServerBlock*> ConfigurationFile::getServerBlocksPointers(void) {
+	std::vector<ServerBlock*> pointers;
+    for (std::vector<ServerBlock>::iterator it = _serverBlocks.begin(); it != _serverBlocks.end(); ++it)
+	{
+        pointers.push_back(&(*it));
+	}
+	return pointers;
+}
+
+
 // IP and Port Getter Function for the ConfigurationFile class
 
 std::vector<std::pair<std::string, int> > ConfigurationFile::getserverIPandPorts(void) const {
