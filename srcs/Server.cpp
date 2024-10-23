@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/23 15:01:41 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/23 15:11:26 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,7 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 	}		
 	catch(const std::exception& e)
 	{
-		std::cerr << e.what() << '\n';
+		print(2, e.what());
 	}
 }
 
@@ -211,6 +211,7 @@ void Server::_disconnectClient(int listenedFD)
 {
 	Client* clientToDisconnect = Client::findInstanceWithFD(this->_clients, listenedFD);
 	modifyEpollCTL(this->_serverFD, listenedFD, EPOLL_CTL_DEL);
+	close(listenedFD);
 	if (clientToDisconnect)
 	{
         for (std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
@@ -223,7 +224,6 @@ void Server::_disconnectClient(int listenedFD)
         }
 		delete clientToDisconnect;
 	}
-	close(listenedFD);
 	throw DisconnectedClientFDException();
 }
 
