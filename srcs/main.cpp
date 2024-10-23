@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:23:30 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/23 11:55:50 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/23 13:36:50 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 int main(int ac, char **av)
 {
-	Server *server = 0;
+	Server &server  = Server::getInstance();
 
-	server->getInstance();
+	// server->getInstance();
 	signal(SIGINT, ft_stop_server);
 	try
 	{
@@ -26,8 +26,8 @@ int main(int ac, char **av)
 		{
 			std::cout << iphost[i].first << " " << iphost[i].second << std::endl;
 		}
-		server->startServer(config); //Should I add the config object as an argument of initiate?
-		server->runServer();
+		server.startServer(&config); //Should I add the config object as an argument of initiate?
+		server.runServer();
 	}
 	catch (std::exception & e)
 	{
