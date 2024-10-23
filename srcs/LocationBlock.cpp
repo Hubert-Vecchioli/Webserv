@@ -21,6 +21,8 @@ LocationBlock &LocationBlock::operator=(LocationBlock const & copy) {
 		this->_dirlisting = copy._dirlisting;
 		this->_methods = copy._methods;
 		this->_redirect = copy._redirect;
+		this->cgi_extension = copy.cgi_extension;
+		this->_upload_path = copy._upload_path;
 	}
 	return *this;
 }
@@ -70,7 +72,7 @@ void LocationBlock::parseRoot(std::vector<std::string> &args) {
 		throw std::runtime_error("Error: invalid root directive");
 	if (args[0].find(";") != args[0].size() - 1)
 		throw std::runtime_error("Error: invalid root directive");
-	this->_root = args[0].substr(0, args[0].size() - 2);
+	this->_root = args[0].substr(0, args[0].size() - 1);
 }
 
 void LocationBlock::parseIndex(std::vector<std::string> &args) {
@@ -136,7 +138,6 @@ void LocationBlock::parseUploadPath(std::vector<std::string> &args) {
 		throw std::runtime_error("Error: invalid upload_path directive");
 	this->_upload_path = args[0].substr(0, args[0].size() - 1);
 }
-
 //  Getters for the LocationBlock class
 
 std::string LocationBlock::getLocation(void) const {
