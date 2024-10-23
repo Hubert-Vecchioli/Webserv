@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/22 15:44:50 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/23 13:32:02 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ class Server
 		}
 		~Server(void);
 		
-		void startServer(ConfigurationFile & configurationFile);
+		void startServer(ConfigurationFile * configurationFile);
 		void runServer(void);
 		static void stopServer(void);
 		//ConfigurationFile &getConfigurationFile() {return _configurationFile;};
