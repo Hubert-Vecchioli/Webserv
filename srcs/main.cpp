@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:23:30 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/23 14:13:38 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/23 14:19:40 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 int main(int ac, char **av)
 {
-	Server *server = 0;
+	Server &server  = Server::getInstance();
 
-	server->getInstance();
+	// server->getInstance();
 	signal(SIGINT, ft_stop_server);
 	try
 	{
