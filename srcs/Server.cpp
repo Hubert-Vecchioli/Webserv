@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/23 14:05:49 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/23 14:56:43 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,10 +115,10 @@ void Server::_reviewRequestsCompleted(void)
 //the function below has an ugly use of exceptions, stucture to be reviewed
 void Server::_reviewClientsHaveNoTimeout(void)
 {
-	std::cout<< this->_clients.size() << std::endl;
-	for(std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
+	std::vector<Client*> clientsCopy = this->_clients;
+	for(std::vector<Client*>::iterator it = clientsCopy.begin(); it != clientsCopy.end(); ++it)
 	{
-		if (std::time(0) - (*it)->getLastActionTimeStamp() > CLIENT_TIMEOUT_LIMIT_SEC)
+		if (std::time(0) - (*it)->getLastActionTimeStamp() >= CLIENT_TIMEOUT_LIMIT_SEC)
 		{
 			try
 			{
@@ -128,7 +128,6 @@ void Server::_reviewClientsHaveNoTimeout(void)
 			{
 				print(2, e.what());
 			}
-			
 		}	
 	}
 }
