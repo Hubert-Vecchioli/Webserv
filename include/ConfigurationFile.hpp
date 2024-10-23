@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigurationFile.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:55:36 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/23 13:20:36 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/23 17:54:43 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ class ConfigurationFile
 		std::string getError_log(void) const;	//get error_log
 		unsigned long getBody_size(void) const;	//get body_size
 		std::vector<ServerBlock> getServerBlocks(void) const;	//get server blocks
+		std::vector<ServerBlock*> getServerBlocksPointers(void);	//get server blocks
 		std::vector<std::pair<std::string, int> > getserverIPandPorts(void) const; 		//get server IP and Ports from the various server blocks
 };
 

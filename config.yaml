@@ -33,7 +33,7 @@ server {
     server_name admin.ebesnoin.com admin.ebesnoin.fr;
     error_page 404 504 418 tomato.html;
 
-    location /  {
+    location /tet  {
     root /var/www/admin;
     index index.html;
     dirlisting off;
