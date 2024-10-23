@@ -40,7 +40,7 @@ void LocationBlock::parseLocationBlock(std::vector<std::string> block) {
 	parseFunctions["redirect"] = &LocationBlock::parseRedirect;
 	parseFunctions["cgi_extension"] = &LocationBlock::parseCgiExtension;
 	parseFunctions["upload_path"] = &LocationBlock::parseUploadPath;
-	//std::cout<< block[0] << std::endl; POUR DEBUG
+
 	parseLocation(tokenize(block[0], ' '));
 	for (size_t i = 1; i < block.size(); i++) {
 		std::vector<std::string> tokens = tokenize(block[i], ' ');
@@ -60,8 +60,6 @@ void LocationBlock::parseLocationBlock(std::vector<std::string> block) {
 }
 
 void LocationBlock::parseLocation(std::vector<std::string> args) {
-	// std::cout<< args[0] << std::endl; POUR DEBUG
-	// std::cout<< args[1] << std::endl; POUR DEBUG
 	if (args.size() != 3)
 		throw std::runtime_error("Error: invalid location directive");
 	this->_location = args[1];
@@ -89,7 +87,7 @@ void LocationBlock::parseDirlisting(std::vector<std::string> &args) {
 		throw std::runtime_error("Error: invalid dirlisting directive");
 	if (args[0].find(";") != args[0].size() - 1)
 		throw std::runtime_error("Error: invalid dirlisting directive");
-	std::string dirlisting  = args[0].substr(0, args[0].size() - 2);
+	std::string dirlisting  = args[0].substr(0, args[0].size() - 1);
 	if (dirlisting == "on")
 		this->_dirlisting = true;
 	else if (dirlisting == "off")
@@ -105,9 +103,13 @@ void LocationBlock::parseMethods(std::vector<std::string> &args) {
 	if (line.find(";") != line.size() - 2)
 		throw std::runtime_error("Error: invalid methods directive");
 	this->_methods = tokenize(line.substr(0, line.size() - 2), ' ');
-	for (size_t i = 0; i < this->_methods.size(); i++)
-		if (this->_methods[i] != "GET" || this->_methods[i] != "POST" || this->_methods[i] != "DELETE")
+	for (size_t i = 0; i < this->_methods.size(); i++) 
+	{
+		if (this->_methods[i] == "GET" || this->_methods[i] == "POST" || this->_methods[i] == "DELETE")
+			continue;
+		else
 			throw std::runtime_error("Error: invalid methods directive");
+	}
 }
 
 void LocationBlock::parseRedirect(std::vector<std::string> &args) {
