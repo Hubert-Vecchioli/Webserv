@@ -10,7 +10,7 @@ server {
     error_page 404 ./web/error404.html;
 
     location / {
-    root /home/ebesnoin/Documents/Webserv/web; 
+    root ./web; 
     index index.html;
     dirlisting off;
     methods GET;
