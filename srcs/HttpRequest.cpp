@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/22 11:06:40 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/24 14:45:33 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,9 +96,11 @@ void HttpRequest::parseRequestHeader(std::string request) {
 void HttpRequest::parseRequestBody(std::string request) {
     std::string str_request = request;
 
-    size_t pos = str_request.find("\r\n");
-    if (pos != std::string::npos) {
+	std::cout << "Request: " << str_request << std::endl;
+    size_t pos = str_request.find_last_of("\r\n");
+    if (pos != std::string::npos && pos != str_request.size() - 1) {
         _content_body = str_request.substr(pos + 2);
+		//std::cout << "Content body: " << _content_body << std::endl;
     }
 }
 
