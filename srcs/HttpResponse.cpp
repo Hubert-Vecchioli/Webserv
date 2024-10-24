@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/24 16:33:21 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/24 16:35:55 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -377,6 +377,7 @@ void HttpResponse::_generateDELResponse(void)
 //Assuming POST is only to upload files
 void HttpResponse::_generatePOSTResponse(void)
 {
+	std::string path = _uploadFile();
 	std::ostringstream oss;
 	oss << _request.getBody().size();
     std::string sizeStr = oss.str();
@@ -384,7 +385,7 @@ void HttpResponse::_generatePOSTResponse(void)
 	std::string responseBody = "{\n";
 	responseBody += "\"message\": \"File uploaded successfully.\",\n";
 	responseBody += "\"filename\": \"";
-	/*responseBody += Path file;*/ 
+	responseBody += path;
 	responseBody += "\",\n";
 	responseBody += "\"uploadedAt\": \"";
 	responseBody += displayTimestampResponseFormat();
@@ -403,7 +404,7 @@ void HttpResponse::_generatePOSTResponse(void)
 	this->_responseContent += responseBody;
 }
 
-void HttpResponse::_uploadFile(void) {
+std::string HttpResponse::_uploadFile(void) {
 	std::string uri = _request.getRequestURI();
 	
 	size_t pos = uri.find('?');
@@ -420,6 +421,7 @@ void HttpResponse::_uploadFile(void) {
 		throw ClientError(403);
 	file << _request.getBody();
 	file.close();
+	return path;
 }
 
 void HttpResponse::_generateErrorResponse(int errorCode, const char *errorMessage) {

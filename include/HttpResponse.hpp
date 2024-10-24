@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/24 11:33:25 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/24 16:35:29 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ class HttpResponse
 		//bool 				_isFileAboveThreshold(std::string &path);
 		//void				_generateChunkedGETResponseContent(std::string path);
 		void				_generateGETResponseContent(std::string path);
+		std::string				_uploadFile(void);
 
 	public:
 		HttpResponse(Server &server, HttpRequest &request) : _server(server), _request(request) {_generateMimeMap();};
