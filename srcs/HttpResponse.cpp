@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/24 15:21:46 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/24 16:33:21 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -378,7 +378,7 @@ void HttpResponse::_generateDELResponse(void)
 void HttpResponse::_generatePOSTResponse(void)
 {
 	std::ostringstream oss;
-	/*oss << TODO: Get the file size;*/
+	oss << _request.getBody().size();
     std::string sizeStr = oss.str();
 	
 	std::string responseBody = "{\n";
@@ -401,6 +401,25 @@ void HttpResponse::_generatePOSTResponse(void)
 	this->_responseContent += "Content-Length: " + sizeStr2 + "\r\n";
 	this->_responseContent += "\r\n";
 	this->_responseContent += responseBody;
+}
+
+void HttpResponse::_uploadFile(void) {
+	std::string uri = _request.getRequestURI();
+	
+	size_t pos = uri.find('?');
+	if(pos == std::string::npos)
+		throw ClientError(400);
+	uri = uri.substr(pos + 1);
+	if (uri.size() > MAX_URI_SIZE)
+		throw ClientError(414);
+	else if (uri.size() == 0)
+		throw ClientError(400);
+	std::string path = _location_block->getUploadPath() + uri;
+	std::ofstream file(path.c_str());
+	if (!file.is_open())
+		throw ClientError(403);
+	file << _request.getBody();
+	file.close();
 }
 
 void HttpResponse::_generateErrorResponse(int errorCode, const char *errorMessage) {
