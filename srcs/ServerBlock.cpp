@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:08:49 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/24 11:56:21 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/24 12:28:34 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ void ServerBlock::parseErrorPages(std::vector<std::string> &args) {
 	if (line.find(";") != line.size() - 2)
 		throw std::runtime_error("Error: invalid error pages directive");
 	for (unsigned long i = 0; i < args.size() - 1; i++)
-		this->_error_pages[std::atoi(args[i].c_str())] = args[args.size() - 1];
+		this->_error_pages[std::atoi(args[i].c_str())] = args[args.size() - 1].substr(0, args[args.size() - 1].find(";"));
 }
 
 size_t ServerBlock::parseLocationBlock(std::vector<std::string> block, size_t i) {
