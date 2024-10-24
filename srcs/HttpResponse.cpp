@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/24 14:27:09 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/24 15:21:46 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,9 @@ void HttpResponse::_generateGETResponse(void)
 }
 
 void HttpResponse::_fetchGETResource(void) {
+	try {
 	std::string uri_no_query = _request.getRequestURI();
+	std::cout << "NNNNNNN"<< std::endl;
 	size_t pos = uri_no_query.find('?');
 	if(pos != std::string::npos)
 		uri_no_query = uri_no_query.substr(pos);
@@ -129,41 +131,30 @@ void HttpResponse::_fetchGETResource(void) {
 	if (stat(path.c_str(), &st) == -1)
 		throw ClientError(404);
 	int fd;
-
+	std::cout << "TEST"<< std::endl;
 	// 1/ est ce que je suis un fichier? Si oui le retourner
 	if (S_ISREG(st.st_mode)) {
 		int fd = open(path.c_str(), O_RDONLY);
 		if (fd == -1)
 			throw ClientError(403);
-		try {
-			_checkAcceptedFormat(path);
-			close(fd);
-			// if (_isFileAboveThreshold(path))
-			// 	_generateChunkedGETResponseContent(path); //_isResponseSent en fcontion de la ou on en est
-			// else
-			_generateGETResponseContent(path); //this->_isResponseSent = true && to be added in the error page, POST & DEL
-			return;
-			}
-		catch (ClientError &e) {
-			throw e;
-		}
+		_checkAcceptedFormat(path);
+		close(fd);
+		// if (_isFileAboveThreshold(path))
+		// 	_generateChunkedGETResponseContent(path); //_isResponseSent en fcontion de la ou on en est
+		// else
+		_generateGETResponseContent(path); //this->_isResponseSent = true && to be added in the error page, POST & DEL
+		return;
 	}
 	// 2/ est ce au je suis un dir? Si oui, est ce que j ai un index valide?
 	if (S_ISDIR(st.st_mode)) {
-		try {
-			fd = _fetchDirectoryRessource(path);
-		}
-		catch (ClientError &e) {
-			throw e;
-		}
+		fd = _fetchDirectoryRessource(path);
 	}
 	// 3/ est ce aue je peux dirlisting?
 	// 4/ Sinon error 404
-	
-
-	
-		return ;
-
+	}
+	catch (HttpResponse::ClientError & e) {
+		return _generateErrorResponse(e.getErrorCode(), e.what());
+	}
 }
 
 // void HttpResponse::_generateChunkedGETResponseContent(std::string path)
