@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/23 17:55:54 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/24 11:25:24 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,6 @@ void HttpResponse::_generateResponseContent(void)
 	//Check redirect and prepare the response
 	// TODO: add a pointer to HTTPrequest
 	
-	
-
 	if (_request.getHTTP() == false) {
 		ServerError error(505);
 		return _generateErrorResponse(505, error.what());
@@ -65,13 +63,16 @@ void	HttpResponse::_fetchServerBlock(void) {
 	std::vector<ServerBlock*> server_blocks = _server.getConfigurationFile().getServerBlocksPointers();
 	_server_block = 0;
 
+	std::cout << "HOST: " << host << std::endl;
 	for (size_t i = 0; i < server_blocks.size(); i++) {
 		std::vector<std::string> server_names = server_blocks[i]->getServerName();
-			server_names[i] += "\r";
-			if (host == server_names[i]) {
+		for (size_t j = 0; j < server_names.size(); j++) {
+			server_names[j] += "\r";
+			if (host == server_names[j]) {
 				_server_block = server_blocks[i];
 				return ;
 			}
+		}
 	}
 	if (!_server_block)
 		throw ClientError(400);
@@ -453,7 +454,7 @@ void HttpResponse::_generateGenericErrorResponse(int errorCode, const char *erro
 	ss << "HTTP/1.1 " << errorCode << " " << errorMessage;
 	ss << _displayTimeStamp()<< "\r\n";
 	ss << "Content-Type: text/html\r\n";
-	ss << "Content-Lenght: " << body.gcount() << "\r\n";
+	ss << "Content-Length: " << body.gcount() << "\r\n";
 	ss << "\r\n";
 	ss << body;
 
