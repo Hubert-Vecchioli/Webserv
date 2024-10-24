@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/24 11:46:12 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/24 12:03:19 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ void	HttpResponse::_fetchServerBlock(void) {
 	std::vector<ServerBlock*> server_blocks = _server.getConfigurationFile().getServerBlocksPointers();
 	_server_block = 0;
 
-	std::cout << "HOST: " << host << std::endl;
 	for (size_t i = 0; i < server_blocks.size(); i++) {
 		std::vector<std::string> server_names = server_blocks[i]->getServerName();
 		for (size_t j = 0; j < server_names.size(); j++) {
@@ -80,17 +79,17 @@ void	HttpResponse::_fetchServerBlock(void) {
 
 void	HttpResponse::_fetchLocationBlock(void) {
 	std::string uri = _request.getRequestURI();
+	std::cout << "URI: " << uri << std::endl;
 	_location_block = 0;
 	if (uri.size() > MAX_URI_SIZE)
 		throw ClientError(414);
 
-	std::vector<LocationBlock> location_blocks = _server_block->getLocationBlocks();
-	// std::cout<< (this->_server_block->getServerName())[0] << std::endl;
-	// std::cout<< "TTTTTTTT" << std::endl;
+	std::vector<LocationBlock*> location_blocks = _server_block->getLocationBlocksPointers();
 	while (uri.size() > 0) {
 		for (size_t i = 0; i < location_blocks.size(); ++i) {
-			if ((location_blocks[i].getLocation()) == uri) {
-				_location_block = &location_blocks[i];
+			std::cout << "Location: " << location_blocks[i]->getLocation() << std::endl;
+			if ((location_blocks[i]->getLocation()) == uri) {
+				_location_block = location_blocks[i];
 				return ;
 			}
 		}
@@ -99,9 +98,11 @@ void	HttpResponse::_fetchLocationBlock(void) {
 			uri = uri.substr(pos + 1);
 		else if (pos == 0 && uri.size() > 1)
 			uri = "/";
-		else
+		else {
 			throw ClientError(404);
+		}
 	}
+	
 	_location_block = 0;
 	throw ClientError(404);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerBlock.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:07:40 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/17 18:25:16 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/24 11:56:42 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ class ServerBlock
 		std::vector<std::string> getServerName(void) const;
 		std::map<int, std::string> getErrorPages(void) const;
 		std::vector<LocationBlock> getLocationBlocks(void) const;
+		std::vector<LocationBlock*> getLocationBlocksPointers(void);
 		std::map<std::string, std::vector<std::string> > getLocMethods(void) const;
 };
 

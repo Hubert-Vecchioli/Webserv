@@ -169,8 +169,9 @@ std::vector<ServerBlock> ConfigurationFile::getServerBlocks(void) const {
 
 std::vector<ServerBlock*> ConfigurationFile::getServerBlocksPointers(void) {
 	std::vector<ServerBlock*> pointers;
-    for (std::vector<ServerBlock>::iterator it = _serverBlocks.begin(); it != _serverBlocks.end(); ++it)
-        pointers.push_back(&(*it));
+    for (std::vector<ServerBlock>::iterator it = _serverBlocks.begin(); it != _serverBlocks.end(); ++it) {
+		pointers.push_back(&(*it));
+	}
 	return pointers;
 }
 
