@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/22 15:41:43 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/24 14:17:31 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@
 
 #define MAX_EVENTS 50 // to be increassed later on
 #define EPOLL_MAX_WAIT_TIME_MS 1000 // to be modified later on
-#define CLIENT_TIMEOUT_LIMIT_SEC 10
+#define CLIENT_TIMEOUT_LIMIT_SEC 120
 #define REQUEST_TIMEOUT_LIMIT_SEC 10
 #define MAX_REQUEST_SIZE 5120
 #define	MAX_URI_SIZE 65536
