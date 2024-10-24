@@ -4,7 +4,7 @@ body_size 1 MB;
 
 server {
     listen 127.0.0.1 8080;
-    server_name 127.0.0.1:8080;
+    server_name 127.0.0.1:8080 localhost:8080;
     error_page 404 504 418 error.html;
     error_page 500 test.html;
     error_page 404 error404.html;

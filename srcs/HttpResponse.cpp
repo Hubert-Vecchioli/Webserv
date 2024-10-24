@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/24 12:03:19 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/24 14:22:23 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,9 +113,15 @@ void HttpResponse::_checkAllowedMethod(void) {
 		throw ClientError(405);
 }
 
+void HttpResponse::_generateGETResponse(void)
+{
+	// can we find the exact path?
+		// Yes then 
+
+}
+
 void HttpResponse::_fetchGETResource(void) {
 	std::string uri_no_query = _request.getRequestURI();
-	
 	size_t pos = uri_no_query.find('?');
 	if(pos != std::string::npos)
 		uri_no_query = uri_no_query.substr(pos);
@@ -125,14 +131,8 @@ void HttpResponse::_fetchGETResource(void) {
 	if (stat(path.c_str(), &st) == -1)
 		throw ClientError(404);
 	int fd;
-	if (S_ISDIR(st.st_mode)) {
-		try {
-			fd = _fetchDirectoryRessource(path);
-		}
-		catch (ClientError &e) {
-			throw e;
-		}
-	}
+
+	// 1/ est ce que je suis un fichier? Si oui le retourner
 	if (S_ISREG(st.st_mode)) {
 		int fd = open(path.c_str(), O_RDONLY);
 		if (fd == -1)
@@ -144,12 +144,28 @@ void HttpResponse::_fetchGETResource(void) {
 			// 	_generateChunkedGETResponseContent(path); //_isResponseSent en fcontion de la ou on en est
 			// else
 			_generateGETResponseContent(path); //this->_isResponseSent = true && to be added in the error page, POST & DEL
+			return;
 			}
 		catch (ClientError &e) {
 			throw e;
 		}
-		return ;
 	}
+	// 2/ est ce au je suis un dir? Si oui, est ce que j ai un index valide?
+	if (S_ISDIR(st.st_mode)) {
+		try {
+			fd = _fetchDirectoryRessource(path);
+		}
+		catch (ClientError &e) {
+			throw e;
+		}
+	}
+	// 3/ est ce aue je peux dirlisting?
+	// 4/ Sinon error 404
+	
+
+	
+		return ;
+
 }
 
 // void HttpResponse::_generateChunkedGETResponseContent(std::string path)
@@ -204,7 +220,7 @@ void HttpResponse::_fetchGETResource(void) {
 void HttpResponse::_generateGETResponseContent(std::string path)
 {
     print(1, "[Info] - Opening file to answer the request from Client FD : ", this->_request.getClient()->getFD());
-    size_t pos = path.find_last_of('.');
+	size_t pos = path.find_last_of('.');
     if (pos == std::string::npos)
         throw ClientError(400);
     std::string extension = path.substr(pos);
@@ -251,13 +267,13 @@ void HttpResponse::_generateGETResponseContent(std::string path)
 
 int	HttpResponse::_fetchDirectoryRessource(std::string path) {
 	std::vector<std::string> index = _location_block->getIndex();
-
+	
 	for (size_t i = 0; i < index.size(); i++) {
 		std::string new_path = path + index[i];
 		int fd = open(new_path.c_str(), O_RDONLY);
 		if (fd > 0){
 			if (_checkAcceptedFormat(new_path) == true)
-				return fd;
+				_generateGETResponseContent(new_path);
 			else
 				close(fd);
 		}
@@ -348,21 +364,6 @@ bool HttpResponse::_checkAcceptedFormat(std::string path) {
 		}
 	}
 	return false;
-}
-
-// CURRENT WORK => GET CONTENT TYPE
-// std::string getContentType(void) {
-// 	std::string uri = request.getRequestURI();
-// 	if ((size_t pos = uri.find('?')) != std::string::npos) {
-// 		uri = uri.substr(pos);
-// 	}
-// }
-
-void HttpResponse::_generateGETResponse(void)
-{
-	// can we find the exact path?
-		// Yes then 
-
 }
 
 void HttpResponse::_generateDELResponse(void)
