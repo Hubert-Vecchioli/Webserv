@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/22 13:00:31 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/24 11:33:25 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ class HttpResponse
 		class ServerError : public std::exception {
 			private:
 				int							_errorCode;
-				std::map<int, std::string>	_errorMap;
+				std::map<int, const char*>	_errorMap;
 			public:
 				ServerError(int code): _errorCode(code) {
 					_errorMap[500] = "Internal Server Error";
@@ -86,7 +86,7 @@ class HttpResponse
 		class ClientError : public std::exception {
 			private:
 				int							_errorCode;
-				std::map<int, std::string>	_errorMap;
+				std::map<int, const char*>	_errorMap;
 			public:
 				ClientError(int code): _errorCode(code) {
 					_errorMap[400] = "Bad Request";

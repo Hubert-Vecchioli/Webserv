@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/23 17:55:54 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/24 11:43:23 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -444,20 +444,18 @@ void HttpResponse::_generateGenericErrorResponse(int errorCode, const char *erro
 	std::stringstream ss;
 	std::stringstream body;
 
-	body << "<html><head><title>";
-	body << errorCode << " " << errorMessage;
-	body << "</title></head><body><h1>";
+	body << "<html lang=\"en\"><head><meta charset=\"utf-8\"><title>Error - WebSerVaBienOuBien Tester</title><link href=\"style.css\" rel=\"stylesheet\"></head>";
+	body << "<body><h1>";
 	body << errorCode << " " << errorMessage;
 	body << "</h1></body></html>";
 	
-	ss << "HTTP/1.1 " << errorCode << " " << errorMessage;
+	ss << "HTTP/1.1 " << errorCode << " " << errorMessage << "\r\n";
 	ss << _displayTimeStamp()<< "\r\n";
 	ss << "Content-Type: text/html\r\n";
-	ss << "Content-Lenght: " << body.gcount() << "\r\n";
+	ss << "Content-Length: " << body.gcount() << "\r\n";
 	ss << "\r\n";
-	ss << body;
 
-	_responseContent = ss.str();
+	_responseContent = ss.str() + body.str();
 }
 
 std::string	HttpResponse::_displayTimeStamp(void) {
@@ -520,11 +518,10 @@ const char *HttpResponse::ServerError::what() const throw() {
 	if (_errorCode < 500 || _errorCode > 505)
 		return "Unknown server error of type 1\n";
 	else {
-		std::map<int, std::string>::const_iterator it = _errorMap.find(_errorCode);
+		std::map<int, const char*>::const_iterator it = _errorMap.find(_errorCode);
 		if (it != _errorMap.end()) {
-			std::string errorMessage = it->second;
-			const char *error = errorMessage.c_str();
-			return error;
+			const char *errorMessage = it->second;
+			return errorMessage;
 		}
 		else
 			return "Unknown server error of type 2\n";
@@ -533,16 +530,15 @@ const char *HttpResponse::ServerError::what() const throw() {
 
 const char *HttpResponse::ClientError::what() const throw() {
 	if (_errorCode < 400 || (_errorCode > 415 && _errorCode != 429))
-		return "Unknown client error of type 1\n";
+		return "Unknown client error of type 1";
 	else {
-		std::map<int, std::string>::const_iterator it = _errorMap.find(_errorCode);
+		std::map<int, const char*>::const_iterator it = _errorMap.find(_errorCode);
 		if (it != _errorMap.end()) {
-			std::string errorMessage = it->second;
-			const char *error = errorMessage.c_str();
-			return error;
+			const char *errorMessage = it->second;
+			return errorMessage;
 		}
 		else
-			return "Unkown client error of type 2\n";
+			return "Unkown client error of type 2";
 	}
 }
 
