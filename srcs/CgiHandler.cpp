@@ -57,6 +57,11 @@ void CgiHandler::executeCgi(HttpResponse const &response) {
 		_status = 500;
 		throw std::runtime_error("Pipe failed");
 	}
+	int fdpost[2];
+	if (pipe(fdpost) == -1) {
+		_status = 500;
+		throw std::runtime_error("Pipe failed");
+	}
 	char **argv = convertArgs(cgi_fullpath, exec_cgi);
 	char **envp = convertEnv();
 	pid = fork();
@@ -109,19 +114,31 @@ char **CgiHandler::convertArgs(std::string cgi_fullpath, std::string exec_cgi) {
 }
 
 void CgiHandler::execChild(char **argv, char **envp, int fd[2]) {
+	close(fdpost[1]);
 	close(fd[0]);
+	dup2(fdpost[0], STDIN_FILENO);
 	dup2(fd[1], STDOUT_FILENO);
+	close(fdpost[0]);
 	close(fd[1]);
 	execve(argv[0], argv, envp);
 	exit(1);
 }
 
 void CgiHandler::execParent(int fd[2]) {
+	close(fdpost[0]);
 	close(fd[1]);
 	signal(SIGALRM, timeoutHandler);
 	alarm(5);
 
 	int status;
+	if (-1 == write(fdpost[1], response.getRequest().getBody().c_str(), response.getRequest().getBody().size())) {
+		close(fdpost[1]);
+		close(fd[0]);
+		_status = 500;
+		kill(pid, SIGKILL);
+		throw std::runtime_error("Write failed");
+	}
+	close(fdpost[1]);
 	pid_t result = waitpid(pid, &status, 0);
 	alarm(0);
 
