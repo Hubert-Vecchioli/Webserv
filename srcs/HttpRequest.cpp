@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/24 15:54:01 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/24 16:40:52 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ void HttpRequest::parseRequestBody(std::string request) {
     }
 	else {
 		_content_body = "";
-	
+	}
 }
 
 void HttpRequest::parseConnection(std::string request) {

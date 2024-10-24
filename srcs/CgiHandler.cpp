@@ -72,10 +72,10 @@ void CgiHandler::executeCgi(HttpResponse const &response) {
 		throw std::runtime_error("Fork failed");
 	}
 	else if (pid == 0)
-		execChild(argv, envp, fd);
+		execChild(argv, envp, fd, fdpost);
 	else
 		try {
-			execParent(fd);
+			execParent(fd, fdpost, response.getRequest().getBody());
 		}
 		catch (std::exception &e) {
 			delete[] envp;
@@ -113,7 +113,7 @@ char **CgiHandler::convertArgs(std::string cgi_fullpath, std::string exec_cgi) {
 	return argv;
 }
 
-void CgiHandler::execChild(char **argv, char **envp, int fd[2]) {
+void CgiHandler::execChild(char **argv, char **envp, int fd[2], int fdpost[2]) {
 	close(fdpost[1]);
 	close(fd[0]);
 	dup2(fdpost[0], STDIN_FILENO);
@@ -124,14 +124,14 @@ void CgiHandler::execChild(char **argv, char **envp, int fd[2]) {
 	exit(1);
 }
 
-void CgiHandler::execParent(int fd[2]) {
+void CgiHandler::execParent(int fd[2], int fdpost[2], std::string body) {
 	close(fdpost[0]);
 	close(fd[1]);
 	signal(SIGALRM, timeoutHandler);
 	alarm(5);
 
 	int status;
-	if (-1 == write(fdpost[1], response.getRequest().getBody().c_str(), response.getRequest().getBody().size())) {
+	if (-1 == write(fdpost[1], body.c_str(), body.size())) {
 		close(fdpost[1]);
 		close(fd[0]);
 		_status = 500;
