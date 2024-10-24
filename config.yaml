@@ -7,10 +7,10 @@ server {
     server_name 127.0.0.1:8080 localhost:8080;
     error_page 404 504 418 error.html;
     error_page 500 test.html;
-    error_page 404 error404.html;
+    error_page 404 ./web/error404.html;
 
     location / {
-    root ./web; 
+    root /home/ebesnoin/Documents/Webserv/web; 
     index index.html;
     dirlisting off;
     methods GET;
