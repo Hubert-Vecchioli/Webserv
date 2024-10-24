@@ -31,10 +31,10 @@ server {
 server {
     listen 127.0.0.8 8080;
     server_name admin.ebesnoin.com admin.ebesnoin.fr;
-    error_page 404 504 418 tomato.html;
+    error_page 404 504 418 error404.html;
 
-    location /tet  {
-    root /var/www/admin;
+    location /  {
+    root /home/ebesnoin/Documents/Webserv/web/;
     index index.html;
     dirlisting off;
     methods GET POST;
