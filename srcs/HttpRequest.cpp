@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/24 14:45:33 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/24 14:47:57 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@ HttpRequest::HttpRequest(Client *client, char *request) : _client(client) {
     std::string str_request = request;
 	parseRequestLine(str_request);
     parseRequestHeader(str_request);
-    parseRequestBody(str_request);
+	if (this->_method == POST)
+    	parseRequestBody(str_request);
 }
 
 HttpRequest::HttpRequest(HttpRequest const & rhs) {
