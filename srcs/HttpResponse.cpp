@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/24 16:35:55 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/24 23:51:44 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,100 +111,45 @@ void HttpResponse::_checkAllowedMethod(void) {
 		throw ClientError(405);
 }
 
-void HttpResponse::_generateGETResponse(void)
-{
-	// can we find the exact path?
-		// Yes then 
-
-}
-
 void HttpResponse::_fetchGETResource(void) {
-	try {
-	std::string uri_no_query = _request.getRequestURI();
-	std::cout << "NNNNNNN"<< std::endl;
-	size_t pos = uri_no_query.find('?');
-	if(pos != std::string::npos)
-		uri_no_query = uri_no_query.substr(pos);
-	
-	std::string path = _location_block->getRoot() + uri_no_query;
-	struct stat st;
-	if (stat(path.c_str(), &st) == -1)
+	try
+	{
+		std::string uri_no_query = _request.getRequestURI();
+		size_t pos = uri_no_query.find('?');
+		if(pos != std::string::npos)
+			uri_no_query = uri_no_query.substr(pos);
+
+		std::string path = _location_block->getRoot() + uri_no_query;
+		struct stat st;
+		if (stat(path.c_str(), &st) == -1)
+			throw ClientError(404);
+		int fd;
+		// 1/ est ce que je suis un fichier? Si oui le retourner
+		if (S_ISREG(st.st_mode)) {
+			int fd = open(path.c_str(), O_RDONLY);
+			if (fd == -1)
+				throw ClientError(403);
+			_checkAcceptedFormat(path);
+			close(fd);
+			// if (_isFileAboveThreshold(path))
+			// 	_generateChunkedGETResponseContent(path); //_isResponseSent en fcontion de la ou on en est
+			// else
+			_generateGETResponseContent(path); //this->_isResponseSent = true && to be added in the error page, POST & DEL
+			return;
+		}
+		// 2/ est ce au je suis un dir? Si oui, est ce que j ai un index valide?
+		// 3/ est ce aue je peux dirlisting?
+		if (S_ISDIR(st.st_mode)) {
+			fd = _fetchDirectoryRessource(path);
+		}
+		// 4/ Sinon error 404
 		throw ClientError(404);
-	int fd;
-	std::cout << "TEST"<< std::endl;
-	// 1/ est ce que je suis un fichier? Si oui le retourner
-	if (S_ISREG(st.st_mode)) {
-		int fd = open(path.c_str(), O_RDONLY);
-		if (fd == -1)
-			throw ClientError(403);
-		_checkAcceptedFormat(path);
-		close(fd);
-		// if (_isFileAboveThreshold(path))
-		// 	_generateChunkedGETResponseContent(path); //_isResponseSent en fcontion de la ou on en est
-		// else
-		_generateGETResponseContent(path); //this->_isResponseSent = true && to be added in the error page, POST & DEL
-		return;
 	}
-	// 2/ est ce au je suis un dir? Si oui, est ce que j ai un index valide?
-	if (S_ISDIR(st.st_mode)) {
-		fd = _fetchDirectoryRessource(path);
-	}
-	// 3/ est ce aue je peux dirlisting?
-	// 4/ Sinon error 404
-	}
-	catch (HttpResponse::ClientError & e) {
+	catch (HttpResponse::ClientError & e)
+	{
 		return _generateErrorResponse(e.getErrorCode(), e.what());
 	}
 }
-
-// void HttpResponse::_generateChunkedGETResponseContent(std::string path)
-// {
-//     print(1, "[Info] - Opening file to answer the request from Client FD : ", this->_request.getClient()->getFD());
-//     //Check si presence de l extension du fichier
-// 	//TODO HV: Factoriser la partie concernant l'extension
-//     size_t pos = path.find_last_of('.');
-//     if (pos == std::string::npos)
-//         throw ClientError(400);
-//     std::string extension = path.substr(pos);
-//     if (_mimeMap[extension].empty())
-//         throw ClientError(400);
-    
-//     this->_responseContent = "HTTP/1.1 200 OK\r\n";
-//     this->_responseContent += "Content-Type: " + _mimeMap[extension] + "\r\n";
-//     this->_responseContent += "Transfer-Encoding: chunked\r\n";
-//     this->_responseContent += "\r\n";
-
-//     // int fileFd = open(path.c_str(), O_RDONLY);
-//     // if (fileFd == -1)
-//     // {
-//     //     print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request.getClient()->getFD());
-//     //     struct stat stats;
-//     //     if (stat(path.c_str(), &stats) != 0)
-//     //         throw ClientError(404); 
-//     //     if ((stats.st_mode & S_IFDIR) != 0)
-//     //         throw ClientError(403);
-//     //     else
-//     //         throw ClientError(404);
-//     // }
-// 	//TODO HV: A tester avec un tres long texte si ça passe
-//     char buffer[RESPONSE_BUFFER];
-//     ssize_t readSize = read(fileFd, buffer, RESPONSE_BUFFER);
-//     if (readSize == -1)
-//         throw ClientError(403);
-//     else if (readSize == 0)
-//     {
-//         close(fileFd);
-//         this->_responseContent += "0\r\n\r\n";
-// 		// TODO HV: si timeout, est ce que je leak d'un fd non fermé??
-//         // ajouter que la reponse est done // TODO avoir un bool: response is ready!
-//     }
-//     else
-//     {
-//         std::stringstream readSizeHex;
-//         readSizeHex << std::hex << readSize;
-//         this->_responseContent += readSizeHex.str() + "\r\n" + buffer + "\r\n";
-//     }
-// }
 
 void HttpResponse::_generateGETResponseContent(std::string path)
 {
@@ -246,46 +191,40 @@ void HttpResponse::_generateGETResponseContent(std::string path)
     this->_responseContent += fileContent;
 }
 
-// bool HttpResponse::_isFileAboveThreshold(std::string &path)
-// {
-// 	struct stat stats;
-// 	if (stat(path.c_str(), &stats) != 0)
-// 		return false;
-// 	return stats.st_size > FILE_CHUNK_THRESHOLD;
-// }
-
-int	HttpResponse::_fetchDirectoryRessource(std::string path) {
+void	HttpResponse::_fetchDirectoryRessource(std::string path) {
 	std::vector<std::string> index = _location_block->getIndex();
 	
 	for (size_t i = 0; i < index.size(); i++) {
 		std::string new_path = path + index[i];
 		int fd = open(new_path.c_str(), O_RDONLY);
-		if (fd > 0){
+		if (fd > 0)
+		{
+			close(fd);
 			if (_checkAcceptedFormat(new_path) == true)
+			{
 				_generateGETResponseContent(new_path);
-			else
-				close(fd);
+				return;	
+			}
 		}
 	}
 	if (_location_block->getDirlisting() == true) {
 		_generateDirlistingResponse(path);
-		return 0;
+		return;
 	}
-	//close(fd); Propsotion to add this (from HV)
 	throw ClientError(404);
 }
 
 bool HttpResponse::_isPathWithinRoot(std::string path)
 {
-		std::string root = _location_block->getRoot();
-		if (path.size() < root.size())
+	std::string root = _location_block->getRoot();
+	if (path.size() < root.size())
+		return (false);
+	for(size_t i = 0; i < root.size(); ++i)
+	{
+		if (root[i] != path[i])
 			return (false);
-		for(size_t i = 0; i < root.size(); ++i)
-		{
-			if (root[i] != path[i])
-				return (false);
-		}
-		return (true);
+	}
+	return (true);
 }
 
 void HttpResponse::_generateDirlistingResponse(std::string path)
@@ -339,7 +278,7 @@ bool HttpResponse::_checkAcceptedFormat(std::string path) {
 		return true;
 	size_t pos = path.find_last_of('.');
 	if (pos == std::string::npos)
-		return false; // TBC HERE => i refuse any file without an extension because there is no way to know if it s binary or text
+		return false
 	std::string extension = path.substr(pos);
 	if (_mimeMap[extension].empty()) {
 		std::string mime_type = _mimeMap[extension];
@@ -566,3 +505,64 @@ HttpResponse & HttpResponse::operator=(HttpResponse const & rhs) {
 	}
 	return *this;
 }
+
+// void HttpResponse::_generateGETResponse(void)
+// {
+// }
+
+// bool HttpResponse::_isFileAboveThreshold(std::string &path)
+// {
+// 	struct stat stats;
+// 	if (stat(path.c_str(), &stats) != 0)
+// 		return false;
+// 	return stats.st_size > FILE_CHUNK_THRESHOLD;
+// }
+
+// void HttpResponse::_generateChunkedGETResponseContent(std::string path)
+// {
+//     print(1, "[Info] - Opening file to answer the request from Client FD : ", this->_request.getClient()->getFD());
+//     //Check si presence de l extension du fichier
+// 	//TODO HV: Factoriser la partie concernant l'extension
+//     size_t pos = path.find_last_of('.');
+//     if (pos == std::string::npos)
+//         throw ClientError(400);
+//     std::string extension = path.substr(pos);
+//     if (_mimeMap[extension].empty())
+//         throw ClientError(400);
+    
+//     this->_responseContent = "HTTP/1.1 200 OK\r\n";
+//     this->_responseContent += "Content-Type: " + _mimeMap[extension] + "\r\n";
+//     this->_responseContent += "Transfer-Encoding: chunked\r\n";
+//     this->_responseContent += "\r\n";
+
+//     // int fileFd = open(path.c_str(), O_RDONLY);
+//     // if (fileFd == -1)
+//     // {
+//     //     print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request.getClient()->getFD());
+//     //     struct stat stats;
+//     //     if (stat(path.c_str(), &stats) != 0)
+//     //         throw ClientError(404); 
+//     //     if ((stats.st_mode & S_IFDIR) != 0)
+//     //         throw ClientError(403);
+//     //     else
+//     //         throw ClientError(404);
+//     // }
+// 	//TODO HV: A tester avec un tres long texte si ça passe
+//     char buffer[RESPONSE_BUFFER];
+//     ssize_t readSize = read(fileFd, buffer, RESPONSE_BUFFER);
+//     if (readSize == -1)
+//         throw ClientError(403);
+//     else if (readSize == 0)
+//     {
+//         close(fileFd);
+//         this->_responseContent += "0\r\n\r\n";
+// 		// TODO HV: si timeout, est ce que je leak d'un fd non fermé??
+//         // ajouter que la reponse est done // TODO avoir un bool: response is ready!
+//     }
+//     else
+//     {
+//         std::stringstream readSizeHex;
+//         readSizeHex << std::hex << readSize;
+//         this->_responseContent += readSizeHex.str() + "\r\n" + buffer + "\r\n";
+//     }
+// }
