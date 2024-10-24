@@ -9,10 +9,10 @@ server {
     error_page 500 test.html;
     error_page 404 error404.html;
 
-    location /photos {
+    location / {
     root ./web; 
     index index.html;
-    dirlisting on;
+    dirlisting off;
     methods GET;
     }
 

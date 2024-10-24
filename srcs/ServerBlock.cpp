@@ -6,7 +6,7 @@
 /*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 14:08:49 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/23 13:12:35 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/24 11:56:21 by ebesnoin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,14 @@ std::map<int, std::string> ServerBlock::getErrorPages(void) const {
 
 std::vector<LocationBlock> ServerBlock::getLocationBlocks(void) const {
 	return this->_locationBlocks;
+}
+
+std::vector<LocationBlock*> ServerBlock::getLocationBlocksPointers(void) {
+	std::vector<LocationBlock*> pointers;
+    for (std::vector<LocationBlock>::iterator it = _locationBlocks.begin(); it != _locationBlocks.end(); ++it) {
+		pointers.push_back(&(*it));
+	}
+	return pointers;
 }
 
 std::map<std::string, std::vector<std::string> > ServerBlock::getLocMethods(void) const {
