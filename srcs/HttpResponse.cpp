@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/24 14:22:23 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/24 14:27:09 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,6 @@ void	HttpResponse::_fetchServerBlock(void) {
 
 void	HttpResponse::_fetchLocationBlock(void) {
 	std::string uri = _request.getRequestURI();
-	std::cout << "URI: " << uri << std::endl;
 	_location_block = 0;
 	if (uri.size() > MAX_URI_SIZE)
 		throw ClientError(414);
@@ -87,7 +86,6 @@ void	HttpResponse::_fetchLocationBlock(void) {
 	std::vector<LocationBlock*> location_blocks = _server_block->getLocationBlocksPointers();
 	while (uri.size() > 0) {
 		for (size_t i = 0; i < location_blocks.size(); ++i) {
-			std::cout << "Location: " << location_blocks[i]->getLocation() << std::endl;
 			if ((location_blocks[i]->getLocation()) == uri) {
 				_location_block = location_blocks[i];
 				return ;
@@ -425,15 +423,15 @@ void HttpResponse::_generateErrorResponse(int errorCode, const char *errorMessag
 	std::string error_page = _server_block->getErrorPages()[errorCode];
 	if (error_page.empty())
 		return _generateGenericErrorResponse(errorCode, errorMessage);
-	std::string path = _location_block->getRoot() + error_page;
+	
 	struct stat stats;
-	if (stat(path.c_str(), &stats) == -1)
+	if (stat(error_page.c_str(), &stats) == -1)
 		return _generateGenericErrorResponse(errorCode, errorMessage);
 	size_t size = stats.st_size;
 	ss << "Content-Size: " << size << "\r\n";
 	ss << "\r\n";
 	
-	std::ifstream file(path.c_str());
+	std::ifstream file(error_page.c_str());
 	if (!file.is_open())
 		return _generateGenericErrorResponse(errorCode, errorMessage);
 	std::string line;
@@ -532,16 +530,18 @@ const char *HttpResponse::ServerError::what() const throw() {
 }
 
 const char *HttpResponse::ClientError::what() const throw() {
-	if (_errorCode < 400 || (_errorCode > 415 && _errorCode != 429))
+	if (_errorCode < 400 || (_errorCode > 415 && _errorCode != 429)) {
 		return "Unknown client error of type 1";
+	}
 	else {
 		std::map<int, const char*>::const_iterator it = _errorMap.find(_errorCode);
 		if (it != _errorMap.end()) {
 			const char *errorMessage = it->second;
 			return errorMessage;
 		}
-		else
+		else {
 			return "Unkown client error of type 2";
+		}
 	}
 }
 
