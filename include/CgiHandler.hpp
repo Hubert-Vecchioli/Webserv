@@ -22,8 +22,8 @@ class CgiHandler
 		std::string _output;
 
 		void executeCgi(HttpResponse const &response);
-		void execChild(char **argv, char **envp, int fd[2]);
-		void execParent(int fd[2]);
+		void execChild(char **argv, char **envp, int fd[2], int fdpost[2]);
+		void execParent(int fd[2], int fdpost[2], std::string body);
 		char **convertEnv();
 		char **convertArgs(std::string cgi_fullpath, std::string exec_cgi);
 
