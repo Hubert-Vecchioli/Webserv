@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/24 16:40:52 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/25 14:47:51 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,11 @@ void HttpRequest::parseRequestLine(std::string request) {
 
 void HttpRequest::parseRequestHeader(std::string request) {
         _host = getValue(request, "Host: ");
-        _accept = tokenize(getValue(request, "Accept: "), ' ');
+        std::string accept = getValue(request, "Accept: ");
+        for (size_t i = 0; i < accept.size(); i++) {
+            if (accept[i] == ';') accept[i] = ',';
+        }
+        _accept = tokenize(accept, ',');
         _content_type = getValue(request, "Content-Type: ");
         std::string len = getValue(request, "Content-Length: ");
         _content_len = atol(len.c_str());
@@ -129,6 +133,20 @@ void HttpRequest::parseCookie(std::string request) {
 }
 
 // Helper functions
+
+void HttpRequest::getCGIExtension() {
+    _CGItype = "";
+    if (!_requestURI.empty()) {
+        size_t pos = _requestURI.find_last_of('.');
+        if (pos != 0 && pos != _requestURI.size()) {
+            std::string extension = _requestURI.substr(pos + 1);
+            if (extension == "py")
+                _CGItype = "python";
+            if (extension == "sh")
+                _CGItype = "bash";
+        }
+    }
+}
 
 std::string HttpRequest::getStringMethod() {
     std::string method;
