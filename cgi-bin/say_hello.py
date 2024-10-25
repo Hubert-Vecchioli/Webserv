@@ -18,10 +18,10 @@ response_body = f"""
 		<header>
 			<nav class="navbar">
 				<ul>
-					<li><a href="index.html">Home</a></li>
-					<li><a href="about.html">About</a></li>
-					<li><a href="contact.html">Contact</a></li>
-					<li class="active"><a href="say_hello.html">Say Hello</a></li>
+					<li><a href="../web/index.html">Home</a></li>
+					<li><a href="../web/about.html">About</a></li>
+					<li><a href="../web/contact.html">Contact</a></li>
+					<li class="active"><a href="../web/say_hello.html">Say Hello</a></li>
 				</ul>
 			</nav>
 		</header>
