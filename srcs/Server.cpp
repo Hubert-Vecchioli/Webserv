@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/24 15:04:23 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/25 11:57:41 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,9 @@ void Server::runServer(void)
 				throw FailureEpollWaitException();
 			}
 			for (int eventId = 0; eventId < epollWaitResult; ++eventId)
-				this->_triageEpollEvents(epollEvents[eventId]);
+			{
+					this->_triageEpollEvents(epollEvents[eventId]);
+			}
 			this->_reviewClientsHaveNoTimeout();
 			this->_reviewRequestsCompleted();
 		}
@@ -94,9 +96,9 @@ void Server::runServer(void)
 
 void Server::_reviewRequestsCompleted(void)
 {
-	for(std::vector<HttpRequest*>::iterator it = this->_requests.begin(); it != this->_requests.begin(); ++it)
+	for(std::vector<HttpRequest*>::iterator it = this->_requests.begin(); it != this->_requests.end(); ++it)
 	{
-		if ((*it)->getResponse()->getResponseStatus() && std::time(0) - (*it)->getResponse()->getLastActionTimeStamp() > REQUEST_TIMEOUT_LIMIT_SEC)
+		if ((*it)->getResponse()->getResponseStatus())// || std::time(0) - (*it)->getResponse()->getLastActionTimeStamp() > REQUEST_TIMEOUT_LIMIT_SEC)
 		{
 			try
 			{
@@ -108,6 +110,7 @@ void Server::_reviewRequestsCompleted(void)
 			{
 				print(2, e.what());
 			}
+			break;
 		}	
 	}
 }
@@ -162,14 +165,15 @@ void Server::_sendRequest(int fd)
 	Client::findInstanceWithFD(this->_clients, fd)->updateLastActionTimeStamp();
 	print(1, "[Info] - Sending response to Client FD : ", fd);
 	HttpResponse *response = HttpRequest::findInstanceWithFD(this->_requests, fd)->getResponse();
-	std::cout<< response->getResponseContent()<<std::endl; // TODO REMOVE THIS DEBUG
+	// std::cout<< response->getResponseContent()<<std::endl; // TODO REMOVE THIS DEBUG
 	int sizeHTTPResponseSent = send(fd, response->getResponseContent().c_str(), response->getResponseContent().size(), 0);// For info, send is equivalent to write as I am not using any flag
 	if(sizeHTTPResponseSent == 0 && response->getResponseContent().size() > 0)
 		this->_disconnectClient(fd);
 	if(sizeHTTPResponseSent < 0)
 		throw FailureToSendData();
-	modifyEpollCTL(this->_serverFD, fd, EPOLL_CTL_MOD);
+	modifyEpollCTL(this->_serverFD, fd, EPOLL_CTL_MOD, false);
 	print(1, "[Info] - Response successfully sent to Client FD : ", fd);
+	response->setResponseStatustoTrue();
 }
 
 void Server::_receiveRequest(int fd)
@@ -186,7 +190,10 @@ void Server::_receiveRequest(int fd)
 		throw FailureToReceiveData();
 	rawHTTPRequest[sizeHTTPRequest] = 0;
 	HttpRequest *request = new HttpRequest(clientSendingARequest, rawHTTPRequest);
+	// std::cout<< rawHTTPRequest<< std::endl;
 	HttpResponse *response = new HttpResponse(*this, *request);
+	std::cout << "request "<< request << std::endl;
+	std::cout << "response "<< response << std::endl;
 	request->setResponse(response);
 	this->_requests.push_back(request);
 	print(1, "[Info] - Request successfully received from Client FD : ", fd);
@@ -226,6 +233,7 @@ void Server::_disconnectClient(int listenedFD)
         }
 		delete clientToDisconnect;
 	}
+	// std::cout<<"[Error] - Client FD disconnected, associated client was erased fd: "<<listenedFD<< std::endl;
 	throw DisconnectedClientFDException();
 }
 

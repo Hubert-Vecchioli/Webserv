@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 10:13:16 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/25 11:55:39 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ void HttpResponse::_generateResponseContent(void)
 {
 	//Check redirect and prepare the response
 	// TODO: add a pointer to HTTPrequest
-	
 	if (_request.getHTTP() == false) {
 		ServerError error(505);
 		return _generateErrorResponse(505, error.what());
@@ -26,6 +25,7 @@ void HttpResponse::_generateResponseContent(void)
 		_fetchServerBlock();
 		_fetchLocationBlock();
 		_checkAllowedMethod();
+
 	}
 	catch (HttpResponse::ClientError & e) {
 		return _generateErrorResponse(e.getErrorCode(), e.what());
@@ -93,14 +93,13 @@ void	HttpResponse::_fetchLocationBlock(void) {
 		}
 		size_t pos = uri.find_last_of('/');
 		if (pos != std::string::npos && pos != 0)
-			uri = uri.substr(pos + 1);
+			uri = uri.substr(0, pos);
 		else if (pos == 0 && uri.size() > 1)
 			uri = "/";
 		else {
 			throw ClientError(404);
 		}
 	}
-	
 	_location_block = 0;
 	throw ClientError(404);
 }
@@ -504,6 +503,11 @@ HttpResponse & HttpResponse::operator=(HttpResponse const & rhs) {
 	}
 	return *this;
 }
+
+void HttpResponse::setResponseStatustoTrue(void) 
+{
+	this->_isResponseSent = true;
+};
 
 // void HttpResponse::_generateGETResponse(void)
 // {
