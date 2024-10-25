@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebesnoin <ebesnoin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:23:30 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/24 11:20:42 by ebesnoin         ###   ########.fr       */
+/*   Updated: 2024/10/25 14:26:55 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,8 @@ int main(int ac, char **av)
 		print(2, e.what());
 		return (1);
 	}
+	server.cleanup();
+	delete &Server::getInstance();
 	print(1, "[Info] - Webserv is now stopped");
 	return (0);
 }
