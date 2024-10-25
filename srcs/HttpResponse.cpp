@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/24 23:51:44 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/25 10:13:16 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,6 @@ void HttpResponse::_fetchGETResource(void) {
 		struct stat st;
 		if (stat(path.c_str(), &st) == -1)
 			throw ClientError(404);
-		int fd;
 		// 1/ est ce que je suis un fichier? Si oui le retourner
 		if (S_ISREG(st.st_mode)) {
 			int fd = open(path.c_str(), O_RDONLY);
@@ -140,7 +139,7 @@ void HttpResponse::_fetchGETResource(void) {
 		// 2/ est ce au je suis un dir? Si oui, est ce que j ai un index valide?
 		// 3/ est ce aue je peux dirlisting?
 		if (S_ISDIR(st.st_mode)) {
-			fd = _fetchDirectoryRessource(path);
+			_fetchDirectoryRessource(path);
 		}
 		// 4/ Sinon error 404
 		throw ClientError(404);
@@ -278,7 +277,7 @@ bool HttpResponse::_checkAcceptedFormat(std::string path) {
 		return true;
 	size_t pos = path.find_last_of('.');
 	if (pos == std::string::npos)
-		return false
+		return false;
 	std::string extension = path.substr(pos);
 	if (_mimeMap[extension].empty()) {
 		std::string mime_type = _mimeMap[extension];
