@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/23 17:37:46 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/25 14:26:47 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,10 @@ class Server
 		void _reviewRequestsCompleted(void);
 		void _addNewClient(int listenedFD);
 		void _disconnectClient(int listenedFD);
+		void _deleteAssociatedRequests(int fdToDelete);
 
 	public:
-		static Server &getInstance() {
+		static Server &getInstance(void) {
 			if (!_uniqueInstance)
 				_uniqueInstance = new Server();
 			return *_uniqueInstance;
@@ -55,6 +56,7 @@ class Server
 		void startServer(ConfigurationFile * configurationFile);
 		void runServer(void);
 		static void stopServer(void);
+		void cleanup(void);
 		//ConfigurationFile &getConfigurationFile() {return _configurationFile;};
 
 		ConfigurationFile &getConfigurationFile(void) {return *_configurationFile;};
