@@ -18,7 +18,7 @@ server {
     }
 
     location /farfadet {
-    redirect 301 rickroll.com;
+    redirect 301 www.rickroll.com;
     }
 
     location /photos/chien {
