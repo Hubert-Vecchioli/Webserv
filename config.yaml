@@ -12,7 +12,7 @@ server {
     location / {
     root ./web; 
     index index.html;
-    dirlisting off;
+    dirlisting on;
     methods GET;
     }
 
