@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 14:06:58 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/25 16:26:33 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ class HttpRequest
 		void parseCookie(std::string str_request);
 
 	public:
-		HttpRequest(Client *client, char *request);
+		HttpRequest(Client *client, unsigned char *request, int requestSize);
 		HttpRequest(HttpRequest const & rhs);
 		HttpRequest &operator=(HttpRequest const & rhs);
 		~HttpRequest(void);
