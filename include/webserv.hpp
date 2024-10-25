@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 12:18:46 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/25 14:17:14 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@
 # include "Server.hpp"
 # include "Socket.hpp"
 # include "Client.hpp"
+# include "CgiHandler.hpp"
 # include "HttpRequest.hpp"
 # include "HttpResponse.hpp"
 # include "ConfigurationFile.hpp"

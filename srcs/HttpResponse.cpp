@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 11:55:39 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/25 15:00:48 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,11 @@ void HttpResponse::_generateResponseContent(void)
 		_fetchServerBlock();
 		_fetchLocationBlock();
 		_checkAllowedMethod();
-
+		if (!_request.getCGIType().empty()) {
+			CgiHandler cgi(*this);
+			_responseContent = cgi.getOutput();
+			return ;
+		}
 	}
 	catch (HttpResponse::ClientError & e) {
 		return _generateErrorResponse(e.getErrorCode(), e.what());
@@ -137,8 +141,9 @@ void HttpResponse::_fetchGETResource(void) {
 		}
 		// 2/ est ce au je suis un dir? Si oui, est ce que j ai un index valide?
 		// 3/ est ce aue je peux dirlisting?
-		if (S_ISDIR(st.st_mode)) {
+		if (S_ISDIR(st.st_mode) || uri_no_query == "/") {
 			_fetchDirectoryRessource(path);
+			return ;
 		}
 		// 4/ Sinon error 404
 		throw ClientError(404);
@@ -161,7 +166,7 @@ void HttpResponse::_generateGETResponseContent(std::string path)
     std::ifstream file(path.c_str());
     if (!file.is_open())
     {
-        print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request.getClient()->getFD());
+		print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request.getClient()->getFD());
         struct stat stats;
         if (stat(path.c_str(), &stats) != 0)
             throw ClientError(404); 
@@ -267,16 +272,20 @@ void HttpResponse::_generateDirlistingResponse(std::string path)
 bool HttpResponse::_checkAcceptedFormat(std::string path) {
 	std::vector<std::string> accepted_formats = _request.getAccept();
 	
+	for (size_t i = 0; i < accepted_formats.size(); i++)
+		std::cout << "A-F = " << accepted_formats[i] << std::endl;
 	if (accepted_formats.size() == 0)
 		return true;
-	
+		
 	std::vector<std::string>::iterator beg = accepted_formats.begin();
 	std::vector<std::string>::iterator end = accepted_formats.end(); 
 	if (std::find(beg, end, "*/*") != end)
 		return true;
+	
 	size_t pos = path.find_last_of('.');
 	if (pos == std::string::npos)
 		return false;
+	
 	std::string extension = path.substr(pos);
 	if (_mimeMap[extension].empty()) {
 		std::string mime_type = _mimeMap[extension];
