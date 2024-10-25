@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 11:57:41 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/25 12:30:45 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,18 +24,21 @@ Server::~Server()
 		delete *it;
 		//this->_requests.erase(it);
 	}
+	this->_requests.clear();
 	for (std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
 	{
 		close((*it)->getFD());
 		delete (*it);
 		//this->_clients.erase(it);
 	}
+	this->_clients.clear();
 	for (std::vector<Socket*>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); ++it)
 	{
 		close((*it)->getFD());
 		delete (*it);
 		//this->_sockets.erase(it);
 	}
+	this->_sockets.clear();
 	delete _uniqueInstance;
 }
 
@@ -98,7 +101,7 @@ void Server::_reviewRequestsCompleted(void)
 {
 	for(std::vector<HttpRequest*>::iterator it = this->_requests.begin(); it != this->_requests.end(); ++it)
 	{
-		if ((*it)->getResponse()->getResponseStatus())// || std::time(0) - (*it)->getResponse()->getLastActionTimeStamp() > REQUEST_TIMEOUT_LIMIT_SEC)
+		if ((*it)->getResponse()->getResponseStatus() || std::time(0) - (*it)->getResponse()->getLastActionTimeStamp() > REQUEST_TIMEOUT_LIMIT_SEC)
 		{
 			try
 			{
@@ -165,7 +168,7 @@ void Server::_sendRequest(int fd)
 	Client::findInstanceWithFD(this->_clients, fd)->updateLastActionTimeStamp();
 	print(1, "[Info] - Sending response to Client FD : ", fd);
 	HttpResponse *response = HttpRequest::findInstanceWithFD(this->_requests, fd)->getResponse();
-	// std::cout<< response->getResponseContent()<<std::endl; // TODO REMOVE THIS DEBUG
+	//std::cout<< response->getResponseContent()<<std::endl; // TODO REMOVE THIS DEBUG
 	int sizeHTTPResponseSent = send(fd, response->getResponseContent().c_str(), response->getResponseContent().size(), 0);// For info, send is equivalent to write as I am not using any flag
 	if(sizeHTTPResponseSent == 0 && response->getResponseContent().size() > 0)
 		this->_disconnectClient(fd);
@@ -190,10 +193,8 @@ void Server::_receiveRequest(int fd)
 		throw FailureToReceiveData();
 	rawHTTPRequest[sizeHTTPRequest] = 0;
 	HttpRequest *request = new HttpRequest(clientSendingARequest, rawHTTPRequest);
-	// std::cout<< rawHTTPRequest<< std::endl;
+	//std::cout<< rawHTTPRequest<< std::endl;
 	HttpResponse *response = new HttpResponse(*this, *request);
-	std::cout << "request "<< request << std::endl;
-	std::cout << "response "<< response << std::endl;
 	request->setResponse(response);
 	this->_requests.push_back(request);
 	print(1, "[Info] - Request successfully received from Client FD : ", fd);
@@ -233,7 +234,7 @@ void Server::_disconnectClient(int listenedFD)
         }
 		delete clientToDisconnect;
 	}
-	// std::cout<<"[Error] - Client FD disconnected, associated client was erased fd: "<<listenedFD<< std::endl;
+	std::cout<<"[Error] - Client FD disconnected, associated client was erased fd: "<<listenedFD<< std::endl;
 	throw DisconnectedClientFDException();
 }
 
