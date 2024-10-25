@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 15:00:48 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/25 15:04:52 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -271,9 +271,7 @@ void HttpResponse::_generateDirlistingResponse(std::string path)
 
 bool HttpResponse::_checkAcceptedFormat(std::string path) {
 	std::vector<std::string> accepted_formats = _request.getAccept();
-	
-	for (size_t i = 0; i < accepted_formats.size(); i++)
-		std::cout << "A-F = " << accepted_formats[i] << std::endl;
+
 	if (accepted_formats.size() == 0)
 		return true;
 		
