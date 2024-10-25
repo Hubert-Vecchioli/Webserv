@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 10:10:49 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/25 10:40:59 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,12 +54,13 @@ class HttpResponse
 		std::string				_uploadFile(void);
 
 	public:
-		HttpResponse(Server &server, HttpRequest &request) : _server(server), _request(request) {_generateMimeMap();};
+		HttpResponse(Server &server, HttpRequest &request) : _server(server), _request(request),_isResponseSent(false)  {_generateMimeMap();};
 		HttpResponse(HttpResponse const & rhs) : _server(rhs._server), _request(rhs._request) {if (this != &rhs) *this = rhs;};
 		HttpResponse &operator=(HttpResponse const & rhs);
 		~HttpResponse(void) {};
 		
 		bool getResponseStatus(void) const {return _isResponseSent;};
+		void setResponseStatustoTrue(void);
 		std::time_t getLastActionTimeStamp(void) const {return _lastActionTimeStamp;};
 		std::string getResponseContent(void);
 		HttpRequest & getRequest() const {return _request;};
