@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 14:25:32 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/25 14:31:12 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,27 +16,22 @@ Server* Server::_uniqueInstance = 0;
 
 void Server::cleanup(void)
 {
-	std::cout<<"am I delete"<<std::endl;
-
 	if (this->_serverFD != -1)
 		close(_serverFD);
 	for (std::vector<Socket*>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); ++it)
 	{
 		close((*it)->getFD());
-		std::cout<<"am I delete2"<<std::endl;
 		delete (*it);
 	}
 	this->_sockets.clear();
 	for(std::vector<HttpRequest*>::iterator it = this->_requests.begin(); it != this->_requests.end(); ++it)
 	{
-		std::cout<<"am I delete3"<<std::endl;
 		delete (*it)->getResponse();
 		delete *it;
 	}
 	this->_requests.clear();
 	for (std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
 	{
-		std::cout<<"am I delete4"<<std::endl;
 		close((*it)->getFD());
 		delete (*it);
 	}
