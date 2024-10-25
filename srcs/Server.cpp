@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 12:30:45 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/25 14:31:12 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,32 +14,60 @@
 
 Server* Server::_uniqueInstance = 0;
 
-Server::~Server()
+void Server::cleanup(void)
 {
 	if (this->_serverFD != -1)
 		close(_serverFD);
-	for(std::vector<HttpRequest*>::iterator it = this->_requests.begin(); it != this->_requests.begin(); ++it)
+	for (std::vector<Socket*>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); ++it)
+	{
+		close((*it)->getFD());
+		delete (*it);
+	}
+	this->_sockets.clear();
+	for(std::vector<HttpRequest*>::iterator it = this->_requests.begin(); it != this->_requests.end(); ++it)
 	{
 		delete (*it)->getResponse();
 		delete *it;
-		//this->_requests.erase(it);
 	}
 	this->_requests.clear();
 	for (std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
 	{
 		close((*it)->getFD());
 		delete (*it);
-		//this->_clients.erase(it);
 	}
 	this->_clients.clear();
-	for (std::vector<Socket*>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); ++it)
-	{
-		close((*it)->getFD());
-		delete (*it);
-		//this->_sockets.erase(it);
-	}
-	this->_sockets.clear();
-	delete _uniqueInstance;
+	//delete _uniqueInstance;
+}
+
+Server::~Server()
+{
+	// std::cout<<"am I delete"<<std::endl;
+
+	// if (this->_serverFD != -1)
+	// 	close(_serverFD);
+	// for (std::vector<Socket*>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); ++it)
+	// {
+	// 	close((*it)->getFD());
+	// 	std::cout<<"am I delete"<<std::endl;
+	// 	delete (*it);
+	// 	//this->_sockets.erase(it);
+	// }
+	// this->_sockets.clear();
+	// for(std::vector<HttpRequest*>::iterator it = this->_requests.begin(); it != this->_requests.end(); ++it)
+	// {
+	// 	delete (*it)->getResponse();
+	// 	delete *it;
+	// 	//this->_requests.erase(it);
+	// }
+	// this->_requests.clear();
+	// for (std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
+	// {
+	// 	close((*it)->getFD());
+	// 	delete (*it);
+	// 	//this->_clients.erase(it);
+	// }
+	// this->_clients.clear();
+	// delete _uniqueInstance;
 }
 
 void Server::startServer(ConfigurationFile * configurationFile)
@@ -228,14 +256,38 @@ void Server::_disconnectClient(int listenedFD)
         {
             if (*it == clientToDisconnect)
             {
-                this->_clients.erase(it);
+                this->_deleteAssociatedRequests((*it)->getFD());
+				this->_deleteAssociatedRequests((*it)->getFD());
+				close((*it)->getFD());
+				delete (*it);
+				this->_clients.erase(it);
                 break;
             }
         }
-		delete clientToDisconnect;
 	}
 	std::cout<<"[Error] - Client FD disconnected, associated client was erased fd: "<<listenedFD<< std::endl;
 	throw DisconnectedClientFDException();
+}
+
+void Server::_deleteAssociatedRequests(int fdToDelete)
+{
+	for(std::vector<HttpRequest*>::iterator it = this->_requests.begin(); it != this->_requests.end(); ++it)
+	{
+		if ((*it)->getClient()->getFD() == fdToDelete)
+		{
+			try
+			{
+				delete (*it)->getResponse();
+				delete *it;
+				this->_requests.erase(it);
+			}
+			catch(const std::exception& e)
+			{
+				print(2, e.what());
+			}
+			break;
+		}	
+	}
 }
 
 const char* Server::FailureInitiateEpollInstanceException::what() const throw()
