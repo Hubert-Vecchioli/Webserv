@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 15:04:52 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/25 17:26:35 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,10 @@ void HttpResponse::_generateResponseContent(void)
 			_responseContent = cgi.getOutput();
 			return ;
 		}
-	}
-	catch (HttpResponse::ClientError & e) {
-		return _generateErrorResponse(e.getErrorCode(), e.what());
-	}
 	// if(/*_request is CGI*/)
 	// 	// trigger the CGI
 	
-	/*
+	/*000000000000
 	CgiHandler cgi(this);
 	if (cgi.getStatus() != 200)
 		gen the error response
@@ -59,7 +55,10 @@ void HttpResponse::_generateResponseContent(void)
 		default:
 			_generateErrorResponse(405, ClientError(405).what());
 	}
-	
+	}
+	catch (HttpResponse::ClientError & e) {
+		return _generateErrorResponse(e.getErrorCode(), e.what());
+	}
 }
 
 void	HttpResponse::_fetchServerBlock(void) {
@@ -349,18 +348,21 @@ void HttpResponse::_generatePOSTResponse(void)
 }
 
 std::string HttpResponse::_uploadFile(void) {
+	std::cout<< "je suis une test"<< std::endl;
 	std::string uri = _request.getRequestURI();
-	
+	std::cout<< uri <<std::endl;
 	size_t pos = uri.find('?');
-	if(pos == std::string::npos)
+	if(pos != std::string::npos)
 		throw ClientError(400);
 	uri = uri.substr(pos + 1);
 	if (uri.size() > MAX_URI_SIZE)
 		throw ClientError(414);
 	else if (uri.size() == 0)
 		throw ClientError(400);
-	std::string path = _location_block->getUploadPath() + uri;
+	std::string path = "."+_location_block->getUploadPath() + uri+"/test.png";
 	std::ofstream file(path.c_str());
+	file.open(path.c_str(), std::ofstream::out | std::ofstream::trunc);
+	std::cout<<  _request.getBody() <<std::endl;
 	if (!file.is_open())
 		throw ClientError(403);
 	file << _request.getBody();

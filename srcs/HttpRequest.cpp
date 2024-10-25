@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 14:47:51 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/25 17:28:37 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 // Constructors and Destructors for the HttpRequest class
 
-HttpRequest::HttpRequest(Client *client, char *request) : _client(client) {
-    std::string str_request = request;
+HttpRequest::HttpRequest(Client *client, unsigned char *request, int requestSize) : _client(client) {
+    std::string str_request((char *) request, requestSize);
 	parseRequestLine(str_request);
     parseRequestHeader(str_request);
 	if (this->_method == POST)
@@ -99,12 +99,9 @@ void HttpRequest::parseRequestHeader(std::string request) {
 }
 
 void HttpRequest::parseRequestBody(std::string request) {
-    std::string str_request = request;
-
-	std::cout << "Request: " << str_request << std::endl;
-    size_t pos = str_request.find_last_of("\r\n");
-    if (pos != std::string::npos && pos != str_request.size() - 1) {
-        _content_body = str_request.substr(pos + 2);
+    std::cout<< "je suis un autre test"<< std::endl;
+  if (_content_len != 0) {
+        _content_body = request.substr(request.size() - _content_len);
     }
 	else {
 		_content_body = "";

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 14:17:14 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/25 17:04:54 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@
 #define EPOLL_MAX_WAIT_TIME_MS 1000 // to be modified later on
 #define CLIENT_TIMEOUT_LIMIT_SEC 120
 #define REQUEST_TIMEOUT_LIMIT_SEC 20
-#define MAX_REQUEST_SIZE 5120
+#define MAX_REQUEST_SIZE 5000000
 #define	MAX_URI_SIZE 65536
 #define	FILE_CHUNK_THRESHOLD 163840 // randomly chose 5120 * 2^5
 #define RESPONSE_BUFFER 20480 // randomly chose 5120 * 2^2
