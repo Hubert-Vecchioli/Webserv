@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/28 10:27:10 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/28 14:46:22 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ void HttpResponse::_generateResponseContent(void)
 		return _generateErrorResponse(505, error.what());
 	}
 	std::cout<< "A2"<< std::endl;
-	try {
+	try
+	{
 		std::cout<< "A3"<< std::endl;
 		_fetchServerBlock();
 		std::cout<< "A4"<< std::endl;
@@ -50,21 +51,21 @@ void HttpResponse::_generateResponseContent(void)
 	*/
 
 	//will need to add the try & catch
-	std::cout<< "A7"<< std::endl;
-	switch(_request.getMethod())
-	{
-		case GET:
-			this->_fetchGETResource();
-			break;
-		case POST:
-			this->_generatePOSTResponse();
-			break;
-		case DELETE:
-			this->_generateDELResponse();
-			break;
-		default:
-			_generateErrorResponse(405, ClientError(405).what());
-	}
+		std::cout<< "A7"<< std::endl;
+		switch(_request.getMethod())
+		{
+			case GET:
+				this->_fetchGETResource();
+				break;
+			case POST:
+				this->_generatePOSTResponse();
+				break;
+			case DELETE:
+				this->_generateDELResponse();
+				break;
+			default:
+				_generateErrorResponse(405, ClientError(405).what());
+		}
 	}
 	catch (HttpResponse::ClientError & e) {
 		return _generateErrorResponse(e.getErrorCode(), e.what());
@@ -418,7 +419,7 @@ void HttpResponse::_generateErrorResponse(int errorCode, const char *errorMessag
 	if (stat(error_page.c_str(), &stats) == -1)
 		return _generateGenericErrorResponse(errorCode, errorMessage);
 	size_t size = stats.st_size;
-	ss << "Content-Size: " << size << "\r\n";
+	ss << "Content-Length: " << size << "\r\n";
 	ss << "\r\n";
 	
 	std::ifstream file(error_page.c_str());

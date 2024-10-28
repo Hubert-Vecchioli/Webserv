@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/27 21:08:02 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/28 17:21:41 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ HttpRequest::HttpRequest(Client *client, unsigned char *request, int requestSize
     std::string str_request((char *) request, requestSize);
 	parseRequestLine(str_request);
     parseRequestHeader(str_request);
+    std::cout<< "test print _content_len"<< _content_len<<std::endl;
     getCGIExtension();
 	if (this->_method == POST)
     {
@@ -111,6 +112,8 @@ void HttpRequest::parseRequestBody(std::string request) {
 	else {
 		_content_body = "";
 	}
+    std::cout<< "Request body : " << _content_body << std::endl;
+
 }
 
 void HttpRequest::parseConnection(std::string request) {
@@ -142,9 +145,13 @@ void HttpRequest::getCGIExtension() {
     std::cout<< "getCGIExtension : "<< std::endl;
     _CGItype = "";
     if (!_requestURI.empty()) {
+        std::cout<< "CGI1 "<< std::endl;
         size_t pos = _requestURI.find_last_of('.');
+        std::cout<< "CGI2 "<< std::endl;
         size_t npos = _requestURI.find_last_of('?');
-        if (pos != 0 && pos != _requestURI.size()) {
+        if (pos != 0 && pos != _requestURI.size())
+        {
+            std::cout<< "CGI3 "<< std::endl;
             std::string extension = _requestURI.substr(pos, npos - (pos));
             std::cout<< extension<< std::endl;
             if (extension == ".py")
@@ -153,6 +160,7 @@ void HttpRequest::getCGIExtension() {
                 _CGItype = "bash";
         }
     }
+    std::cout<< "CGI4 "<< std::endl;
 }
 
 std::string HttpRequest::getStringMethod() {
