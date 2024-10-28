@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 12:17:52 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/25 18:30:45 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,9 @@ class HttpResponse
 		void				_fetchLocationBlock(void);
 		void				_checkAllowedMethod(void);
 		bool				_checkAcceptedFormat(std::string path);
-		void					_fetchDirectoryRessource(std::string path);
+		void				_fetchDirectoryRessource(std::string path);
 		void				_fetchGETResource(void);
+		void				_redirectOutput(void);
 		bool 				_isPathWithinRoot(std::string path);
 		//bool 				_isFileAboveThreshold(std::string &path);
 		//void				_generateChunkedGETResponseContent(std::string path);

@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/27 12:04:24 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/28 10:27:10 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,10 @@ void HttpResponse::_generateResponseContent(void)
 		_fetchServerBlock();
 		std::cout<< "A4"<< std::endl;
 		_fetchLocationBlock();
+		if (_location_block->getRedirect().first != 0) {
+			_redirectOutput();
+			return ;
+		}
 		std::cout<< "A5"<< std::endl;
 		_checkAllowedMethod();
 		std::cout<< "A6"<< std::endl;
@@ -106,11 +110,32 @@ void	HttpResponse::_fetchLocationBlock(void) {
 		else if (pos == 0 && uri.size() > 1)
 			uri = "/";
 		else {
+			std::cout << "YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" << std::endl;
 			throw ClientError(404);
 		}
 	}
 	_location_block = 0;
 	throw ClientError(404);
+}
+
+void HttpResponse::_redirectOutput() {
+	std::pair<int, std::string> redir = _location_block->getRedirect();
+	std::stringstream ss;
+
+	std::map<int, std::string>redirectMap;
+	redirectMap[300] = "Multiple Choices";
+    redirectMap[301] = "Moved Permanently";
+    redirectMap[302] = "Found";
+    redirectMap[303] = "See Other";
+    redirectMap[304] = "Not Modified";
+    redirectMap[305] = "Use Proxy";
+    redirectMap[307] = "Temporary Redirect";
+    redirectMap[308] = "Permanent Redirect";
+
+	ss << "HTTP/1.1 " << redir.first << " " << redirectMap[redir.first] << "\r\n";
+    ss << "Location: " << redir.second << "\r\n";
+    ss << "Content-Length: 0\r\n\r\n";
+	_responseContent = ss.str();
 }
 
 void HttpResponse::_checkAllowedMethod(void) {
