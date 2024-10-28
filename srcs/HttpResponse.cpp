@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 18:56:26 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/28 10:11:59 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ void HttpResponse::_redirectOutput() {
 
 	ss << "HTTP/1.1 " << redir.first << " " << redirectMap[redir.first] << "\r\n";
     ss << "Location: " << redir.second << "\r\n";
-    ss << "Content-Length: 0\r\n";
+    ss << "Content-Length: 0\r\n\r\n";
 	_responseContent = ss.str();
 }
 
