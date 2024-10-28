@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/27 12:03:13 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/28 17:19:47 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,19 +212,57 @@ void Server::_sendRequest(int fd)
 
 void Server::_receiveRequest(int fd)
 {
-	//TODO: Have a review to prevent having 2 simultaneous requests from a single fd
+	// Empêcher les requêtes simultanées d'un même fd
 	Client* clientSendingARequest = Client::findInstanceWithFD(this->_clients, fd);
 	clientSendingARequest->updateLastActionTimeStamp();
 	print(1, "[Info] - Receiving request from Client FD : ", fd);
+
+	// Réception initiale de l'en-tête HTTP
 	unsigned char rawHTTPRequest[MAX_REQUEST_SIZE + 1];
 	int sizeHTTPRequest = recv(fd, rawHTTPRequest, MAX_REQUEST_SIZE, 0);
-	if(sizeHTTPRequest == 0)
+
+	if (sizeHTTPRequest == 0) {
 		this->_disconnectClient(fd);
-	if(sizeHTTPRequest < 0)
+		return;
+	}
+	if (sizeHTTPRequest < 0)
 		throw FailureToReceiveData();
+
 	rawHTTPRequest[sizeHTTPRequest] = 0;
+	std::cout << "Raw request: " << rawHTTPRequest << std::endl;
+
+	// Analyse de l'en-tête pour détecter le Content-Type et Content-Length
+	std::string header(reinterpret_cast<char*>(rawHTTPRequest));
+	std::size_t contentTypePos = header.find("Content-Type: application/octet-stream");
+	std::size_t contentLengthPos = header.find("Content-Length: ");
+	int contentLength = 0;
+	bool isOctetStream = (contentTypePos != std::string::npos);
+
+	if (contentLengthPos != std::string::npos) {
+		contentLength = atoi(header.substr(contentLengthPos + 16).c_str());
+	}
+
+	// Lecture du corps de la requête si c'est un octet-stream
+	if (isOctetStream && contentLength > 0) {
+		int totalReceived = sizeHTTPRequest;
+		while (totalReceived < contentLength) {
+			int remaining = contentLength - totalReceived;
+			int bytesReceived = recv(fd, rawHTTPRequest + totalReceived, remaining, 0);
+
+			if (bytesReceived <= 0) {
+				this->_disconnectClient(fd);
+				return;
+			}
+			totalReceived += bytesReceived;
+		}
+		rawHTTPRequest[totalReceived] = 0;
+		std::cout << "Full raw octet-stream request: " << rawHTTPRequest << std::endl;
+	}
+
+	// Création de l'objet requête et réponse
 	HttpRequest *request = new HttpRequest(clientSendingARequest, rawHTTPRequest, sizeHTTPRequest);
-	std::cout<< rawHTTPRequest<< std::endl;
+	std::cout << "je fonctionne " << std::endl;
+
 	HttpResponse *response = new HttpResponse(*this, *request);
 	request->setResponse(response);
 	this->_requests.push_back(request);
