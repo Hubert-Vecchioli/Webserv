@@ -3,8 +3,8 @@ error_log /var/log/nginx/error.log;
 body_size 1 MB;
 
 server {
-    listen 127.0.0.1 8080;
-    server_name 127.0.0.1:8080 localhost:8080;
+    listen 0.0.0.0 8080;
+    server_name 0.0.0.0:8080 localhost:8080;
     error_page 404 504 418 error.html;
     error_page 500 test.html;
     error_page 404 ./web/error404.html;

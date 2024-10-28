@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 17:26:35 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/27 12:04:24 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,20 @@ void HttpResponse::_generateResponseContent(void)
 {
 	//Check redirect and prepare the response
 	// TODO: add a pointer to HTTPrequest
+	std::cout<< "A1"<< std::endl;
 	if (_request.getHTTP() == false) {
 		ServerError error(505);
 		return _generateErrorResponse(505, error.what());
 	}
-
+	std::cout<< "A2"<< std::endl;
 	try {
+		std::cout<< "A3"<< std::endl;
 		_fetchServerBlock();
+		std::cout<< "A4"<< std::endl;
 		_fetchLocationBlock();
+		std::cout<< "A5"<< std::endl;
 		_checkAllowedMethod();
+		std::cout<< "A6"<< std::endl;
 		if (!_request.getCGIType().empty()) {
 			CgiHandler cgi(*this);
 			_responseContent = cgi.getOutput();
@@ -41,6 +46,7 @@ void HttpResponse::_generateResponseContent(void)
 	*/
 
 	//will need to add the try & catch
+	std::cout<< "A7"<< std::endl;
 	switch(_request.getMethod())
 	{
 		case GET:
@@ -320,6 +326,7 @@ void HttpResponse::_generateDELResponse(void)
 //Assuming POST is only to upload files
 void HttpResponse::_generatePOSTResponse(void)
 {
+	std::cout<< "A8"<< std::endl;
 	std::string path = _uploadFile();
 	std::ostringstream oss;
 	oss << _request.getBody().size();

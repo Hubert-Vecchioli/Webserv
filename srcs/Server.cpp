@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 17:17:14 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/27 12:03:13 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,8 +196,11 @@ void Server::_sendRequest(int fd)
 	Client::findInstanceWithFD(this->_clients, fd)->updateLastActionTimeStamp();
 	print(1, "[Info] - Sending response to Client FD : ", fd);
 	HttpResponse *response = HttpRequest::findInstanceWithFD(this->_requests, fd)->getResponse();
+    std::cout<< "A"<< std::endl;
 	std::cout<< response->getResponseContent()<<std::endl; // TODO REMOVE THIS DEBUG
+    std::cout<< "B"<< std::endl;
 	int sizeHTTPResponseSent = send(fd, response->getResponseContent().c_str(), response->getResponseContent().size(), 0);// For info, send is equivalent to write as I am not using any flag
+    std::cout<< "C"<< std::endl;
 	if(sizeHTTPResponseSent == 0 && response->getResponseContent().size() > 0)
 		this->_disconnectClient(fd);
 	if(sizeHTTPResponseSent < 0)
@@ -221,7 +224,7 @@ void Server::_receiveRequest(int fd)
 		throw FailureToReceiveData();
 	rawHTTPRequest[sizeHTTPRequest] = 0;
 	HttpRequest *request = new HttpRequest(clientSendingARequest, rawHTTPRequest, sizeHTTPRequest);
-	//std::cout<< rawHTTPRequest<< std::endl;
+	std::cout<< rawHTTPRequest<< std::endl;
 	HttpResponse *response = new HttpResponse(*this, *request);
 	request->setResponse(response);
 	this->_requests.push_back(request);
