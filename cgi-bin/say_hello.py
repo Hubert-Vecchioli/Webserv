@@ -4,10 +4,11 @@ import os, cgi, http.cookies, datetime
 print(f"HTTP/1.1 200 OK")
 print(f"Content-type: text/html")
 
-cookie_string = os.environ.get('HTTP_COOKIE','')
+cookie_string = os.environ.get('HTTP_COOKIE', '')
 cookie = http.cookies.SimpleCookie(cookie_string)
 
-name = cookie.get('name')
+cookie_name = cookie.get('name')
+name = cookie_name.value if cookie_name else None 
 
 form_html = f"""
 <!DOCTYPE html>
