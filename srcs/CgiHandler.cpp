@@ -45,14 +45,23 @@ CgiHandler::~CgiHandler(void) {}
 
 void CgiHandler::executeCgi(HttpResponse const &response) {
 	std::string cgi_fullpath = _env["PATH_TRANSLATED"] + _env["SCRIPT_NAME"] ;
-	std::string cgi_ext = cgi_fullpath.substr(cgi_fullpath.find_last_of('.') + 1);
+	std::cout<<"cgi_fullpath: "<< cgi_fullpath << std::endl;
+	std::string cgi_ext = cgi_fullpath.substr(cgi_fullpath.find_last_of('.'), cgi_fullpath.find_last_of('?') - (cgi_fullpath.find_last_of('.')));
+	std::cout<<"cgi_ext: "<< cgi_ext << std::endl;
 	std::string exec_cgi = response.getLocationBlock().getCgiExtension()[cgi_ext];
+	for(std::map<std::string, std::string>::iterator it = response.getLocationBlock().getCgiExtension().begin(); it !=response.getLocationBlock().getCgiExtension().end();++it)
+	{
+		std::cout<<"cgi ext map: "<< it->first << ": " << it->second << std::endl;
+	}
+	std::cout<<"Location block address : "<< &response.getLocationBlock() << std::endl;
 	if (exec_cgi.empty()) {
+		std::cout<<"cgi is empty! " << std::endl;
 		_status = 501;
 		throw std::runtime_error("Unrecognized CGI extension");
 		return;
 	}
 	int fd[2];
+	std::cout<<"pipe is about to start " << std::endl;
 	if (pipe(fd) == -1) {
 		_status = 500;
 		throw std::runtime_error("Pipe failed");
@@ -64,6 +73,7 @@ void CgiHandler::executeCgi(HttpResponse const &response) {
 	}
 	char **argv = convertArgs(cgi_fullpath, exec_cgi);
 	char **envp = convertEnv();
+	std::cout<<"fork is about to start " << std::endl;
 	pid = fork();
 	if (pid < 0) {
 		_status = 500;
@@ -82,6 +92,7 @@ void CgiHandler::executeCgi(HttpResponse const &response) {
 			delete[] argv;
 			throw e;
 		}
+	std::cout<<"Done " << std::endl;
 	_status = 200;
 	delete[] envp;
 	delete[] argv;
