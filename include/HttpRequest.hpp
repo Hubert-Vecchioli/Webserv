@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 16:26:33 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/28 17:13:50 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ class HttpRequest
 		std::string							_content_type; //header
 		size_t								_content_len; //header
 		std::map<std::string, std::string>	_cookie; //header
+		std::string							_cookieString;
 		std::string							_content_body; //body
 		std::string							_CGItype;
 		
@@ -81,6 +82,7 @@ class HttpRequest
 		std::string getContentType() {return _content_type;};
 		std::string getBody() {return _content_body;};
 		std::string getCGIType() {return _CGItype;};
+		std::string getCookieString() {return _cookieString;};
 };
 
 #endif
