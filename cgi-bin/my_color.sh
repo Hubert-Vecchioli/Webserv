@@ -4,17 +4,17 @@ read -r input
 # Get the color + decode the url formatting (' ' instead of '+' & %xx by ascii)
 color=$(echo "$input" | sed -n 's/.*color=\([^&]*\).*/\1/p'| sed 's/+/ /g;s/%/\\x/g')
 
-echo "HTTP/1.1 200 OK\r\n"
+echo "HTTP/1.1 200 OK"
 echo "Content-Type: text/html; charset=utf-8"
-echo -e "\r\n\r\n"
-echo ""
 
-cat << PP
+
+cat << PP > ${color}.css
 <!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
 		<title>About - WebSerVaBienOuBien Tester</title>
+		<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
 		<style>
 			body {
 				font-family: Helvetica, sans-serif;
@@ -256,10 +256,10 @@ cat << PP
 		<header>
 			<nav class="navbar">
 				<ul>
-					<li><a href="index.html">Home</a></li>
-					<li><a href="about.html">About</a></li>
-					<li><a href="contact.html">Contact</a></li>
-					<li><a href="destroyer.html">Destroyer</a></li>
+					<li><a href="/index.html">Home</a></li>
+					<li><a href="/about.html">About</a></li>
+					<li><a href="/contact.html">Contact</a></li>
+					<li><a href="/destroyer.html">Destroyer</a></li>
 					<li class="active"><a href="say_hello.html">Say Hello</a></li>
 				</ul>
 			</nav>
@@ -288,3 +288,9 @@ cat << PP
 	</body>
 </html>
 PP
+
+$len = wc -c ${color}.css
+echo -n "Content-Length: $(stat -c%s "${color}.css")" 
+echo -e "\r\n\r\n"
+cat ${color}.css
+rm ${color}.css
