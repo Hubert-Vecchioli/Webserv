@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/28 10:27:10 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/28 17:45:16 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,24 +16,18 @@ void HttpResponse::_generateResponseContent(void)
 {
 	//Check redirect and prepare the response
 	// TODO: add a pointer to HTTPrequest
-	std::cout<< "A1"<< std::endl;
 	if (_request.getHTTP() == false) {
 		ServerError error(505);
 		return _generateErrorResponse(505, error.what());
 	}
-	std::cout<< "A2"<< std::endl;
 	try {
-		std::cout<< "A3"<< std::endl;
 		_fetchServerBlock();
-		std::cout<< "A4"<< std::endl;
 		_fetchLocationBlock();
 		if (_location_block->getRedirect().first != 0) {
 			_redirectOutput();
 			return ;
 		}
-		std::cout<< "A5"<< std::endl;
 		_checkAllowedMethod();
-		std::cout<< "A6"<< std::endl;
 		if (!_request.getCGIType().empty()) {
 			CgiHandler cgi(*this);
 			_responseContent = cgi.getOutput();
@@ -50,7 +44,6 @@ void HttpResponse::_generateResponseContent(void)
 	*/
 
 	//will need to add the try & catch
-	std::cout<< "A7"<< std::endl;
 	switch(_request.getMethod())
 	{
 		case GET:
@@ -110,7 +103,6 @@ void	HttpResponse::_fetchLocationBlock(void) {
 		else if (pos == 0 && uri.size() > 1)
 			uri = "/";
 		else {
-			std::cout << "YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" << std::endl;
 			throw ClientError(404);
 		}
 	}
@@ -172,6 +164,7 @@ void HttpResponse::_fetchGETResource(void) {
 		// 2/ est ce au je suis un dir? Si oui, est ce que j ai un index valide?
 		// 3/ est ce aue je peux dirlisting?
 		if (S_ISDIR(st.st_mode) || uri_no_query == "/") {
+			std::cout << "ISDIR" << std::endl;
 			_fetchDirectoryRessource(path);
 			return ;
 		}
@@ -351,7 +344,6 @@ void HttpResponse::_generateDELResponse(void)
 //Assuming POST is only to upload files
 void HttpResponse::_generatePOSTResponse(void)
 {
-	std::cout<< "A8"<< std::endl;
 	std::string path = _uploadFile();
 	std::ostringstream oss;
 	oss << _request.getBody().size();
@@ -380,9 +372,7 @@ void HttpResponse::_generatePOSTResponse(void)
 }
 
 std::string HttpResponse::_uploadFile(void) {
-	std::cout<< "je suis une test"<< std::endl;
 	std::string uri = _request.getRequestURI();
-	std::cout<< uri <<std::endl;
 	size_t pos = uri.find('?');
 	if(pos != std::string::npos)
 		throw ClientError(400);
@@ -394,7 +384,6 @@ std::string HttpResponse::_uploadFile(void) {
 	std::string path = "."+_location_block->getUploadPath() + uri+"/test.png";
 	std::ofstream file(path.c_str());
 	file.open(path.c_str(), std::ofstream::out | std::ofstream::trunc);
-	std::cout<<  _request.getBody() <<std::endl;
 	if (!file.is_open())
 		throw ClientError(403);
 	file << _request.getBody();
@@ -418,7 +407,7 @@ void HttpResponse::_generateErrorResponse(int errorCode, const char *errorMessag
 	if (stat(error_page.c_str(), &stats) == -1)
 		return _generateGenericErrorResponse(errorCode, errorMessage);
 	size_t size = stats.st_size;
-	ss << "Content-Size: " << size << "\r\n";
+	ss << "Content-Length: " << size << "\r\n";
 	ss << "\r\n";
 	
 	std::ifstream file(error_page.c_str());

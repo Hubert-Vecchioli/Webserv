@@ -1,19 +1,22 @@
-import cgi, os, datetime
 
-form = cgi.FieldStorage()
+import os, cgi, http.cookies, datetime
 
-name = form.getvalue("name", "wonderful person")
 print(f"HTTP/1.1 200 OK")
-print ("Content-type:text/html")
+print(f"Content-type: text/html")
 
-response_body = f"""
+cookie_string = os.environ.get('HTTP_COOKIE','')
+cookie = http.cookies.SimpleCookie(cookie_string)
+
+name = cookie.get('name')
+
+form_html = f"""
 <!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
 		<title>Hello you - WebSerVaBienOuBien Tester</title>
 		<link href="/style.css" rel="stylesheet">
-		<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+		<link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
 	</head>
 	<body>
 		<header>
@@ -23,25 +26,64 @@ response_body = f"""
 					<li><a href="/about.html">About</a></li>
 					<li><a href="/contact.html">Contact</a></li>
 					<li><a href="/destroyer.html">Destroyer</a></li>
-					<li class="active"><a href="/say_hello.html">Say Hello</a></li>
+					<li><a href="/set_color.html">Set Color</a></li>
+					<li class="active"><a href="/cgi-bin/say_hello.py">Set Name</a></li>
 				</ul>
 			</nav>
 		</header>
-		<main>
-			<h1>Hello {name}!</h1>
-			<p>You look great today!</p>
-		</main>
-	</body>
+	<main>
+		<h1>Hello... But what's your name?</h1>
+			<form class="styled-form" method="get" action="/cgi-bin/set_name.py">
+				<input type="text" name="name" placeholder="name" autofocus>
+				<button type="submit">Submit</button>
+			</form>
+	</main>
 </html>
 """
 
-content_length = len(response_body)
-
-print(f"Content-Length: {content_length}")
+say_hello_html = f"""
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+			<title>Hello you - WebSerVaBienOuBien Tester</title>
+			<link href="/style.css" rel="stylesheet">
+			<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+		</head>
+		<body>
+			<header>
+				<nav class="navbar">
+					<ul>
+						<li><a href="/index.html">Home</a></li>
+						<li><a href="/about.html">About</a></li>
+						<li><a href="/contact.html">Contact</a></li>
+						<li><a href="/destroyer.html">Destroyer</a></li>
+						<li><a href="/set_color.html">Set Color</a></li>
+						<li class="active"><a href="/cgi-bin/say_hello.py">Set Name</a></li>
+					</ul>
+				</nav>
+			</header>
+			<main>
+				<h1>Hello {name}!</h1>
+				<p>You look great today!</p>
+			</main>
+		</body>
+	</html>
+"""
+	
 if "SERVER_NAME" in os.environ:
 	server_name = os.environ.get('SERVER_NAME')
 	print(f"Server: {server_name}")
 date = datetime.datetime.now().astimezone().strftime("%a, %d %b %Y %T %Z")
-print(f"Date: {date}\n")
-print()
-print(response_body)
+print(f"Date: {date}")
+
+if name:
+	content_length = len(say_hello_html)
+	print(f"Content-Length: {content_length}")
+	print()
+	print(say_hello_html)
+else:
+	content_length = len(form_html)
+	print(f"Content-Length: {content_length}")
+	print()
+	print(form_html)

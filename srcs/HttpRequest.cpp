@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/27 21:08:02 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/28 17:51:24 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ HttpRequest & HttpRequest::operator=(HttpRequest const & rhs) {
         _content_body = rhs._content_body;
         _accept = rhs._accept;
 		_cookie = rhs._cookie;
+        _cookieString = rhs._cookieString;
         // delete _client;
         // delete _HttpResponse;
         // _client = Client(rhs._client);
@@ -55,7 +56,6 @@ HttpRequest::~HttpRequest(void) {};
 // GETTERS
 
 void HttpRequest::parseRequestLine(std::string request) {
-    std::cout<<"parseRequestLine"<<std::endl;
     std::string str_request = request;
     
     size_t pos1 = str_request.find(' ');
@@ -89,7 +89,6 @@ void HttpRequest::parseRequestLine(std::string request) {
 }
 
 void HttpRequest::parseRequestHeader(std::string request) {
-        std::cout<<"parseRequestHeader"<<std::endl;
         _host = getValue(request, "Host: ");
         std::string accept = getValue(request, "Accept: ");
         for (size_t i = 0; i < accept.size(); i++) {
@@ -101,10 +100,10 @@ void HttpRequest::parseRequestHeader(std::string request) {
         _content_len = atol(len.c_str());
 		parseConnection(request);
 		parseCookie(request);
+        std::cout << "COOKIE PARSE REQUEST HEADER = " << _cookieString;
 }
 
 void HttpRequest::parseRequestBody(std::string request) {
-    std::cout<< "parseRequestBody"<< std::endl;
   if (_content_len != 0) {
         _content_body = request.substr(request.size() - _content_len);
     }
@@ -114,7 +113,6 @@ void HttpRequest::parseRequestBody(std::string request) {
 }
 
 void HttpRequest::parseConnection(std::string request) {
-    std::cout<< "parseConnection"<< std::endl;
 	if (getValue(request, "Connection: ") == "keep-alive")
 		this->_connection = KEEP_ALIVE;
 	else
@@ -122,30 +120,31 @@ void HttpRequest::parseConnection(std::string request) {
 }
 
 void HttpRequest::parseCookie(std::string request) {
-    std::cout<< "parseCookie"<< std::endl;
-	std::string cookie = getValue(request, "Cookie: ");
-		std::vector<std::string> cookies = tokenize(cookie, ';');
-		for (size_t i = 0; i < cookies.size(); i++) {
-			std::vector<std::string> key_value = tokenize(cookies[i], '=');
-			if (key_value.size() == 2)
-				this->_cookie[key_value[0]] = key_value[1];
-			else if (key_value.size() == 1)
-				this->_cookie[key_value[0]] = "";
-			else
-				throw std::runtime_error("Error: invalid cookie");
-		}
+    _cookieString = getValue(request, "Cookie: ");
+    std::cout << "COOKIE DEBUT PARSE COOKIE= " << _cookieString << std::endl;
+    // std::string cookie(_cookieString);
+	// std::vector<std::string> cookies = tokenize(cookie, ';');
+	// 	for (size_t i = 0; i < cookies.size(); i++) {
+	// 		std::vector<std::string> key_value = tokenize(cookies[i], '=');
+	// 		if (key_value.size() == 2)
+	// 			this->_cookie[key_value[0]] = key_value[1];
+	// 		else if (key_value.size() == 1)
+	// 			this->_cookie[key_value[0]] = "";
+	// 		else
+	// 			throw std::runtime_error("Error: invalid cookie");
+	// 	}
+    std::cout << "COOKIE FIN PARSE COOKIE= " << _cookieString << std::endl;
 }
 
 // Helper functions
 
 void HttpRequest::getCGIExtension() {
-    std::cout<< "getCGIExtension : "<< std::endl;
     _CGItype = "";
     if (!_requestURI.empty()) {
         size_t pos = _requestURI.find_last_of('.');
-        size_t npos = _requestURI.find_last_of('?');
-        if (pos != 0 && pos != _requestURI.size()) {
-            std::string extension = _requestURI.substr(pos, npos - (pos));
+        size_t pos2 = _requestURI.find_last_of('?');
+        if (pos != std::string::npos && pos != _requestURI.size()) {
+            std::string extension = _requestURI.substr(pos, pos2 - (pos));
             std::cout<< extension<< std::endl;
             if (extension == ".py")
                 _CGItype = "python";
@@ -156,7 +155,6 @@ void HttpRequest::getCGIExtension() {
 }
 
 std::string HttpRequest::getStringMethod() {
-    std::cout<< "getStringMethod"<< std::endl;
     std::string method;
     switch (_method)
     {
@@ -177,7 +175,6 @@ std::string HttpRequest::getStringMethod() {
 }
 
 std::string HttpRequest::getValue(std::string request, std::string key_with_sep) {
-    std::cout<< "getValue"<< std::endl;
     std::string value;
     
     size_t pos_key = request.find(key_with_sep);
@@ -194,7 +191,6 @@ std::string HttpRequest::getValue(std::string request, std::string key_with_sep)
 }
 
 HttpRequest* HttpRequest::findInstanceWithFD(std::vector<HttpRequest*>& vector, int fd) {
-    std::cout<< "findInstanceWithFD"<< std::endl;
     for (std::vector<HttpRequest*>::iterator it = vector.begin(); it != vector.end(); ++it) {
         if ((*it)->_client->getFD() == fd) {
             return (*it);
@@ -206,7 +202,6 @@ HttpRequest* HttpRequest::findInstanceWithFD(std::vector<HttpRequest*>& vector, 
 // DEBUG
 
 void HttpRequest::displayRequestLine(std::ostream &o) {
-    std::cout<< "displayRequestLine"<< std::endl;
     switch (_method)
     {
         case GET:
