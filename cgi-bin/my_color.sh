@@ -7,6 +7,26 @@ color=$(echo "$input" | sed -n 's/.*color=\([^&]*\).*/\1/p'| sed 's/+/ /g;s/%/\\
 echo "HTTP/1.1 200 OK"
 echo "Content-Type: text/html; charset=utf-8"
 
+case "$color" in
+  "red")
+    color="#ba1609"
+    ;;
+  "green")
+    color="#1b8320"
+    ;;
+  "blue")
+    color="#285aa6"
+    ;;
+	"purple")
+	color="#5f1b83"
+	;;
+	"yellow")
+	color="#e4c40f"
+	;;
+  *)
+    color="#ffffff"
+    ;;
+esac
 
 cat << PP > ${color}.css
 <!DOCTYPE html>
@@ -54,7 +74,7 @@ cat << PP > ${color}.css
 			}
 
 			h1 {
-				color: $color;
+				color: white;
 				margin-bottom: 20px;
 				/* text-align: center; */
 				width: 100%;
@@ -253,33 +273,28 @@ cat << PP > ${color}.css
 		</style>
 	</head>
 	<body>
-		<header>
-			<nav class="navbar">
-				<ul>
-					<li><a href="/index.html">Home</a></li>
-					<li><a href="/about.html">About</a></li>
-					<li><a href="/contact.html">Contact</a></li>
-					<li><a href="/destroyer.html">Destroyer</a></li>
-					<li class="active"><a href="say_hello.html">Say Hello</a></li>
-				</ul>
-			</nav>
-		</header>
+			<header>
+				<nav class="navbar">
+					<ul>
+						<li><a href="/index.html">Home</a></li>
+						<li><a href="/about.html">About</a></li>
+						<li><a href="/contact.html">Contact</a></li>
+						<li><a href="/destroyer.html">Destroyer</a></li>
+						<li><a href="/set_color.html">Set Color</a></li>
+						<li class="active"><a href="/cgi-bin/say_hello.py">Say Hello</a></li>
+					</ul>
+				</nav>
+			</header>
 		<main>
-			<h1>Hello... But what's your name?</h1>
-			<form class="styled-form" method="get" action="../cgi-bin/say_hello.py">
-				<input type="text" name="name" placeholder="name" autofocus>
-				<button type="submit">Submit</button>
-			</form>
-			<!-- Test Hubert -->
-			<h2>How about changing the color ?</h2>
+			<h1>How about changing the color ?</h1>
 			<form action="../cgi-bin/my_color.sh" method="post">
 				<label for="color">Choose a color:</label>
 				<select id="color" name="color">
-					<option value="red">Red</option>
-					<option value="blue">Blue</option>
-					<option value="green">Green</option>
-					<option value="yellow">Yellow</option>
-					<option value="purple">Purple</option>
+					<option value="red" $( [ "$color" = "#ba1609" ] && echo "selected" )>Red</option>
+					<option value="blue" $( [ "$color" = "#285aa6" ] && echo "selected" )>Blue</option>
+					<option value="green" $( [ "$color" = "#1b8320" ] && echo "selected" )>Green</option>
+					<option value="yellow" $( [ "$color" = "#e4c40f" ] && echo "selected" )>Yellow</option>
+					<option value="purple" $( [ "$color" = "#5f1b83" ] && echo "selected" )>Purple</option>
 				</select>
 				<br><br>
 				<input class="button" type="submit" value="Submit">

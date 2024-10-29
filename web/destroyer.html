@@ -14,19 +14,23 @@
 					<li><a href="about.html">About</a></li>
 					<li><a href="contact.html">Contact</a></li>
 					<li class="active"><a href="destroyer.html">Destroyer</a></li>
-					<li><a href="say_hello.html">Say Hello</a></li>
+					<li><a href="set_color.html">Set Color</a></li>
+					<li><a href="../cgi-bin/say_hello.py">Say Hello</a></li>
 				</ul>
 			</nav>
 		</header>
 		<main>
 			<h1>Destroyer</h1>
-			<img src="images/pigs.png" width="300" alt="Photo of us three" />
-			<p>This <strong>am-AH-zing</strong> project was brought to you by:</p>
-			<ul class="pointer-list">
-				<li><a href="mailto: hvecchio@student.42.fr">Hubert-Cool</a></li>
-				<li><a href="mailto: ebesnoin@student.42.fr">Emmagnifique</a></li>
-				<li><a href="mailto: jblaye@student.42.fr">Ju-no-lie-mit</a></li>
-			</ul>
+			<p>Please select a file to destroy:</p>
+			<form id="deleteForm" method="post" action="../cgi-bin/destroyer.sh">
+				<select id="mySelect" name="option">
+				  <option value="fileok1">File that can be deleted</option>
+				  <option value="fileok2">File that can be deleted 2</option>
+				  <option value="filenok1">File without appropriate authorization</option>
+				  <option value="filenok2">File that does not exist</option>
+				</select>
+				<button type="submit">Delete</button>
+			  </form>
 		</main>
 	</body>
 </html>

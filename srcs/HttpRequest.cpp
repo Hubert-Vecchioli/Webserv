@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/29 13:48:30 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/28 17:51:24 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ HttpRequest & HttpRequest::operator=(HttpRequest const & rhs) {
         _content_body = rhs._content_body;
         _accept = rhs._accept;
 		_cookie = rhs._cookie;
+        _cookieString = rhs._cookieString;
         // delete _client;
         // delete _HttpResponse;
         // _client = Client(rhs._client);
@@ -99,6 +100,7 @@ void HttpRequest::parseRequestHeader(std::string request) {
         _content_len = atol(len.c_str());
 		parseConnection(request);
 		parseCookie(request);
+        std::cout << "COOKIE PARSE REQUEST HEADER = " << _cookieString;
 }
 
 void HttpRequest::parseRequestBody(std::string request) {
@@ -119,17 +121,7 @@ void HttpRequest::parseConnection(std::string request) {
 }
 
 void HttpRequest::parseCookie(std::string request) {
-	std::string cookie = getValue(request, "Cookie: ");
-		std::vector<std::string> cookies = tokenize(cookie, ';');
-		for (size_t i = 0; i < cookies.size(); i++) {
-			std::vector<std::string> key_value = tokenize(cookies[i], '=');
-			if (key_value.size() == 2)
-				this->_cookie[key_value[0]] = key_value[1];
-			else if (key_value.size() == 1)
-				this->_cookie[key_value[0]] = "";
-			else
-				throw std::runtime_error("Error: invalid cookie");
-		}
+    _cookieString = getValue(request, "Cookie: ");
 }
 
 // Helper functions
@@ -138,11 +130,9 @@ void HttpRequest::getCGIExtension() {
     _CGItype = "";
     if (!_requestURI.empty()) {
         size_t pos = _requestURI.find_last_of('.');
-        size_t npos = _requestURI.find_last_of('?');
-
-        if (pos != 0 && pos != _requestURI.size() && (npos - pos) > 0)
-        {
-            std::string extension = _requestURI.substr(pos, npos - (pos));
+        size_t pos2 = _requestURI.find_last_of('?');
+        if (pos != std::string::npos && pos != _requestURI.size() && (npos - pos) > 0) {
+            std::string extension = _requestURI.substr(pos, pos2 - (pos));
             if (extension == ".py")
                 _CGItype = "python";
             if (extension == ".sh")

@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
 /*   Updated: 2024/10/29 16:20:11 by hvecchio         ###   ########.fr       */
@@ -154,6 +154,7 @@ void HttpResponse::_fetchGETResource(void) {
 		// 2/ est ce au je suis un dir? Si oui, est ce que j ai un index valide?
 		// 3/ est ce aue je peux dirlisting?
 		if (S_ISDIR(st.st_mode) || uri_no_query == "/") {
+			std::cout << "ISDIR" << std::endl;
 			_fetchDirectoryRessource(path);
 			return ;
 		}
