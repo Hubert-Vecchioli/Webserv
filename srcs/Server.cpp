@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/28 17:21:57 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/29 18:20:30 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ void Server::runServer(void)
 	}
 	catch(const std::exception& e)
 	{
+		std::cout<< "A1"<<std::endl;
 		print(2, e.what());
 	}
 }
@@ -112,6 +113,7 @@ void Server::_reviewRequestsCompleted(void)
 			}
 			catch(const std::exception& e)
 			{
+				std::cout<< "A2"<<std::endl;
 				print(2, e.what());
 			}
 			break;
@@ -133,6 +135,7 @@ void Server::_reviewClientsHaveNoTimeout(void)
 			}
 			catch(const std::exception& e)
 			{
+				std::cout<< "A3"<<std::endl;
 				print(2, e.what());
 			}
 		}	
@@ -155,11 +158,15 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 		if (epollEvents.events & EPOLLOUT)
 		{
 			if(HttpRequest::findInstanceWithFD(this->_requests, epollEvents.data.fd) && !HttpRequest::findInstanceWithFD(this->_requests, epollEvents.data.fd)->getResponse()->getResponseStatus())
+			{
+				std::cout<< "-done"<<std::endl;
 				this->_sendRequest(epollEvents.data.fd);
+			}	
 		}
-	}		
+	}
 	catch(const std::exception& e)
 	{
+		std::cout<< "A4"<<std::endl;
 		print(2, e.what());
 	}
 }
@@ -167,11 +174,15 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 void Server::_sendRequest(int fd)
 {
 	Client::findInstanceWithFD(this->_clients, fd)->updateLastActionTimeStamp();
+	std::cout<< "_sendRequest 1 "<<std::endl;
 	print(1, "[Info] - Sending response to Client FD : ", fd);
+	std::cout<< "_sendRequest 2 "<<std::endl;
 	HttpResponse *response = HttpRequest::findInstanceWithFD(this->_requests, fd)->getResponse();
 	int sizeHTTPResponseSent = send(fd, response->getResponseContent().c_str(), response->getResponseContent().size(), 0);// For info, send is equivalent to write as I am not using any flag
+	std::cout<< "_sendRequest 3 "<<std::endl;
 	if(sizeHTTPResponseSent == 0 && response->getResponseContent().size() > 0)
 		this->_disconnectClient(fd);
+	std::cout<< "_sendRequest 4 "<<std::endl;
 	if(sizeHTTPResponseSent < 0)
 		throw FailureToSendData();
 	modifyEpollCTL(this->_serverFD, fd, EPOLL_CTL_MOD, false);
@@ -303,6 +314,7 @@ void Server::_deleteAssociatedRequests(int fdToDelete)
 			}
 			catch(const std::exception& e)
 			{
+				std::cout<< "A5"<<std::endl;
 				print(2, e.what());
 			}
 			break;
