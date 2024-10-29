@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 17:17:14 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/29 16:40:26 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,33 +41,6 @@ void Server::cleanup(void)
 
 Server::~Server()
 {
-	// std::cout<<"am I delete"<<std::endl;
-
-	// if (this->_serverFD != -1)
-	// 	close(_serverFD);
-	// for (std::vector<Socket*>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); ++it)
-	// {
-	// 	close((*it)->getFD());
-	// 	std::cout<<"am I delete"<<std::endl;
-	// 	delete (*it);
-	// 	//this->_sockets.erase(it);
-	// }
-	// this->_sockets.clear();
-	// for(std::vector<HttpRequest*>::iterator it = this->_requests.begin(); it != this->_requests.end(); ++it)
-	// {
-	// 	delete (*it)->getResponse();
-	// 	delete *it;
-	// 	//this->_requests.erase(it);
-	// }
-	// this->_requests.clear();
-	// for (std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
-	// {
-	// 	close((*it)->getFD());
-	// 	delete (*it);
-	// 	//this->_clients.erase(it);
-	// }
-	// this->_clients.clear();
-	// delete _uniqueInstance;
 }
 
 void Server::startServer(ConfigurationFile * configurationFile)
@@ -196,7 +169,7 @@ void Server::_sendRequest(int fd)
 	Client::findInstanceWithFD(this->_clients, fd)->updateLastActionTimeStamp();
 	print(1, "[Info] - Sending response to Client FD : ", fd);
 	HttpResponse *response = HttpRequest::findInstanceWithFD(this->_requests, fd)->getResponse();
-	std::cout<< response->getResponseContent()<<std::endl; // TODO REMOVE THIS DEBUG
+	//std::cout<< response->getResponseContent()<<std::endl; // TODO REMOVE THIS DEBUG
 	int sizeHTTPResponseSent = send(fd, response->getResponseContent().c_str(), response->getResponseContent().size(), 0);// For info, send is equivalent to write as I am not using any flag
 	if(sizeHTTPResponseSent == 0 && response->getResponseContent().size() > 0)
 		this->_disconnectClient(fd);
@@ -209,24 +182,72 @@ void Server::_sendRequest(int fd)
 
 void Server::_receiveRequest(int fd)
 {
-	//TODO: Have a review to prevent having 2 simultaneous requests from a single fd
-	Client* clientSendingARequest = Client::findInstanceWithFD(this->_clients, fd);
-	clientSendingARequest->updateLastActionTimeStamp();
-	print(1, "[Info] - Receiving request from Client FD : ", fd);
-	unsigned char rawHTTPRequest[MAX_REQUEST_SIZE + 1];
-	int sizeHTTPRequest = recv(fd, rawHTTPRequest, MAX_REQUEST_SIZE, 0);
-	if(sizeHTTPRequest == 0)
-		this->_disconnectClient(fd);
-	if(sizeHTTPRequest < 0)
-		throw FailureToReceiveData();
-	rawHTTPRequest[sizeHTTPRequest] = 0;
-	HttpRequest *request = new HttpRequest(clientSendingARequest, rawHTTPRequest, sizeHTTPRequest);
-	//std::cout<< rawHTTPRequest<< std::endl;
-	HttpResponse *response = new HttpResponse(*this, *request);
-	request->setResponse(response);
-	this->_requests.push_back(request);
-	print(1, "[Info] - Request successfully received from Client FD : ", fd);
-	modifyEpollCTL(this->_serverFD, fd, EPOLL_CTL_MOD, true);
+// Empêcher les requêtes simultanées d'un même fd
+    Client* clientSendingARequest = Client::findInstanceWithFD(this->_clients, fd);
+    clientSendingARequest->updateLastActionTimeStamp();
+    print(1, "[Info] - Receiving request from Client FD : ", fd);
+
+    unsigned char* rawHTTPRequest = new unsigned char[MAX_REQUEST_SIZE * 3 + 1]; 
+    int sizeHTTPRequest = recv(fd, rawHTTPRequest, MAX_REQUEST_SIZE, 0);
+    if (sizeHTTPRequest == 0)
+	{
+        this->_disconnectClient(fd);
+        delete[] rawHTTPRequest;
+        return;
+    }
+    if (sizeHTTPRequest < 0)
+    {
+        delete[] rawHTTPRequest;
+        throw FailureToReceiveData();
+    }
+    
+    rawHTTPRequest[sizeHTTPRequest] = 0;
+    std::string header(reinterpret_cast<char*>(rawHTTPRequest));
+    std::size_t contentTypePos = header.find("Content-Type: application/octet-stream");
+    std::size_t contentLengthPos = header.find("Content-Length: ");
+    int contentLength = 0;
+    bool isOctetStream = (contentTypePos != std::string::npos);
+
+    if (contentLengthPos != std::string::npos) {
+        contentLength = atoi(header.substr(contentLengthPos + 16).c_str());
+		if(contentLength > 616514560)
+		{
+			delete[] rawHTTPRequest;
+			this->_disconnectClient(fd);
+        	throw ExcessiveFileSize();
+		}
+    }
+    if (isOctetStream && contentLength > 0)
+    {
+        unsigned char* tempBuffer = NULL;
+        while (sizeHTTPRequest < contentLength)
+        {
+            int bytesReceived = recv(fd, rawHTTPRequest + sizeHTTPRequest, MAX_REQUEST_SIZE, 0);
+            if (bytesReceived <= 0)
+            {
+                this->_disconnectClient(fd);
+                delete[] rawHTTPRequest;
+                return;
+            }
+            sizeHTTPRequest += bytesReceived;
+            tempBuffer = new unsigned char[sizeHTTPRequest + 2*MAX_REQUEST_SIZE + 1]; // Redimensionner
+			std::copy(rawHTTPRequest, rawHTTPRequest + sizeHTTPRequest, tempBuffer);
+			delete[] rawHTTPRequest; 
+			rawHTTPRequest = tempBuffer;
+        }
+        rawHTTPRequest[sizeHTTPRequest] = 0;
+    }
+	std::cout<< rawHTTPRequest<<std::endl;
+    HttpRequest* request = new HttpRequest(clientSendingARequest, rawHTTPRequest, sizeHTTPRequest);
+    HttpResponse* response = new HttpResponse(*this, *request);
+    request->setResponse(response);
+    this->_requests.push_back(request);
+    
+    print(1, "[Info] - Request successfully received from Client FD : ", fd);
+    modifyEpollCTL(this->_serverFD, fd, EPOLL_CTL_MOD, true);
+    
+    // Libération de la mémoire allouée pour rawHTTPRequest
+    delete[] rawHTTPRequest;
 }
 
 void Server::_addNewClient(int listenedFD)
@@ -312,7 +333,7 @@ const char* Server::FailureEpollWaitException::what() const throw()
 
 const char* Server::DisconnectedClientFDException::what() const throw()
 {
-	return ("[Error] - Client FD disconnected, associated client was erased");
+	return ("[Info] - Client FD disconnected, associated client was erased");
 }
 
 const char* Server::AcceptFailureException::what() const throw()
@@ -322,10 +343,15 @@ const char* Server::AcceptFailureException::what() const throw()
 
 const char* Server::FailureToReceiveData::what() const throw()
 {
-	return ("[Error] - The function recv() failed"); //TBD if the client FD is required to debug
+	return ("[Error] - The function recv() failed");
 }
 
 const char* Server::FailureToSendData::what() const throw()
 {
-	return ("[Error] - The function send() failed"); //TBD if the client FD is required to debug
+	return ("[Error] - The function send() failed");
+}
+
+const char* Server::ExcessiveFileSize::what() const throw()
+{
+	return ("[Error] - The file sent is excessively large");
 }

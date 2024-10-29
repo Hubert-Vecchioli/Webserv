@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 17:28:37 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/29 13:48:30 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,11 @@ HttpRequest::HttpRequest(Client *client, unsigned char *request, int requestSize
     std::string str_request((char *) request, requestSize);
 	parseRequestLine(str_request);
     parseRequestHeader(str_request);
+    getCGIExtension();
 	if (this->_method == POST)
-    	parseRequestBody(str_request);
+    {
+        parseRequestBody(str_request);   
+    }
 }
 
 HttpRequest::HttpRequest(HttpRequest const & rhs) {
@@ -99,13 +102,13 @@ void HttpRequest::parseRequestHeader(std::string request) {
 }
 
 void HttpRequest::parseRequestBody(std::string request) {
-    std::cout<< "je suis un autre test"<< std::endl;
-  if (_content_len != 0) {
+    if (_content_len != 0) {
         _content_body = request.substr(request.size() - _content_len);
     }
-	else {
-		_content_body = "";
-	}
+    else {
+        _content_body = "";
+    }
+
 }
 
 void HttpRequest::parseConnection(std::string request) {
@@ -135,11 +138,14 @@ void HttpRequest::getCGIExtension() {
     _CGItype = "";
     if (!_requestURI.empty()) {
         size_t pos = _requestURI.find_last_of('.');
-        if (pos != 0 && pos != _requestURI.size()) {
-            std::string extension = _requestURI.substr(pos + 1);
-            if (extension == "py")
+        size_t npos = _requestURI.find_last_of('?');
+
+        if (pos != 0 && pos != _requestURI.size() && (npos - pos) > 0)
+        {
+            std::string extension = _requestURI.substr(pos, npos - (pos));
+            if (extension == ".py")
                 _CGItype = "python";
-            if (extension == "sh")
+            if (extension == ".sh")
                 _CGItype = "bash";
         }
     }
