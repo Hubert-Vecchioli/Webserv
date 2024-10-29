@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/28 10:11:59 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/29 16:20:11 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@ void HttpResponse::_generateResponseContent(void)
 		ServerError error(505);
 		return _generateErrorResponse(505, error.what());
 	}
-
-	try {
+	try
+	{
 		_fetchServerBlock();
 		_fetchLocationBlock();
 		if (_location_block->getRedirect().first != 0) {
@@ -34,31 +34,20 @@ void HttpResponse::_generateResponseContent(void)
 			_responseContent = cgi.getOutput();
 			return ;
 		}
-	// if(/*_request is CGI*/)
-	// 	// trigger the CGI
-	
-	/*000000000000
-	CgiHandler cgi(this);
-	if (cgi.getStatus() != 200)
-		gen the error response
-	std::string out = cgi.getOutput();
-	*/
-
-	//will need to add the try & catch
-	switch(_request.getMethod())
-	{
-		case GET:
-			this->_fetchGETResource();
-			break;
-		case POST:
-			this->_generatePOSTResponse();
-			break;
-		case DELETE:
-			this->_generateDELResponse();
-			break;
-		default:
-			_generateErrorResponse(405, ClientError(405).what());
-	}
+		switch(_request.getMethod())
+		{
+			case GET:
+				this->_fetchGETResource();
+				break;
+			case POST:
+				this->_generatePOSTResponse();
+				break;
+			case DELETE:
+				this->_generateDELResponse();
+				break;
+			default:
+				_generateErrorResponse(405, ClientError(405).what());
+		}
 	}
 	catch (HttpResponse::ClientError & e) {
 		return _generateErrorResponse(e.getErrorCode(), e.what());
@@ -104,7 +93,6 @@ void	HttpResponse::_fetchLocationBlock(void) {
 		else if (pos == 0 && uri.size() > 1)
 			uri = "/";
 		else {
-			std::cout << "YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" << std::endl;
 			throw ClientError(404);
 		}
 	}
@@ -373,21 +361,21 @@ void HttpResponse::_generatePOSTResponse(void)
 }
 
 std::string HttpResponse::_uploadFile(void) {
-	std::cout<< "je suis une test"<< std::endl;
 	std::string uri = _request.getRequestURI();
-	std::cout<< uri <<std::endl;
 	size_t pos = uri.find('?');
-	if(pos != std::string::npos)
-		throw ClientError(400);
-	uri = uri.substr(pos + 1);
+	size_t pos2 = uri.find('=');
+	if(pos == std::string::npos)
+		throw ClientError(400);	
+	std::string filename = uri.substr(pos2 + 1);
+	uri = uri.substr( 0, pos);
 	if (uri.size() > MAX_URI_SIZE)
 		throw ClientError(414);
 	else if (uri.size() == 0)
 		throw ClientError(400);
-	std::string path = "."+_location_block->getUploadPath() + uri+"/test.png";
-	std::ofstream file(path.c_str());
+	
+	std::string path = "."+_location_block->getUploadPath() + uri+"/" + filename;
+	std::ofstream file;
 	file.open(path.c_str(), std::ofstream::out | std::ofstream::trunc);
-	std::cout<<  _request.getBody() <<std::endl;
 	if (!file.is_open())
 		throw ClientError(403);
 	file << _request.getBody();
@@ -411,7 +399,7 @@ void HttpResponse::_generateErrorResponse(int errorCode, const char *errorMessag
 	if (stat(error_page.c_str(), &stats) == -1)
 		return _generateGenericErrorResponse(errorCode, errorMessage);
 	size_t size = stats.st_size;
-	ss << "Content-Size: " << size << "\r\n";
+	ss << "Content-Length: " << size << "\r\n";
 	ss << "\r\n";
 	
 	std::ifstream file(error_page.c_str());
@@ -572,34 +560,36 @@ void HttpResponse::setResponseStatustoTrue(void)
 //     this->_responseContent += "Transfer-Encoding: chunked\r\n";
 //     this->_responseContent += "\r\n";
 
-//     // int fileFd = open(path.c_str(), O_RDONLY);
-//     // if (fileFd == -1)
-//     // {
-//     //     print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request.getClient()->getFD());
-//     //     struct stat stats;
-//     //     if (stat(path.c_str(), &stats) != 0)
-//     //         throw ClientError(404); 
-//     //     if ((stats.st_mode & S_IFDIR) != 0)
-//     //         throw ClientError(403);
-//     //     else
-//     //         throw ClientError(404);
-//     // }
+//     int fileFd = open(path.c_str(), O_RDONLY);
+//     if (fileFd == -1)
+//     {
+//         print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request.getClient()->getFD());
+//         struct stat stats;
+//         if (stat(path.c_str(), &stats) != 0)
+//             throw ClientError(404); 
+//         if ((stats.st_mode & S_IFDIR) != 0)
+//             throw ClientError(403);
+//         else
+//             throw ClientError(404);
+//     }
 // 	//TODO HV: A tester avec un tres long texte si ça passe
 //     char buffer[RESPONSE_BUFFER];
-//     ssize_t readSize = read(fileFd, buffer, RESPONSE_BUFFER);
+// 	ssize_t readSize;
+// 	while((readSize = read(fileFd, buffer, RESPONSE_BUFFER)) > 0)
+//     {
+//         std::stringstream readSizeHex;
+//         readSizeHex << std::hex << readSize;
+//         this->_responseContent += readSizeHex.str() + "\r\n" + buffer + "\r\n";
+//     }
+	
 //     if (readSize == -1)
 //         throw ClientError(403);
 //     else if (readSize == 0)
 //     {
 //         close(fileFd);
 //         this->_responseContent += "0\r\n\r\n";
-// 		// TODO HV: si timeout, est ce que je leak d'un fd non fermé??
-//         // ajouter que la reponse est done // TODO avoir un bool: response is ready!
+
 //     }
-//     else
-//     {
-//         std::stringstream readSizeHex;
-//         readSizeHex << std::hex << readSize;
-//         this->_responseContent += readSizeHex.str() + "\r\n" + buffer + "\r\n";
-//     }
+
+
 // }
