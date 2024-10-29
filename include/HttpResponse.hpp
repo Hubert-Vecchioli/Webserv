@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 18:30:45 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/29 16:20:00 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,8 @@ class HttpResponse
 		void				_fetchGETResource(void);
 		void				_redirectOutput(void);
 		bool 				_isPathWithinRoot(std::string path);
-		//bool 				_isFileAboveThreshold(std::string &path);
-		//void				_generateChunkedGETResponseContent(std::string path);
+		// bool 			_isFileAboveThreshold(std::string &path);
+		// void				_generateChunkedGETResponseContent(std::string path);
 		void				_generateGETResponseContent(std::string path);
 		std::string				_uploadFile(void);
 

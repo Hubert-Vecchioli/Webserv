@@ -104,12 +104,13 @@ void HttpRequest::parseRequestHeader(std::string request) {
 }
 
 void HttpRequest::parseRequestBody(std::string request) {
-  if (_content_len != 0) {
+    if (_content_len != 0) {
         _content_body = request.substr(request.size() - _content_len);
     }
-	else {
-		_content_body = "";
-	}
+    else {
+        _content_body = "";
+    }
+
 }
 
 void HttpRequest::parseConnection(std::string request) {
@@ -121,19 +122,6 @@ void HttpRequest::parseConnection(std::string request) {
 
 void HttpRequest::parseCookie(std::string request) {
     _cookieString = getValue(request, "Cookie: ");
-    std::cout << "COOKIE DEBUT PARSE COOKIE= " << _cookieString << std::endl;
-    // std::string cookie(_cookieString);
-	// std::vector<std::string> cookies = tokenize(cookie, ';');
-	// 	for (size_t i = 0; i < cookies.size(); i++) {
-	// 		std::vector<std::string> key_value = tokenize(cookies[i], '=');
-	// 		if (key_value.size() == 2)
-	// 			this->_cookie[key_value[0]] = key_value[1];
-	// 		else if (key_value.size() == 1)
-	// 			this->_cookie[key_value[0]] = "";
-	// 		else
-	// 			throw std::runtime_error("Error: invalid cookie");
-	// 	}
-    std::cout << "COOKIE FIN PARSE COOKIE= " << _cookieString << std::endl;
 }
 
 // Helper functions
@@ -143,9 +131,8 @@ void HttpRequest::getCGIExtension() {
     if (!_requestURI.empty()) {
         size_t pos = _requestURI.find_last_of('.');
         size_t pos2 = _requestURI.find_last_of('?');
-        if (pos != std::string::npos && pos != _requestURI.size()) {
+        if (pos != std::string::npos && pos != _requestURI.size() && (npos - pos) > 0) {
             std::string extension = _requestURI.substr(pos, pos2 - (pos));
-            std::cout<< extension<< std::endl;
             if (extension == ".py")
                 _CGItype = "python";
             if (extension == ".sh")

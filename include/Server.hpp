@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 14:26:47 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/29 15:43:39 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,11 @@ class Server
 				virtual const char* what() const throw();
 		};
 		class FailureToSendData : public std::exception
+		{
+			public:
+				virtual const char* what() const throw();
+		};
+		class ExcessiveFileSize : public std::exception
 		{
 			public:
 				virtual const char* what() const throw();
