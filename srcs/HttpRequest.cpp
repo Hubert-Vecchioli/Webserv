@@ -6,7 +6,7 @@
 /*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/28 17:51:24 by jblaye           ###   ########.fr       */
+/*   Updated: 2024/10/29 17:48:55 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ void HttpRequest::getCGIExtension() {
     if (!_requestURI.empty()) {
         size_t pos = _requestURI.find_last_of('.');
         size_t pos2 = _requestURI.find_last_of('?');
-        if (pos != std::string::npos && pos != _requestURI.size() && (npos - pos) > 0) {
+        if (pos != std::string::npos && pos != _requestURI.size() && (pos2 - pos) > 0) {
             std::string extension = _requestURI.substr(pos, pos2 - (pos));
             if (extension == ".py")
                 _CGItype = "python";
