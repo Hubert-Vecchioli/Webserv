@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/29 16:36:19 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/29 16:40:26 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,6 +237,7 @@ void Server::_receiveRequest(int fd)
         }
         rawHTTPRequest[sizeHTTPRequest] = 0;
     }
+	std::cout<< rawHTTPRequest<<std::endl;
     HttpRequest* request = new HttpRequest(clientSendingARequest, rawHTTPRequest, sizeHTTPRequest);
     HttpResponse* response = new HttpResponse(*this, *request);
     request->setResponse(response);
