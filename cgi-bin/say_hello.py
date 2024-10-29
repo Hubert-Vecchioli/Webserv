@@ -28,7 +28,7 @@ form_html = f"""
 					<li><a href="/contact.html">Contact</a></li>
 					<li><a href="/destroyer.html">Destroyer</a></li>
 					<li><a href="/set_color.html">Set Color</a></li>
-					<li class="active"><a href="/cgi-bin/say_hello.py">Set Name</a></li>
+					<li class="active"><a href="/cgi-bin/say_hello.py">Say Hello</a></li>
 				</ul>
 			</nav>
 		</header>
@@ -60,7 +60,7 @@ say_hello_html = f"""
 						<li><a href="/contact.html">Contact</a></li>
 						<li><a href="/destroyer.html">Destroyer</a></li>
 						<li><a href="/set_color.html">Set Color</a></li>
-						<li class="active"><a href="/cgi-bin/say_hello.py">Set Name</a></li>
+						<li class="active"><a href="/cgi-bin/say_hello.py">Say Hello</a></li>
 					</ul>
 				</nav>
 			</header>
