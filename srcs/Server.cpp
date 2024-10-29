@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/29 16:32:07 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/29 16:36:19 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,7 +169,7 @@ void Server::_sendRequest(int fd)
 	Client::findInstanceWithFD(this->_clients, fd)->updateLastActionTimeStamp();
 	print(1, "[Info] - Sending response to Client FD : ", fd);
 	HttpResponse *response = HttpRequest::findInstanceWithFD(this->_requests, fd)->getResponse();
-	std::cout<< response->getResponseContent()<<std::endl; // TODO REMOVE THIS DEBUG
+	//std::cout<< response->getResponseContent()<<std::endl; // TODO REMOVE THIS DEBUG
 	int sizeHTTPResponseSent = send(fd, response->getResponseContent().c_str(), response->getResponseContent().size(), 0);// For info, send is equivalent to write as I am not using any flag
 	if(sizeHTTPResponseSent == 0 && response->getResponseContent().size() > 0)
 		this->_disconnectClient(fd);
