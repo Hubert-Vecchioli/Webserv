@@ -14,18 +14,14 @@
 					<li><a href="about.html">About</a></li>
 					<li><a href="contact.html">Contact</a></li>
 					<li><a href="destroyer.html">Destroyer</a></li>
-					<li class="active"><a href="say_hello.html">Say Hello</a></li>
+					<li class="active"><a href="set_color.html">Set Color</a></li>
+					<li><a href="../cgi-bin/say_hello.py">Say Hello</a></li>
 				</ul>
 			</nav>
 		</header>
 		<main>
-			<h1>Hello... But what's your name?</h1>
-			<form class="styled-form" method="get" action="../cgi-bin/say_hello.py">
-				<input type="text" name="name" placeholder="name" autofocus>
-				<button type="submit">Submit</button>
-			</form>
 			<!-- Test Hubert -->
-			<h2>How about changing the color ?</h2>
+			<h1>How about changing the color ?</h1>
 				<form action="../cgi-bin/my_color.sh" method="post">
 					<label for="color">Choose a color:</label>
 					<select id="color" name="color">

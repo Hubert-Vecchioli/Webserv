@@ -13,7 +13,6 @@ CgiHandler::CgiHandler(HttpResponse const &response) {
 	_env["PATH_INFO"] = pathinfo;
 	_env["PATH_TRANSLATED"] = response.getLocationBlock().getRoot() + pathinfo;
 	_env["QUERY_STRING"] = response.getRequest().getQueryString();
-
 	_env["REMOTE_ADDR"] = ""; //client IP :: TODO
 	_env["REQUEST_METHOD"] = response.getRequest().getStringMethod();
 	_env["SCRIPT_NAME"] = uri.substr(uri.find('/') + 1);;//.substr(uri.find_last_of('/') + 1);
@@ -21,6 +20,7 @@ CgiHandler::CgiHandler(HttpResponse const &response) {
 	_env["SERVER_PORT"] = ft_toString(response.getServerBlock().getIPandPort().second);
 	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	_env["SERVER_SOFTWARE"] = "webserv";
+	_env["HTTP_COOKIE"] = response.getRequest().getCookieString();
 	//_env["REMOTE_HOST"] = nullptr; // client domain name if available
 	//_env["REMOTE_IDENT"] = nullptr; // not implemented
 	//_env["REMOTE_USER"] = ""; // linked to auth type - not implemented
