@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/29 15:46:21 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/29 16:20:11 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -560,34 +560,36 @@ void HttpResponse::setResponseStatustoTrue(void)
 //     this->_responseContent += "Transfer-Encoding: chunked\r\n";
 //     this->_responseContent += "\r\n";
 
-//     // int fileFd = open(path.c_str(), O_RDONLY);
-//     // if (fileFd == -1)
-//     // {
-//     //     print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request.getClient()->getFD());
-//     //     struct stat stats;
-//     //     if (stat(path.c_str(), &stats) != 0)
-//     //         throw ClientError(404); 
-//     //     if ((stats.st_mode & S_IFDIR) != 0)
-//     //         throw ClientError(403);
-//     //     else
-//     //         throw ClientError(404);
-//     // }
+//     int fileFd = open(path.c_str(), O_RDONLY);
+//     if (fileFd == -1)
+//     {
+//         print(2, "[Error] - Failure to open the requested file from Client FD : ", this->_request.getClient()->getFD());
+//         struct stat stats;
+//         if (stat(path.c_str(), &stats) != 0)
+//             throw ClientError(404); 
+//         if ((stats.st_mode & S_IFDIR) != 0)
+//             throw ClientError(403);
+//         else
+//             throw ClientError(404);
+//     }
 // 	//TODO HV: A tester avec un tres long texte si ça passe
 //     char buffer[RESPONSE_BUFFER];
-//     ssize_t readSize = read(fileFd, buffer, RESPONSE_BUFFER);
+// 	ssize_t readSize;
+// 	while((readSize = read(fileFd, buffer, RESPONSE_BUFFER)) > 0)
+//     {
+//         std::stringstream readSizeHex;
+//         readSizeHex << std::hex << readSize;
+//         this->_responseContent += readSizeHex.str() + "\r\n" + buffer + "\r\n";
+//     }
+	
 //     if (readSize == -1)
 //         throw ClientError(403);
 //     else if (readSize == 0)
 //     {
 //         close(fileFd);
 //         this->_responseContent += "0\r\n\r\n";
-// 		// TODO HV: si timeout, est ce que je leak d'un fd non fermé??
-//         // ajouter que la reponse est done // TODO avoir un bool: response is ready!
+
 //     }
-//     else
-//     {
-//         std::stringstream readSizeHex;
-//         readSizeHex << std::hex << readSize;
-//         this->_responseContent += readSizeHex.str() + "\r\n" + buffer + "\r\n";
-//     }
+
+
 // }

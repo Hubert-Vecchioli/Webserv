@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/29 15:46:35 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/29 16:32:07 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,7 +169,7 @@ void Server::_sendRequest(int fd)
 	Client::findInstanceWithFD(this->_clients, fd)->updateLastActionTimeStamp();
 	print(1, "[Info] - Sending response to Client FD : ", fd);
 	HttpResponse *response = HttpRequest::findInstanceWithFD(this->_requests, fd)->getResponse();
-	//std::cout<< response->getResponseContent()<<std::endl; // TODO REMOVE THIS DEBUG
+	std::cout<< response->getResponseContent()<<std::endl; // TODO REMOVE THIS DEBUG
 	int sizeHTTPResponseSent = send(fd, response->getResponseContent().c_str(), response->getResponseContent().size(), 0);// For info, send is equivalent to write as I am not using any flag
 	if(sizeHTTPResponseSent == 0 && response->getResponseContent().size() > 0)
 		this->_disconnectClient(fd);
@@ -187,7 +187,7 @@ void Server::_receiveRequest(int fd)
     clientSendingARequest->updateLastActionTimeStamp();
     print(1, "[Info] - Receiving request from Client FD : ", fd);
 
-    unsigned char* rawHTTPRequest = new unsigned char[MAX_REQUEST_SIZE * 2 + 1]; 
+    unsigned char* rawHTTPRequest = new unsigned char[MAX_REQUEST_SIZE * 3 + 1]; 
     int sizeHTTPRequest = recv(fd, rawHTTPRequest, MAX_REQUEST_SIZE, 0);
     if (sizeHTTPRequest == 0)
 	{
@@ -210,7 +210,7 @@ void Server::_receiveRequest(int fd)
 
     if (contentLengthPos != std::string::npos) {
         contentLength = atoi(header.substr(contentLengthPos + 16).c_str());
-		if(contentLength > 61651456)
+		if(contentLength > 616514560)
 		{
 			delete[] rawHTTPRequest;
 			this->_disconnectClient(fd);
@@ -230,13 +230,10 @@ void Server::_receiveRequest(int fd)
                 return;
             }
             sizeHTTPRequest += bytesReceived;
-            if (sizeHTTPRequest >= MAX_REQUEST_SIZE)
-            {
-                tempBuffer = new unsigned char[sizeHTTPRequest + 2*MAX_REQUEST_SIZE + 1]; // Redimensionner
-                std::copy(rawHTTPRequest, rawHTTPRequest + sizeHTTPRequest, tempBuffer);
-                delete[] rawHTTPRequest; 
-                rawHTTPRequest = tempBuffer;
-            }
+            tempBuffer = new unsigned char[sizeHTTPRequest + 2*MAX_REQUEST_SIZE + 1]; // Redimensionner
+			std::copy(rawHTTPRequest, rawHTTPRequest + sizeHTTPRequest, tempBuffer);
+			delete[] rawHTTPRequest; 
+			rawHTTPRequest = tempBuffer;
         }
         rawHTTPRequest[sizeHTTPRequest] = 0;
     }
@@ -335,7 +332,7 @@ const char* Server::FailureEpollWaitException::what() const throw()
 
 const char* Server::DisconnectedClientFDException::what() const throw()
 {
-	return ("[Error] - Client FD disconnected, associated client was erased");
+	return ("[Info] - Client FD disconnected, associated client was erased");
 }
 
 const char* Server::AcceptFailureException::what() const throw()
