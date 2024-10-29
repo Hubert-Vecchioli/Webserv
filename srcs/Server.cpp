@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/28 17:19:47 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/29 15:46:35 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,33 +41,6 @@ void Server::cleanup(void)
 
 Server::~Server()
 {
-	// std::cout<<"am I delete"<<std::endl;
-
-	// if (this->_serverFD != -1)
-	// 	close(_serverFD);
-	// for (std::vector<Socket*>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); ++it)
-	// {
-	// 	close((*it)->getFD());
-	// 	std::cout<<"am I delete"<<std::endl;
-	// 	delete (*it);
-	// 	//this->_sockets.erase(it);
-	// }
-	// this->_sockets.clear();
-	// for(std::vector<HttpRequest*>::iterator it = this->_requests.begin(); it != this->_requests.end(); ++it)
-	// {
-	// 	delete (*it)->getResponse();
-	// 	delete *it;
-	// 	//this->_requests.erase(it);
-	// }
-	// this->_requests.clear();
-	// for (std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
-	// {
-	// 	close((*it)->getFD());
-	// 	delete (*it);
-	// 	//this->_clients.erase(it);
-	// }
-	// this->_clients.clear();
-	// delete _uniqueInstance;
 }
 
 void Server::startServer(ConfigurationFile * configurationFile)
@@ -196,11 +169,8 @@ void Server::_sendRequest(int fd)
 	Client::findInstanceWithFD(this->_clients, fd)->updateLastActionTimeStamp();
 	print(1, "[Info] - Sending response to Client FD : ", fd);
 	HttpResponse *response = HttpRequest::findInstanceWithFD(this->_requests, fd)->getResponse();
-    std::cout<< "A"<< std::endl;
-	std::cout<< response->getResponseContent()<<std::endl; // TODO REMOVE THIS DEBUG
-    std::cout<< "B"<< std::endl;
+	//std::cout<< response->getResponseContent()<<std::endl; // TODO REMOVE THIS DEBUG
 	int sizeHTTPResponseSent = send(fd, response->getResponseContent().c_str(), response->getResponseContent().size(), 0);// For info, send is equivalent to write as I am not using any flag
-    std::cout<< "C"<< std::endl;
 	if(sizeHTTPResponseSent == 0 && response->getResponseContent().size() > 0)
 		this->_disconnectClient(fd);
 	if(sizeHTTPResponseSent < 0)
@@ -212,62 +182,74 @@ void Server::_sendRequest(int fd)
 
 void Server::_receiveRequest(int fd)
 {
-	// Empêcher les requêtes simultanées d'un même fd
-	Client* clientSendingARequest = Client::findInstanceWithFD(this->_clients, fd);
-	clientSendingARequest->updateLastActionTimeStamp();
-	print(1, "[Info] - Receiving request from Client FD : ", fd);
+// Empêcher les requêtes simultanées d'un même fd
+    Client* clientSendingARequest = Client::findInstanceWithFD(this->_clients, fd);
+    clientSendingARequest->updateLastActionTimeStamp();
+    print(1, "[Info] - Receiving request from Client FD : ", fd);
 
-	// Réception initiale de l'en-tête HTTP
-	unsigned char rawHTTPRequest[MAX_REQUEST_SIZE + 1];
-	int sizeHTTPRequest = recv(fd, rawHTTPRequest, MAX_REQUEST_SIZE, 0);
+    unsigned char* rawHTTPRequest = new unsigned char[MAX_REQUEST_SIZE * 2 + 1]; 
+    int sizeHTTPRequest = recv(fd, rawHTTPRequest, MAX_REQUEST_SIZE, 0);
+    if (sizeHTTPRequest == 0)
+	{
+        this->_disconnectClient(fd);
+        delete[] rawHTTPRequest;
+        return;
+    }
+    if (sizeHTTPRequest < 0)
+    {
+        delete[] rawHTTPRequest;
+        throw FailureToReceiveData();
+    }
+    
+    rawHTTPRequest[sizeHTTPRequest] = 0;
+    std::string header(reinterpret_cast<char*>(rawHTTPRequest));
+    std::size_t contentTypePos = header.find("Content-Type: application/octet-stream");
+    std::size_t contentLengthPos = header.find("Content-Length: ");
+    int contentLength = 0;
+    bool isOctetStream = (contentTypePos != std::string::npos);
 
-	if (sizeHTTPRequest == 0) {
-		this->_disconnectClient(fd);
-		return;
-	}
-	if (sizeHTTPRequest < 0)
-		throw FailureToReceiveData();
-
-	rawHTTPRequest[sizeHTTPRequest] = 0;
-	std::cout << "Raw request: " << rawHTTPRequest << std::endl;
-
-	// Analyse de l'en-tête pour détecter le Content-Type et Content-Length
-	std::string header(reinterpret_cast<char*>(rawHTTPRequest));
-	std::size_t contentTypePos = header.find("Content-Type: application/octet-stream");
-	std::size_t contentLengthPos = header.find("Content-Length: ");
-	int contentLength = 0;
-	bool isOctetStream = (contentTypePos != std::string::npos);
-
-	if (contentLengthPos != std::string::npos) {
-		contentLength = atoi(header.substr(contentLengthPos + 16).c_str());
-	}
-
-	// Lecture du corps de la requête si c'est un octet-stream
-	if (isOctetStream && contentLength > 0) {
-		int totalReceived = sizeHTTPRequest;
-		while (totalReceived < contentLength) {
-			int remaining = contentLength - totalReceived;
-			int bytesReceived = recv(fd, rawHTTPRequest + totalReceived, remaining, 0);
-
-			if (bytesReceived <= 0) {
-				this->_disconnectClient(fd);
-				return;
-			}
-			totalReceived += bytesReceived;
+    if (contentLengthPos != std::string::npos) {
+        contentLength = atoi(header.substr(contentLengthPos + 16).c_str());
+		if(contentLength > 61651456)
+		{
+			delete[] rawHTTPRequest;
+			this->_disconnectClient(fd);
+        	throw ExcessiveFileSize();
 		}
-		rawHTTPRequest[totalReceived] = 0;
-		std::cout << "Full raw octet-stream request: " << rawHTTPRequest << std::endl;
-	}
-
-	// Création de l'objet requête et réponse
-	HttpRequest *request = new HttpRequest(clientSendingARequest, rawHTTPRequest, sizeHTTPRequest);
-	std::cout << "je fonctionne " << std::endl;
-
-	HttpResponse *response = new HttpResponse(*this, *request);
-	request->setResponse(response);
-	this->_requests.push_back(request);
-	print(1, "[Info] - Request successfully received from Client FD : ", fd);
-	modifyEpollCTL(this->_serverFD, fd, EPOLL_CTL_MOD, true);
+    }
+    if (isOctetStream && contentLength > 0)
+    {
+        unsigned char* tempBuffer = NULL;
+        while (sizeHTTPRequest < contentLength)
+        {
+            int bytesReceived = recv(fd, rawHTTPRequest + sizeHTTPRequest, MAX_REQUEST_SIZE, 0);
+            if (bytesReceived <= 0)
+            {
+                this->_disconnectClient(fd);
+                delete[] rawHTTPRequest;
+                return;
+            }
+            sizeHTTPRequest += bytesReceived;
+            if (sizeHTTPRequest >= MAX_REQUEST_SIZE)
+            {
+                tempBuffer = new unsigned char[sizeHTTPRequest + 2*MAX_REQUEST_SIZE + 1]; // Redimensionner
+                std::copy(rawHTTPRequest, rawHTTPRequest + sizeHTTPRequest, tempBuffer);
+                delete[] rawHTTPRequest; 
+                rawHTTPRequest = tempBuffer;
+            }
+        }
+        rawHTTPRequest[sizeHTTPRequest] = 0;
+    }
+    HttpRequest* request = new HttpRequest(clientSendingARequest, rawHTTPRequest, sizeHTTPRequest);
+    HttpResponse* response = new HttpResponse(*this, *request);
+    request->setResponse(response);
+    this->_requests.push_back(request);
+    
+    print(1, "[Info] - Request successfully received from Client FD : ", fd);
+    modifyEpollCTL(this->_serverFD, fd, EPOLL_CTL_MOD, true);
+    
+    // Libération de la mémoire allouée pour rawHTTPRequest
+    delete[] rawHTTPRequest;
 }
 
 void Server::_addNewClient(int listenedFD)
@@ -363,10 +345,15 @@ const char* Server::AcceptFailureException::what() const throw()
 
 const char* Server::FailureToReceiveData::what() const throw()
 {
-	return ("[Error] - The function recv() failed"); //TBD if the client FD is required to debug
+	return ("[Error] - The function recv() failed");
 }
 
 const char* Server::FailureToSendData::what() const throw()
 {
-	return ("[Error] - The function send() failed"); //TBD if the client FD is required to debug
+	return ("[Error] - The function send() failed");
+}
+
+const char* Server::ExcessiveFileSize::what() const throw()
+{
+	return ("[Error] - The file sent is excessively large");
 }

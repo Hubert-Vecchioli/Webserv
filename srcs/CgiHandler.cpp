@@ -4,7 +4,6 @@ pid_t pid = -1;
 
 CgiHandler::CgiHandler(HttpResponse const &response) {
 	std::string uri = response.getRequest().getRequestURI();
-	std::cout<<"uri: "<< uri << std::endl;
 
 	std::string pathinfo = uri.substr(uri.find('.', 8));
 	pathinfo = pathinfo.substr(0, pathinfo.find_last_of('/') + 1);
@@ -14,7 +13,6 @@ CgiHandler::CgiHandler(HttpResponse const &response) {
 	_env["PATH_INFO"] = pathinfo;
 	_env["PATH_TRANSLATED"] = response.getLocationBlock().getRoot() + pathinfo;
 	_env["QUERY_STRING"] = response.getRequest().getQueryString();
-		std::cout<<"QUERY_STRING: "<< response.getRequest().getQueryString() << std::endl;
 
 	_env["REMOTE_ADDR"] = ""; //client IP :: TODO
 	_env["REQUEST_METHOD"] = response.getRequest().getStringMethod();
@@ -52,24 +50,15 @@ void CgiHandler::executeCgi(HttpResponse const &response) {
     size_t query_pos = cgi_fullpath.find_last_of('?');
 	if (query_pos != std::string::npos)
     	cgi_fullpath = cgi_fullpath.substr(0, query_pos);
-	std::cout<<"cgi_fullpath: "<< cgi_fullpath << std::endl;
 	std::string cgi_ext = cgi_fullpath.substr(cgi_fullpath.find_last_of('.'), cgi_fullpath.find_last_of('?') - (cgi_fullpath.find_last_of('.')));
-	std::cout<<"cgi_ext: "<< cgi_ext << std::endl;
 	std::string exec_cgi = response.getLocationBlock().getCgiExtension()[cgi_ext];
 	std::map<std::string, std::string> cgiExtension = response.getLocationBlock().getCgiExtension();
-	for(std::map<std::string, std::string>::iterator it = cgiExtension.begin(); it != cgiExtension.end();++it)
-	{
-		std::cout<<"cgi ext map: "<< it->first << ": " << it->second << std::endl;
-	}
-	std::cout<<"Location block address : "<< &response.getLocationBlock() << std::endl;
 	if (exec_cgi.empty()) {
-		std::cout<<"cgi is empty! " << std::endl;
 		_status = 501;
 		throw std::runtime_error("Unrecognized CGI extension");
 		return;
 	}
 	int fd[2];
-	std::cout<<"pipe is about to start " << std::endl;
 	if (pipe(fd) == -1) {
 		_status = 500;
 		throw std::runtime_error("Pipe failed");
@@ -81,7 +70,6 @@ void CgiHandler::executeCgi(HttpResponse const &response) {
 	}
 	char **argv = convertArgs(cgi_fullpath, exec_cgi);
 	char **envp = convertEnv();
-	std::cout<<"fork is about to start " << std::endl;
 	pid = fork();
 	if (pid < 0) {
 		_status = 500;
@@ -100,7 +88,6 @@ void CgiHandler::executeCgi(HttpResponse const &response) {
 			delete[] argv;
 			throw e;
 		}
-	std::cout<<"Done " << std::endl;
 	_status = 200;
 	delete[] envp;
 	delete[] argv;
@@ -118,7 +105,6 @@ char **CgiHandler::convertEnv() {
 	for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++) {
 		std::string keyvalue = it->first + "=" + it->second;
 		env[i] = strdup(keyvalue.c_str());
-		std::cout<<" env [" << i << "]"<< env[i] << std::endl;
 		i++;
 	}
 	env[i] = NULL;

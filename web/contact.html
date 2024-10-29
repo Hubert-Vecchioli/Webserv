@@ -37,8 +37,11 @@
 					return;
 				}
 
+				const fileName = encodeURIComponent(file.name);  // Encode to safely include in URL
+        		const url = `/upload?filename=${fileName}`;  // Add the filename as a query parameter
+
 				try {
-					const response = await fetch('/upload', {
+					const response = await fetch(url, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/octet-stream'

@@ -131,8 +131,6 @@ void LocationBlock::parseCgiExtension(std::vector<std::string> &args) {
 	std::string key = args[0];
 	std::string value = args[1].substr(0, args[1].size() - 1);
 	this->cgi_extension[key] = value;
-	std::cout<< "CGI PARSE key : " << key<< std::endl;
-	std::cout<< "CGI PARSE value : " << value<< std::endl;
 }
 
 void LocationBlock::parseUploadPath(std::vector<std::string> &args) {
