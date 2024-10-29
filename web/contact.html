@@ -22,10 +22,44 @@
 		<main>
 			<h1>Send us a picture of a banana.</h1>
 			<p>(pineapples tolerated)</p>
-			<form class="styled-form" method="post" action="/upload" enctype="multipart/form-data">
-				<input type="file" name="file" placeholder="Choose de file" required>
-				<input type="submit" value="Upload">
+			<form id="uploadForm" class="styled-form">
+				<input id="fileInput" type="file" name="file" placeholder="Choose the file" required>
+				<button type="button" onclick="uploadFile()">Upload</button>
 			</form>
 		</main>
+
+		<script>
+			async function uploadFile() {
+				const fileInput = document.getElementById('fileInput');
+				const file = fileInput.files[0];
+
+				if (!file) {
+					alert('Please choose a file first.');
+					return;
+				}
+
+				const fileName = encodeURIComponent(file.name);  // Encode to safely include in URL
+        		const url = `/upload?filename=${fileName}`;  // Add the filename as a query parameter
+
+				try {
+					const response = await fetch(url, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/octet-stream'
+						},
+						body: file
+					});
+
+					if (response.ok) {
+						alert('File uploaded successfully');
+					} else {
+						alert('Upload failed');
+					}
+				} catch (error) {
+					console.error('Error uploading file:', error);
+					alert('An error occurred during the upload');
+				}
+			}
+		</script>
 	</body>
 </html>
