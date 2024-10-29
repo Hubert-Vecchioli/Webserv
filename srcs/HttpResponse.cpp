@@ -6,7 +6,7 @@
 /*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/28 14:46:22 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/29 15:46:21 by hvecchio         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,42 +16,24 @@ void HttpResponse::_generateResponseContent(void)
 {
 	//Check redirect and prepare the response
 	// TODO: add a pointer to HTTPrequest
-	std::cout<< "A1"<< std::endl;
 	if (_request.getHTTP() == false) {
 		ServerError error(505);
 		return _generateErrorResponse(505, error.what());
 	}
-	std::cout<< "A2"<< std::endl;
 	try
 	{
-		std::cout<< "A3"<< std::endl;
 		_fetchServerBlock();
-		std::cout<< "A4"<< std::endl;
 		_fetchLocationBlock();
 		if (_location_block->getRedirect().first != 0) {
 			_redirectOutput();
 			return ;
 		}
-		std::cout<< "A5"<< std::endl;
 		_checkAllowedMethod();
-		std::cout<< "A6"<< std::endl;
 		if (!_request.getCGIType().empty()) {
 			CgiHandler cgi(*this);
 			_responseContent = cgi.getOutput();
 			return ;
 		}
-	// if(/*_request is CGI*/)
-	// 	// trigger the CGI
-	
-	/*000000000000
-	CgiHandler cgi(this);
-	if (cgi.getStatus() != 200)
-		gen the error response
-	std::string out = cgi.getOutput();
-	*/
-
-	//will need to add the try & catch
-		std::cout<< "A7"<< std::endl;
 		switch(_request.getMethod())
 		{
 			case GET:
@@ -111,7 +93,6 @@ void	HttpResponse::_fetchLocationBlock(void) {
 		else if (pos == 0 && uri.size() > 1)
 			uri = "/";
 		else {
-			std::cout << "YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" << std::endl;
 			throw ClientError(404);
 		}
 	}
@@ -352,7 +333,6 @@ void HttpResponse::_generateDELResponse(void)
 //Assuming POST is only to upload files
 void HttpResponse::_generatePOSTResponse(void)
 {
-	std::cout<< "A8"<< std::endl;
 	std::string path = _uploadFile();
 	std::ostringstream oss;
 	oss << _request.getBody().size();
@@ -381,21 +361,21 @@ void HttpResponse::_generatePOSTResponse(void)
 }
 
 std::string HttpResponse::_uploadFile(void) {
-	std::cout<< "je suis une test"<< std::endl;
 	std::string uri = _request.getRequestURI();
-	std::cout<< uri <<std::endl;
 	size_t pos = uri.find('?');
-	if(pos != std::string::npos)
-		throw ClientError(400);
-	uri = uri.substr(pos + 1);
+	size_t pos2 = uri.find('=');
+	if(pos == std::string::npos)
+		throw ClientError(400);	
+	std::string filename = uri.substr(pos2 + 1);
+	uri = uri.substr( 0, pos);
 	if (uri.size() > MAX_URI_SIZE)
 		throw ClientError(414);
 	else if (uri.size() == 0)
 		throw ClientError(400);
-	std::string path = "."+_location_block->getUploadPath() + uri+"/test.png";
-	std::ofstream file(path.c_str());
+	
+	std::string path = "."+_location_block->getUploadPath() + uri+"/" + filename;
+	std::ofstream file;
 	file.open(path.c_str(), std::ofstream::out | std::ofstream::trunc);
-	std::cout<<  _request.getBody() <<std::endl;
 	if (!file.is_open())
 		throw ClientError(403);
 	file << _request.getBody();
