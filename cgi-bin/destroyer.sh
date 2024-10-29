@@ -6,17 +6,17 @@ filepath=""
 
 case "$selected_file" in
   "fileok1")
-    filepath="../destroy/fileok1.txt"
+    filepath="http://127.0.0.1:8088/destroy/fileok1.txt"
     ;;
   "fileok2")
-    filepath="../destroy/fileok2.txt"
+    filepath="http://127.0.0.1:8088/destroy/fileok2.txt"
     ;;
   "filenok1")
-    filepath="../destroy/filenok1.txt"
+    filepath="http://127.0.0.1:8088/destroy/filenok1.txt"
     ;;
   "filenok2")
-    filepath="../destroy/filenok2.txt"
+    filepath="http://127.0.0.1:8088/destroy/filenok2.txt"
     ;;
 esac
 
-curl -X DELETE filepath
+curl -X DELETE "$filepath"
