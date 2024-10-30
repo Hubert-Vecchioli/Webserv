@@ -14,8 +14,8 @@ server {
     index index.html;
     cgi_extension .py /usr/bin/python3;
     cgi_extension .sh /usr/bin/bash;
-    dirlisting off;
-    methods GET POST;
+    dirlisting on;
+    methods GET POST DELETE;
     }
 
     location /farfadet {

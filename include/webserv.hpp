@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   webserv.hpp                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/27 17:43:06 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/29 15:26:49 by hvecchio         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #ifndef WEBSERV_HPP
 # define WEBSERV_HPP
@@ -54,16 +43,17 @@
 #define EPOLL_MAX_WAIT_TIME_MS 1000 // to be modified later on
 #define CLIENT_TIMEOUT_LIMIT_SEC 120
 #define REQUEST_TIMEOUT_LIMIT_SEC 20
-#define MAX_REQUEST_SIZE 500000
+#define MAX_REQUEST_SIZE 50000
 #define	MAX_URI_SIZE 65536
 #define	FILE_CHUNK_THRESHOLD 163840 // randomly chose 5120 * 2^5
 #define RESPONSE_BUFFER 20480 // randomly chose 5120 * 2^2
+#define MAX_CLIENT_NUMBER 250
 
 void	displayTimestamp(void);
 std::string	displayTimestampResponseFormat(void);
 void	print(int i, std::string message, int fd = -2);
 std::vector<std::string> tokenize(std::string s, char delimiter);
 void	modifyEpollCTL(int EpollFD, int listendFD, int epollAction, bool isReadyToSendResponse = false);
-void ft_stop_server(int signum);
+void 	ft_stop_server(int signum);
 
 #endif
