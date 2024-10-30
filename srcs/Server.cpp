@@ -1,4 +1,3 @@
-
 #include "webserv.hpp"
 
 Server* Server::_uniqueInstance = 0;

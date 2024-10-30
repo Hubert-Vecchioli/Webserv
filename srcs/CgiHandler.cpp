@@ -10,13 +10,12 @@ CgiHandler::CgiHandler(HttpResponse const &response) {
 	_env["CONTENT_LENGTH"] = ft_toString(response.getRequest().getContentLength());
 	_env["CONTENT_TYPE"] = response.getRequest().getContentType();
 	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-	_env["PATH_INFO"] = pathinfo;
-	_env["PATH_TRANSLATED"] = response.getLocationBlock().getRoot() + pathinfo;
+	_env["PATH_INFO"] = uri; //pathinfo;
+	_env["PATH_TRANSLATED"] = response.getLocationBlock().getRoot() + uri;
 	_env["QUERY_STRING"] = response.getRequest().getQueryString();
-	_env["REMOTE_ADDR"] = ""; //client IP :: TODO
 	_env["REQUEST_METHOD"] = response.getRequest().getStringMethod();
 	_env["SCRIPT_NAME"] = uri.substr(uri.find('/') + 1);;//.substr(uri.find_last_of('/') + 1);
-	_env["SERVER_NAME"] = uri.substr(8, uri.find('.', 8) - 8);
+	_env["SERVER_NAME"] = response.getServerBlock().getServerName()[0];
 	_env["SERVER_PORT"] = ft_toString(response.getServerBlock().getIPandPort().second);
 	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	_env["SERVER_SOFTWARE"] = "webserv";
@@ -25,6 +24,7 @@ CgiHandler::CgiHandler(HttpResponse const &response) {
 	//_env["REMOTE_IDENT"] = nullptr; // not implemented
 	//_env["REMOTE_USER"] = ""; // linked to auth type - not implemented
 	//_env["AUTH_TYPE"] = ""; // not implemented
+	//_env["REMOTE_ADDR"] = ""; //client IP // not implemented
 	executeCgi(response);
 }
 

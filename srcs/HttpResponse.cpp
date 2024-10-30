@@ -1,4 +1,3 @@
-
 #include "webserv.hpp"
 
 void HttpResponse::_generateResponseContent(void)
@@ -258,7 +257,7 @@ void HttpResponse::_generateDirlistingResponse(std::string path)
 	}
 	closedir(dp);
 
-	std::string responseBody = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Directory listing</title><style>body {font-family: 'Arial', sans-serif;background: linear-gradient(90deg, #8360c3, #faae5a);color: #fff;margin: 0;padding: 0;}h1 {text-align: center;color: #5d5fef;margin-top: 50px;}.container {max-width: 800px;margin: 20px auto;padding: 20px;box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);border-radius: 8px;}ul {list-style-type: none;padding: 0;}ul li {padding: 10px;border-bottom: 1px solid #ddd;}ul li a {text-decoration: none;color: #fff;}ul li:hover {background-color: #f0f0f5;}footer {text-align: center;margin-top: 20px;padding: 10px 0;background-color: #5d5fef;color: white;}</style></head><body><h1>Liste des fichiers</h1><div class=\"container\"><ul>";
+	std::string responseBody = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Directory listing</title><style>body {font-family: 'Arial', sans-serif;background: linear-gradient(90deg, #8360c3, #faae5a);color: #fff;margin: 0;padding: 0;}h1 {text-align: center;color: #55228f;margin-top: 50px;}.container {max-width: 800px;margin: 20px auto;padding: 20px;box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);border-radius: 8px;}ul {list-style-type: none;padding: 0;}ul li {padding: 10px;border-bottom: 1px solid #ddd;}ul li a {text-decoration: none;color: #fff;}ul li:hover {background-color: #f0f0f5;}</style></head><body><h1>Liste des fichiers</h1><div class=\"container\"><ul>";
 	for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); ++it)
 	{
 		responseBody += "<li><a href=\"";
@@ -267,7 +266,7 @@ void HttpResponse::_generateDirlistingResponse(std::string path)
 		responseBody += *it;
 		responseBody += "</a></li>";
 	}
-	responseBody +="</ul></div><footer><p>Brought to you by JB, EB & HV</p></footer></body></html>";
+	responseBody +="</ul></div></body></html>";
 	
 	std::ostringstream oss2;
 	oss2 << responseBody.size();
