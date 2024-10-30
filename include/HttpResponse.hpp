@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:56:00 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/29 16:20:00 by hvecchio         ###   ########.fr       */
+/*   Updated: 2024/10/30 13:48:35 by jblaye           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ class HttpResponse
 		std::string				_uploadFile(void);
 
 	public:
-		HttpResponse(Server &server, HttpRequest &request) : _server(server), _request(request),_isResponseSent(false), _lastActionTimeStamp(std::time(0))  {_generateMimeMap();};
+		HttpResponse(Server &server, HttpRequest &request) : _server(server), _request(request),_isResponseSent(false), _lastActionTimeStamp(std::time(0))  {_generateMimeMap();_server_block = 0;_location_block = 0;};
 		HttpResponse(HttpResponse const & rhs) : _server(rhs._server), _request(rhs._request) {if (this != &rhs) *this = rhs;};
 		HttpResponse &operator=(HttpResponse const & rhs);
 		~HttpResponse(void) {};
