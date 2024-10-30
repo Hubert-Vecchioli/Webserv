@@ -6,13 +6,21 @@ void HttpResponse::_generateResponseContent(void)
 	//Check redirect and prepare the response
 	// TODO: add a pointer to HTTPrequest
 
-	if (_request.getHTTP() == false) {
-		ServerError error(505);
-		return _generateErrorResponse(505, error.what());
-	}
+
 
 	try
 	{
+		if (_request.getRequestURI() == "413")
+		{
+			_server_block = NULL;
+			ClientError error(413);
+			return _generateErrorResponse(413, error.what());
+		}
+		if (_request.getHTTP() == false)
+		{
+			ServerError error(505);
+			return _generateErrorResponse(505, error.what());
+		}
 		_fetchServerBlock();
 		_fetchLocationBlock();
 		if (_location_block->getRedirect().first != 0) {
@@ -304,7 +312,6 @@ bool HttpResponse::_checkAcceptedFormat(std::string path) {
 
 void HttpResponse::_generateDELResponse(void)
 {
-	std::cout<<"i am here!!!!"<<std::endl;
 	std::string uri_no_query = _request.getRequestURI();
 	
 	size_t pos = uri_no_query.find('?');
@@ -401,7 +408,7 @@ void HttpResponse::_generateErrorResponse(int errorCode, const char *errorMessag
 	while (getline(file, line))
 		ss << line << "\r\n";
 	file.close();
-	_responseContent = ss.str();		
+	this->_responseContent = ss.str();		
 }
 
 void HttpResponse::_generateGenericErrorResponse(int errorCode, const char *errorMessage) {
@@ -412,14 +419,16 @@ void HttpResponse::_generateGenericErrorResponse(int errorCode, const char *erro
 	body << "<body><h1>";
 	body << errorCode << " " << errorMessage;
 	body << "</h1></body></html>";
-	
+
+	std::string str_body = body.str();
+
 	ss << "HTTP/1.1 " << errorCode << " " << errorMessage << "\r\n";
 	ss << _displayTimeStamp()<< "\r\n";
 	ss << "Content-Type: text/html\r\n";
-	ss << "Content-Length: " << body.gcount() << "\r\n";
+	ss << "Content-Length: " << str_body.size() << "\r\n";
 	ss << "\r\n";
 
-	_responseContent = ss.str() + body.str();
+	_responseContent = ss.str() + str_body;
 }
 
 std::string	HttpResponse::_displayTimeStamp(void) {

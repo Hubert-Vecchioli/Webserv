@@ -54,6 +54,6 @@ std::string	displayTimestampResponseFormat(void);
 void	print(int i, std::string message, int fd = -2);
 std::vector<std::string> tokenize(std::string s, char delimiter);
 void	modifyEpollCTL(int EpollFD, int listendFD, int epollAction, bool isReadyToSendResponse = false);
-void ft_stop_server(int signum);
+void 	ft_stop_server(int signum);
 
 #endif

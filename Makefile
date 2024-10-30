@@ -6,7 +6,7 @@
 
 NAME			= webserv
 CC 				= c++
-CFLAGS 			= -Wall -Werror -Wextra -Wshadow -Wno-shadow -std=c++98
+CFLAGS 			= -Wall -Werror -Wextra -Wshadow -Wno-shadow -std=c++98 -g3
 
 #******************************  SOURCE  *************************************#
 
