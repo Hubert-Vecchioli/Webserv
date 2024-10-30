@@ -5,6 +5,11 @@
 
 HttpRequest::HttpRequest(Client *client, unsigned char *request, int requestSize) : _client(client) {
     std::string str_request((char *) request, requestSize);
+    if (str_request == "413")
+    {
+        _requestURI = "413";
+        return;
+    }
 	parseRequestLine(str_request);
     parseRequestHeader(str_request);
     getCGIExtension();

@@ -129,7 +129,7 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 {
 	try
 	{
-		if((epollEvents.events & (EPOLLHUP | EPOLLERR | EPOLLRDHUP)) && this->_getNumberClientsConnected() <= MAX_CLIENT_NUMBER) 
+		if((epollEvents.events & (EPOLLHUP | EPOLLERR | EPOLLRDHUP)) && this->_getNumberClientsConnected() <= MAX_CLIENT_NUMBER)
 			this->_disconnectClient(epollEvents.data.fd);
 		if (epollEvents.events & EPOLLIN)
 		{
@@ -158,14 +158,16 @@ void Server::_sendRequest(int fd)
 	print(1, "[Info] - Sending response to Client FD : ", fd);
 	HttpResponse *response = HttpRequest::findInstanceWithFD(this->_requests, fd)->getResponse();
 	int sizeHTTPResponseSent = send(fd, response->getResponseContent().c_str(), response->getResponseContent().size(), 0);// For info, send is equivalent to write as I am not using any flag
-	// std::cout<< "Response"<< response->getResponseContent().c_str()<< std::endl;
 	if(sizeHTTPResponseSent == 0 && response->getResponseContent().size() > 0)
 		this->_disconnectClient(fd);
 	if(sizeHTTPResponseSent < 0)
 		throw FailureToSendData();
+	//std::cout<< "request: "<< response->getResponseContent().c_str()<<std::endl;
 	modifyEpollCTL(this->_serverFD, fd, EPOLL_CTL_MOD, false);
 	print(1, "[Info] - Response successfully sent to Client FD : ", fd);
 	response->setResponseStatustoTrue();
+	if (HttpRequest::findInstanceWithFD(this->_requests, fd)->getRequestURI() == "413")
+		this->_disconnectClient(fd);
 }
 
 void Server::_receiveRequest(int fd)
@@ -197,11 +199,21 @@ void Server::_receiveRequest(int fd)
 
     if (contentLengthPos != std::string::npos) {
         contentLength = atoi(header.substr(contentLengthPos + 16).c_str());
-		if(contentLength > 1165145600)
+		if(contentLength > (int)this->getConfigurationFile().getBody_size())
 		{
 			delete[] rawHTTPRequest;
-			this->_disconnectClient(fd);
-        	throw ExcessiveFileSize();
+			unsigned char error[4];
+			error[0] = '4';
+			error[1] = '1';
+			error[2] = '3';
+			error[3] = 0;
+			HttpRequest* request = new HttpRequest(clientSendingARequest, error, 3);
+			HttpResponse* response = new HttpResponse(*this, *request);
+			request->setResponse(response);
+			this->_requests.push_back(request);
+			print(1, "[Info] - Excessive file size");
+			modifyEpollCTL(this->_serverFD, fd, EPOLL_CTL_MOD, true);
+        	return;
 		}
     }
     if (isOctetStream && contentLength > 0)
@@ -350,9 +362,4 @@ const char* Server::FailureToReceiveData::what() const throw()
 const char* Server::FailureToSendData::what() const throw()
 {
 	return ("[Error] - The function send() failed");
-}
-
-const char* Server::ExcessiveFileSize::what() const throw()
-{
-	return ("[Error] - The file sent is excessively large");
 }

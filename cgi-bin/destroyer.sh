@@ -12,10 +12,10 @@ case "$selected_file" in
     filepath="http://127.0.0.1:8080/destroy/fileok2.txt"
     ;;
   "filenok1")
-    filepath="http://127.0.0.1:8080/destroy/filenok1.txt"
+    filepath="http://127.0.0.1:8080/notdestroy/filenok1.txt"
     ;;
   "filenok2")
-    filepath="http://127.0.0.1:8080/destroy/filenok2.txt"
+    filepath="http://127.0.0.1:8080/notdestroy/filenok2.txt"
     ;;
 esac
 

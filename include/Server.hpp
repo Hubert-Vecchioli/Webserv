@@ -22,7 +22,7 @@ class Server
 		std::vector<Client*>		_clients;
 		std::vector<HttpRequest*>	_requests;
 
-		Server(void) : _configurationFile(0), _isServerGreenlighted(false), _serverFD(-1) {}
+		Server(void) : _configurationFile(0), _isServerGreenlighted(false), _serverFD(-1), _numberClientsConnected(0) { this->_uniqueInstance = NULL; }
 		Server(Server const & rhs);
 		Server &operator=(Server const & rhs);
 
@@ -41,7 +41,10 @@ class Server
 	public:
 		static Server &getInstance(void) {
 			if (!_uniqueInstance)
-				_uniqueInstance = new Server();
+			{
+				Server* tmp = new Server();
+				_uniqueInstance = tmp;
+			}
 			return *_uniqueInstance;
 		}
 		~Server(void);
@@ -94,11 +97,7 @@ class Server
 			public:
 				virtual const char* what() const throw();
 		};
-		class ExcessiveFileSize : public std::exception
-		{
-			public:
-				virtual const char* what() const throw();
-		};
+
 };
 
 #endif
