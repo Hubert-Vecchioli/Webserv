@@ -14,8 +14,8 @@ server {
     index index.html;
     cgi_extension .py /usr/bin/python3;
     cgi_extension .sh /usr/bin/bash;
-    dirlisting off;
-    methods GET POST;
+    dirlisting on;
+    methods GET POST DELETE;
     }
 
     location /farfadet {
@@ -27,9 +27,19 @@ server {
 server {
     listen 127.0.0.8 8080;
     server_name 127.0.0.8:8080;
+    error_page 404 ./web/error404.html;
 
     location / {
-    root ./upload;
+    root ./web; 
+    index index.html;
+    cgi_extension .py /usr/bin/python3;
+    cgi_extension .sh /usr/bin/bash;
+    dirlisting off;
+    methods GET POST;
+    }
+
+    location /upload {
+    root .;
     dirlisting on;
     }
 }

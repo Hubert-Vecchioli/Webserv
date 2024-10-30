@@ -73,8 +73,8 @@ void CgiHandler::executeCgi(HttpResponse const &response) {
 	pid = fork();
 	if (pid < 0) {
 		_status = 500;
-		delete[] envp;
-		delete[] argv;
+		_freeTab(envp);
+		_freeTab(argv);
 		throw std::runtime_error("Fork failed");
 	}
 	else if (pid == 0)
@@ -84,13 +84,22 @@ void CgiHandler::executeCgi(HttpResponse const &response) {
 			execParent(fd, fdpost, response.getRequest().getBody());
 		}
 		catch (std::exception &e) {
-			delete[] envp;
-			delete[] argv;
+			_freeTab(envp);
+			_freeTab(argv);
 			throw e;
 		}
 	_status = 200;
-	delete[] envp;
-	delete[] argv;
+	_freeTab(envp);
+	_freeTab(argv);
+}
+
+void CgiHandler::_freeTab(char **tab) {
+    if (tab) {
+        for (int i = 0; tab[i]; ++i) {
+            free(tab[i]);
+        }
+        delete[] tab;
+    }
 }
 
 static void timeoutHandler(int sig) {
