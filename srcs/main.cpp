@@ -1,28 +1,27 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/27 16:23:30 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/25 14:26:55 by hvecchio         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "webserv.hpp"
 
 int main(int ac, char **av)
 {
 	Server &server  = Server::getInstance();
-
-	// server->getInstance();
 	signal(SIGINT, ft_stop_server);
 	try
 	{
-		ConfigurationFile config = ConfigurationFile(ac, av);// load & parse a config file OR load default config - and its respective cout message
-		
-		// unsigned long body = config.getBody_size();
+		ConfigurationFile config = ConfigurationFile(ac, av);
+		server.startServer(&config);
+		server.runServer();
+	}
+	catch (std::exception & e)
+	{
+		print(2, e.what());
+		return (1);
+	}
+	server.cleanup();
+	delete &Server::getInstance();
+	print(1, "[Info] - Webserv is now stopped");
+	return (0);
+}
+
+// unsigned long body = config.getBody_size();
 		// std::string user = config.getUser();
 		// std::string error = config.getError_log();
 		// std::cout << body << " " << user << " " << error << std::endl;
@@ -67,16 +66,3 @@ int main(int ac, char **av)
 		// 	}
 		// }
 		// std::cout << "-------------------" << std::endl;
-		server.startServer(&config); //Should I add the config object as an argument of initiate?
-		server.runServer();
-	}
-	catch (std::exception & e)
-	{
-		print(2, e.what());
-		return (1);
-	}
-	server.cleanup();
-	delete &Server::getInstance();
-	print(1, "[Info] - Webserv is now stopped");
-	return (0);
-}

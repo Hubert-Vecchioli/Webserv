@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/27 16:31:05 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/29 18:20:30 by hvecchio         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "webserv.hpp"
 
@@ -36,7 +25,6 @@ void Server::cleanup(void)
 		delete (*it);
 	}
 	this->_clients.clear();
-	//delete _uniqueInstance;
 }
 
 Server::~Server()
@@ -66,7 +54,6 @@ void Server::startServer(ConfigurationFile * configurationFile)
 void Server::stopServer(void)
 {
 	Server::getInstance()._isServerGreenlighted = false;
-	//_isServerGreenlighted = false;
 }
 
 void Server::runServer(void)
@@ -94,7 +81,6 @@ void Server::runServer(void)
 	}
 	catch(const std::exception& e)
 	{
-		std::cout<< "A1"<<std::endl;
 		print(2, e.what());
 	}
 }
@@ -113,7 +99,6 @@ void Server::_reviewRequestsCompleted(void)
 			}
 			catch(const std::exception& e)
 			{
-				std::cout<< "A2"<<std::endl;
 				print(2, e.what());
 			}
 			break;
@@ -121,7 +106,6 @@ void Server::_reviewRequestsCompleted(void)
 	}
 }
 
-//the function below has an ugly use of exceptions, stucture to be reviewed
 void Server::_reviewClientsHaveNoTimeout(void)
 {
 	std::vector<Client*> clientsCopy = this->_clients;
@@ -135,7 +119,6 @@ void Server::_reviewClientsHaveNoTimeout(void)
 			}
 			catch(const std::exception& e)
 			{
-				std::cout<< "A3"<<std::endl;
 				print(2, e.what());
 			}
 		}	
@@ -146,8 +129,8 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 {
 	try
 	{
-		if(epollEvents.events & (EPOLLHUP | EPOLLERR | EPOLLRDHUP)) 
-			this->_disconnectClient(epollEvents.data.fd);// Stop listening to this client
+		if((epollEvents.events & (EPOLLHUP | EPOLLERR | EPOLLRDHUP)) && this->_getNumberClientsConnected() <= MAX_CLIENT_NUMBER) 
+			this->_disconnectClient(epollEvents.data.fd);
 		if (epollEvents.events & EPOLLIN)
 		{
 			if (Client::findInstanceWithFD(this->_clients, epollEvents.data.fd))
@@ -159,14 +142,12 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 		{
 			if(HttpRequest::findInstanceWithFD(this->_requests, epollEvents.data.fd) && !HttpRequest::findInstanceWithFD(this->_requests, epollEvents.data.fd)->getResponse()->getResponseStatus())
 			{
-				std::cout<< "-done"<<std::endl;
 				this->_sendRequest(epollEvents.data.fd);
 			}	
 		}
 	}
 	catch(const std::exception& e)
 	{
-		std::cout<< "A4"<<std::endl;
 		print(2, e.what());
 	}
 }
@@ -174,15 +155,12 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 void Server::_sendRequest(int fd)
 {
 	Client::findInstanceWithFD(this->_clients, fd)->updateLastActionTimeStamp();
-	std::cout<< "_sendRequest 1 "<<std::endl;
 	print(1, "[Info] - Sending response to Client FD : ", fd);
-	std::cout<< "_sendRequest 2 "<<std::endl;
 	HttpResponse *response = HttpRequest::findInstanceWithFD(this->_requests, fd)->getResponse();
 	int sizeHTTPResponseSent = send(fd, response->getResponseContent().c_str(), response->getResponseContent().size(), 0);// For info, send is equivalent to write as I am not using any flag
-	std::cout<< "_sendRequest 3 "<<std::endl;
+	// std::cout<< "Response"<< response->getResponseContent().c_str()<< std::endl;
 	if(sizeHTTPResponseSent == 0 && response->getResponseContent().size() > 0)
 		this->_disconnectClient(fd);
-	std::cout<< "_sendRequest 4 "<<std::endl;
 	if(sizeHTTPResponseSent < 0)
 		throw FailureToSendData();
 	modifyEpollCTL(this->_serverFD, fd, EPOLL_CTL_MOD, false);
@@ -192,7 +170,6 @@ void Server::_sendRequest(int fd)
 
 void Server::_receiveRequest(int fd)
 {
-// Empêcher les requêtes simultanées d'un même fd
     Client* clientSendingARequest = Client::findInstanceWithFD(this->_clients, fd);
     clientSendingARequest->updateLastActionTimeStamp();
     print(1, "[Info] - Receiving request from Client FD : ", fd);
@@ -220,7 +197,7 @@ void Server::_receiveRequest(int fd)
 
     if (contentLengthPos != std::string::npos) {
         contentLength = atoi(header.substr(contentLengthPos + 16).c_str());
-		if(contentLength > 616514560)
+		if(contentLength > 1165145600)
 		{
 			delete[] rawHTTPRequest;
 			this->_disconnectClient(fd);
@@ -240,14 +217,14 @@ void Server::_receiveRequest(int fd)
                 return;
             }
             sizeHTTPRequest += bytesReceived;
-            tempBuffer = new unsigned char[sizeHTTPRequest + 2*MAX_REQUEST_SIZE + 1]; // Redimensionner
+            tempBuffer = new unsigned char[sizeHTTPRequest + 3*MAX_REQUEST_SIZE + 1]; // Redimensionner
 			std::copy(rawHTTPRequest, rawHTTPRequest + sizeHTTPRequest, tempBuffer);
 			delete[] rawHTTPRequest; 
 			rawHTTPRequest = tempBuffer;
         }
         rawHTTPRequest[sizeHTTPRequest] = 0;
     }
-	std::cout<< rawHTTPRequest<<std::endl;
+	// std::cout<< rawHTTPRequest<<std::endl;
     HttpRequest* request = new HttpRequest(clientSendingARequest, rawHTTPRequest, sizeHTTPRequest);
     HttpResponse* response = new HttpResponse(*this, *request);
     request->setResponse(response);
@@ -256,14 +233,12 @@ void Server::_receiveRequest(int fd)
     print(1, "[Info] - Request successfully received from Client FD : ", fd);
     modifyEpollCTL(this->_serverFD, fd, EPOLL_CTL_MOD, true);
     
-    // Libération de la mémoire allouée pour rawHTTPRequest
     delete[] rawHTTPRequest;
 }
 
 void Server::_addNewClient(int listenedFD)
 {
-	// TODO: check the nb of clients
-	struct sockaddr	sockAddr; // because it is an IPV4
+	struct sockaddr	sockAddr;
 	socklen_t addrLen = sizeof(sockAddr);
 	int clientFD = accept(listenedFD, &sockAddr, &addrLen);
 	if(clientFD == -1)
@@ -274,6 +249,7 @@ void Server::_addNewClient(int listenedFD)
 	modifyEpollCTL(this->_serverFD, clientFD, EPOLL_CTL_ADD);
 	displayTimestamp();
 	std::cout << "[Info] - New client added (connecting to FD " << listenedFD << ", accepted on the FD: "<< clientFD << " )" << std::endl;
+	this->_addClientToServer();
 }
 
 void Server::_disconnectClient(int listenedFD)
@@ -296,6 +272,7 @@ void Server::_disconnectClient(int listenedFD)
             }
         }
 	}
+	this->_removeClientToServer();
 	//std::cout<<"[Error] - Client FD disconnected, associated client was erased fd: "<<listenedFD<< std::endl;
 	throw DisconnectedClientFDException();
 }
@@ -314,12 +291,25 @@ void Server::_deleteAssociatedRequests(int fdToDelete)
 			}
 			catch(const std::exception& e)
 			{
-				std::cout<< "A5"<<std::endl;
 				print(2, e.what());
 			}
 			break;
 		}	
 	}
+}
+
+int Server::_getNumberClientsConnected() const
+{
+	return _numberClientsConnected;
+}
+void Server::_addClientToServer() 
+{ 
+	this->_numberClientsConnected += 1;
+}
+
+void Server::_removeClientToServer() 
+{ 
+	this->_numberClientsConnected -= 1;
 }
 
 const char* Server::FailureInitiateEpollInstanceException::what() const throw()

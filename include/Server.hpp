@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/29 15:43:39 by hvecchio         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
@@ -28,6 +17,7 @@ class Server
 		ConfigurationFile*			_configurationFile;
 		bool 						_isServerGreenlighted;
 		int							_serverFD;
+		int							_numberClientsConnected;
 		std::vector<Socket*>		_sockets;
 		std::vector<Client*>		_clients;
 		std::vector<HttpRequest*>	_requests;
@@ -44,6 +34,9 @@ class Server
 		void _addNewClient(int listenedFD);
 		void _disconnectClient(int listenedFD);
 		void _deleteAssociatedRequests(int fdToDelete);
+		int  _getNumberClientsConnected() const;
+		void _addClientToServer();
+		void _removeClientToServer();
 
 	public:
 		static Server &getInstance(void) {
@@ -53,10 +46,10 @@ class Server
 		}
 		~Server(void);
 		
-		void startServer(ConfigurationFile * configurationFile);
-		void runServer(void);
-		static void stopServer(void);
-		void cleanup(void);
+		void 			startServer(ConfigurationFile * configurationFile);
+		void 			runServer(void);
+		static void 	stopServer(void);
+		void 			cleanup(void);
 		//ConfigurationFile &getConfigurationFile() {return _configurationFile;};
 
 		ConfigurationFile &getConfigurationFile(void) {return *_configurationFile;};
