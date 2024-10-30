@@ -28,9 +28,17 @@ void HttpResponse::_generateResponseContent(void)
 		}
 		_checkAllowedMethod();
 		if (!_request.getCGIType().empty()) {
-			CgiHandler cgi(*this);
-			_responseContent = cgi.getOutput();
-			return ;
+			try {
+				CgiHandler cgi(*this);
+				_responseContent = cgi.getOutput();
+				return ;
+			}
+			catch (int & e) {
+				if (e >= 500)
+					throw ServerError(e);
+				else
+					throw ClientError(e);
+			}
 		}
 		switch(_request.getMethod())
 		{
@@ -50,9 +58,8 @@ void HttpResponse::_generateResponseContent(void)
 	catch (HttpResponse::ClientError & e) {
 		return _generateErrorResponse(e.getErrorCode(), e.what());
 	}
-	catch (std::runtime_error & e) {
-		ServerError err(500);
-		return _generateErrorResponse(500, err.what());
+	catch (HttpResponse::ServerError & e) {
+		return _generateErrorResponse(e.getErrorCode(), e.what());
 	}
 }
 
