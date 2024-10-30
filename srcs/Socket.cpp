@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Socket.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/27 16:53:54 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/29 18:10:19 by hvecchio         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "webserv.hpp"
 
 Socket::Socket(void) : _fd(-1)
@@ -61,7 +49,6 @@ Socket::Socket(int fd, unsigned int port, std::string ip) : _ip(ip), _fd(fd), _p
 	}
 	catch (std::exception &e)
 	{
-		std::cout<< "A6"<<std::endl;
 		print(2, e.what());
 		if (this->_fd != -1)
 			close(this->_fd);

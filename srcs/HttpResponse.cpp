@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   HttpResponse.cpp                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/27 16:56:19 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/29 16:20:11 by hvecchio         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "webserv.hpp"
 
@@ -16,10 +5,12 @@ void HttpResponse::_generateResponseContent(void)
 {
 	//Check redirect and prepare the response
 	// TODO: add a pointer to HTTPrequest
+
 	if (_request.getHTTP() == false) {
 		ServerError error(505);
 		return _generateErrorResponse(505, error.what());
 	}
+
 	try
 	{
 		_fetchServerBlock();
@@ -154,7 +145,6 @@ void HttpResponse::_fetchGETResource(void) {
 		// 2/ est ce au je suis un dir? Si oui, est ce que j ai un index valide?
 		// 3/ est ce aue je peux dirlisting?
 		if (S_ISDIR(st.st_mode) || uri_no_query == "/") {
-			std::cout << "ISDIR" << std::endl;
 			_fetchDirectoryRessource(path);
 			return ;
 		}
@@ -314,6 +304,7 @@ bool HttpResponse::_checkAcceptedFormat(std::string path) {
 
 void HttpResponse::_generateDELResponse(void)
 {
+	std::cout<<"i am here!!!!"<<std::endl;
 	std::string uri_no_query = _request.getRequestURI();
 	
 	size_t pos = uri_no_query.find('?');

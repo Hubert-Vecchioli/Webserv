@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   HttpRequest.cpp                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jblaye <jblaye@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/27 16:54:18 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/29 17:48:55 by jblaye           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "webserv.hpp"
 
@@ -100,7 +89,6 @@ void HttpRequest::parseRequestHeader(std::string request) {
         _content_len = atol(len.c_str());
 		parseConnection(request);
 		parseCookie(request);
-        std::cout << "COOKIE PARSE REQUEST HEADER = " << _cookieString;
 }
 
 void HttpRequest::parseRequestBody(std::string request) {
