@@ -14,7 +14,7 @@ server {
     index index.html;
     cgi_extension .py /usr/bin/python3;
     cgi_extension .sh /usr/bin/bash;
-    dirlisting on;
+    dirlisting off;
     methods GET POST;
     }
 
@@ -22,31 +22,15 @@ server {
     redirect 301 https://www.rickroll.com;
     }
 
-    location /photos/chien {
-    methods POST DELETE GET;
-    index doggo.html;
-    root /var/www/;
-    upload_path /var/www/photos/uploads;
-    }
 }
 
 server {
     listen 127.0.0.8 8080;
-    server_name admin.ebesnoin.com admin.ebesnoin.fr;
-    error_page 404 504 418 error404.html;
+    server_name 127.0.0.8:8080;
 
-    location /  {
-    root /home/ebesnoin/Documents/Webserv/web/;
-    index index.html;
-    dirlisting off;
-    methods GET POST;
-    }
-
-    location /friends/chat/ {
-    index home.py;
-    cgi_extension .py /usr/bin/python3;
-    cgi_extension .php /usr/bin/php-cgi;
-    root /var/www/chatting;
+    location / {
+    root ./upload;
+    dirlisting on;
     }
 }
 
