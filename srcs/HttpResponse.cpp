@@ -50,6 +50,10 @@ void HttpResponse::_generateResponseContent(void)
 	catch (HttpResponse::ClientError & e) {
 		return _generateErrorResponse(e.getErrorCode(), e.what());
 	}
+	catch (std::runtime_error & e) {
+		ServerError err(500);
+		return _generateErrorResponse(500, err.what());
+	}
 }
 
 void	HttpResponse::_fetchServerBlock(void) {
