@@ -83,7 +83,7 @@ void CgiHandler::executeCgi(HttpResponse const &response) {
 		try {
 			execParent(fd, fdpost, response.getRequest().getBody());
 		}
-		catch (std::exception &e) {
+		catch (std::runtime_error &e) {
 			_freeTab(envp);
 			_freeTab(argv);
 			throw e;
@@ -143,7 +143,7 @@ void CgiHandler::execParent(int fd[2], int fdpost[2], std::string body) {
 	close(fdpost[0]);
 	close(fd[1]);
 	signal(SIGALRM, timeoutHandler);
-	alarm(5);
+	alarm(REQUEST_TIMEOUT_LIMIT_SEC);
 
 	int status;
 	if (-1 == write(fdpost[1], body.c_str(), body.size())) {

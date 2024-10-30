@@ -42,7 +42,7 @@
 #define MAX_EVENTS 50 // to be increassed later on
 #define EPOLL_MAX_WAIT_TIME_MS 1000 // to be modified later on
 #define CLIENT_TIMEOUT_LIMIT_SEC 120
-#define REQUEST_TIMEOUT_LIMIT_SEC 20
+#define REQUEST_TIMEOUT_LIMIT_SEC 5
 #define MAX_REQUEST_SIZE 50000
 #define	MAX_URI_SIZE 65536
 #define	FILE_CHUNK_THRESHOLD 163840 // randomly chose 5120 * 2^5
