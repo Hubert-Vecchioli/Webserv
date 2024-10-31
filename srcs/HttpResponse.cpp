@@ -370,6 +370,9 @@ void HttpResponse::_generatePOSTResponse(void)
 }
 
 std::string HttpResponse::_uploadFile(void) {
+	
+	if(_location_block->getUploadPath().empty())
+		throw ServerError(501);
 	std::string uri = _request.getRequestURI();
 	size_t pos = uri.find('?');
 	size_t pos2 = uri.find('=');
@@ -382,7 +385,8 @@ std::string HttpResponse::_uploadFile(void) {
 	else if (uri.size() == 0)
 		throw ClientError(400);
 	
-	std::string path = "."+_location_block->getUploadPath() + uri+"/" + filename;
+	std::string path = _location_block->getUploadPath() +"/" + filename;
+
 	std::ofstream file;
 	file.open(path.c_str(), std::ofstream::out | std::ofstream::trunc);
 	if (!file.is_open())

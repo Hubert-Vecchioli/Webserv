@@ -12,7 +12,8 @@ server {
     index index.html;
     cgi_extension .py /usr/bin/python3;
     cgi_extension .sh /usr/bin/bash;
-    dirlisting on;
+    dirlisting off;
+    upload_path ./web/upload;
     methods GET POST DELETE;
     }
 
@@ -37,7 +38,7 @@ server {
     }
 
     location /upload {
-    root .;
+    root ./web;
     dirlisting on;
     }
 }
