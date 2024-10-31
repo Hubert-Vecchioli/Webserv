@@ -145,11 +145,16 @@ void Server::_triageEpollEvents(epoll_event & epollEvents)
 			}	
 		}
 	}
-	catch(const std::exception& e)
+	catch(const std::bad_alloc& e)
 	{
 		Server::stopServer();
 		print(2, e.what());
 	}
+	catch(const std::exception& e)
+	{
+		print(2, e.what());
+	}
+
 }
 
 void Server::_sendRequest(int fd)
