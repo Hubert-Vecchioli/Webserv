@@ -304,7 +304,6 @@ cat << PP > ${color}.css
 </html>
 PP
 
-$len = wc -c ${color}.css
 echo -n "Content-Length: $(stat -c%s "${color}.css")" 
 echo -e "\r\n\r\n"
 cat ${color}.css
