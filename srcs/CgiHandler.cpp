@@ -55,27 +55,33 @@ void CgiHandler::executeCgi(HttpResponse const &response) {
 	std::map<std::string, std::string> cgiExtension = response.getLocationBlock().getCgiExtension();
 	if (exec_cgi.empty()) {
 		_status = 501;
-		throw std::runtime_error("Unrecognized CGI extension");
+		throw _status;
 		return;
 	}
+	std::ifstream file(cgi_fullpath.c_str());
+	if (!file.is_open()) {
+		_status = 404;
+		throw _status;
+	}
+	file.close();
 	int fd[2];
 	if (pipe(fd) == -1) {
 		_status = 500;
-		throw std::runtime_error("Pipe failed");
+		throw _status;
 	}
 	int fdpost[2];
 	if (pipe(fdpost) == -1) {
 		_status = 500;
-		throw std::runtime_error("Pipe failed");
+		throw _status;
 	}
 	char **argv = convertArgs(cgi_fullpath, exec_cgi);
 	char **envp = convertEnv();
 	pid = fork();
 	if (pid < 0) {
 		_status = 500;
-		delete[] envp;
-		delete[] argv;
-		throw std::runtime_error("Fork failed");
+		_freeTab(envp);
+		_freeTab(argv);
+		throw _status;
 	}
 	else if (pid == 0)
 		execChild(argv, envp, fd, fdpost);
@@ -83,14 +89,23 @@ void CgiHandler::executeCgi(HttpResponse const &response) {
 		try {
 			execParent(fd, fdpost, response.getRequest().getBody());
 		}
-		catch (std::exception &e) {
-			delete[] envp;
-			delete[] argv;
+		catch (int &e) {
+			_freeTab(envp);
+			_freeTab(argv);
 			throw e;
 		}
 	_status = 200;
-	delete[] envp;
-	delete[] argv;
+	_freeTab(envp);
+	_freeTab(argv);
+}
+
+void CgiHandler::_freeTab(char **tab) {
+    if (tab) {
+        for (int i = 0; tab[i]; ++i) {
+            free(tab[i]);
+        }
+        delete[] tab;
+    }
 }
 
 static void timeoutHandler(int sig) {
@@ -134,7 +149,7 @@ void CgiHandler::execParent(int fd[2], int fdpost[2], std::string body) {
 	close(fdpost[0]);
 	close(fd[1]);
 	signal(SIGALRM, timeoutHandler);
-	alarm(5);
+	alarm(REQUEST_TIMEOUT_LIMIT_SEC);
 
 	int status;
 	if (-1 == write(fdpost[1], body.c_str(), body.size())) {
@@ -142,7 +157,7 @@ void CgiHandler::execParent(int fd[2], int fdpost[2], std::string body) {
 		close(fd[0]);
 		_status = 500;
 		kill(pid, SIGKILL);
-		throw std::runtime_error("Write failed");
+		throw _status;
 	}
 	close(fdpost[1]);
 	pid_t result = waitpid(pid, &status, 0);
@@ -151,17 +166,17 @@ void CgiHandler::execParent(int fd[2], int fdpost[2], std::string body) {
 	if (result == -1) {
 		close(fd[0]);
 		_status = 500;
-		throw std::runtime_error("Waitpid failed");
+		throw _status;
 	}	
 	else if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
 		close(fd[0]);
 		_status = 500;
-		throw std::runtime_error("CGI Failed to execute properly");
+		throw _status;
 	}
 	else if (WIFSIGNALED(status)) {
 		close(fd[0]);
 		_status = 504;
-		throw std::runtime_error("CGI Timeout");
+		throw _status;
 	}
 	
 	int i = 0;

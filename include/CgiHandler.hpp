@@ -26,6 +26,7 @@ class CgiHandler
 		void execParent(int fd[2], int fdpost[2], std::string body);
 		char **convertEnv();
 		char **convertArgs(std::string cgi_fullpath, std::string exec_cgi);
+		void _freeTab(char **tab);
 
 		template <typename T>
 		std::string ft_toString(const T &value) {

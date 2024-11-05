@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hvecchio <hvecchio@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/27 16:31:07 by hvecchio          #+#    #+#             */
-/*   Updated: 2024/10/29 15:43:39 by hvecchio         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
@@ -28,11 +17,12 @@ class Server
 		ConfigurationFile*			_configurationFile;
 		bool 						_isServerGreenlighted;
 		int							_serverFD;
+		int							_numberClientsConnected;
 		std::vector<Socket*>		_sockets;
 		std::vector<Client*>		_clients;
 		std::vector<HttpRequest*>	_requests;
 
-		Server(void) : _configurationFile(0), _isServerGreenlighted(false), _serverFD(-1) {}
+		Server(void) : _configurationFile(0), _isServerGreenlighted(false), _serverFD(-1), _numberClientsConnected(0) { this->_uniqueInstance = NULL; }
 		Server(Server const & rhs);
 		Server &operator=(Server const & rhs);
 
@@ -44,19 +34,25 @@ class Server
 		void _addNewClient(int listenedFD);
 		void _disconnectClient(int listenedFD);
 		void _deleteAssociatedRequests(int fdToDelete);
+		int  _getNumberClientsConnected() const;
+		void _addClientToServer();
+		void _removeClientToServer();
 
 	public:
 		static Server &getInstance(void) {
 			if (!_uniqueInstance)
-				_uniqueInstance = new Server();
+			{
+				Server* tmp = new Server();
+				_uniqueInstance = tmp;
+			}
 			return *_uniqueInstance;
 		}
 		~Server(void);
 		
-		void startServer(ConfigurationFile * configurationFile);
-		void runServer(void);
-		static void stopServer(void);
-		void cleanup(void);
+		void 			startServer(ConfigurationFile * configurationFile);
+		void 			runServer(void);
+		static void 	stopServer(void);
+		void 			cleanup(void);
 		//ConfigurationFile &getConfigurationFile() {return _configurationFile;};
 
 		ConfigurationFile &getConfigurationFile(void) {return *_configurationFile;};
@@ -101,11 +97,7 @@ class Server
 			public:
 				virtual const char* what() const throw();
 		};
-		class ExcessiveFileSize : public std::exception
-		{
-			public:
-				virtual const char* what() const throw();
-		};
+
 };
 
 #endif
