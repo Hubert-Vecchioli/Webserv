@@ -62,3 +62,6 @@ server {
 - **HTTP Methods**: Supports `GET`, `POST`, and `DELETE` requests.
 - **CGI Management**: Executes CGI scripts in Python and Bash.
 - **Cookie Handling**: Manages cookies within HTTP requests.
+
+## Grade
+125%
