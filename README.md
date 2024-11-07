@@ -2,7 +2,7 @@
 
 ## Compilation
 - **Standard Compilation**: Run `make` to compile the web server.
-- This webserver runs on Linux, else use the Dockerfile.
+- This webserver runs on Linux.
 
 ## Test Site
 Access a test site locally after stating the executable `./webserv config.yaml` at : [http://127.0.0.1:8080](http://127.0.0.1:8080).
